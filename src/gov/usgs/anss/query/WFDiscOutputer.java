@@ -16,10 +16,11 @@ import java.io.IOException;
 import java.io.FileNotFoundException;
 
 import java.util.ArrayList;
-import gov.usgs.anss.util.*;
+//import gov.usgs.anss.util.*;
 import gov.usgs.anss.edge.RawDisk;
 import gov.usgs.anss.seed.*;
 import gov.usgs.anss.util.Complex;
+import gov.usgs.anss.util.PNZ;
 
 /**
  *
@@ -79,7 +80,7 @@ public class WFDiscOutputer extends Outputer {
             if (args[i].equals("-sacpz")) {
                 pzunit = args[i + 1];
                 if (!args[i + 1].equalsIgnoreCase("nm") && !args[i + 1].equalsIgnoreCase("um")) {
-                    Util.prt("   ****** -sacpz units must be either um or nm switch values is " + args[i + 1]);
+                    System.out.println("   ****** -sacpz units must be either um or nm switch values is " + args[i + 1]);
                     System.exit(0);
                 }
             }
@@ -97,11 +98,11 @@ public class WFDiscOutputer extends Outputer {
         // build the zero filled area (either with exact limits or with all blocks)
         ZeroFilledSpan span = new ZeroFilledSpan(blks, start, duration, fill);
         if (dbg) {
-            Util.prt("ZeroSpan=" + span.toString());
+            System.out.println("ZeroSpan=" + span.toString());
         }
         if (oneFile) {
             filename = EdgeQueryClient.makeFilename(filemask, lastComp, Util.stringToDate2(begin));
-            Util.prt("one file name=" + filename);
+            System.out.println("one file name=" + filename);
         } else {
             filename = filename.substring(2);
             filename = filename.replaceAll("[__]", "_");
@@ -155,7 +156,7 @@ public class WFDiscOutputer extends Outputer {
                     pf.setLength(fap.length());
                     pf.close();
                 } catch (IOException e) {
-                    Util.prt("IOExcept writing paf e=" + e);
+                    System.out.println("IOExcept writing paf e=" + e);
                 }
             }
         }
@@ -191,7 +192,7 @@ public class WFDiscOutputer extends Outputer {
                 firstCall = false;
 
             } catch (FileNotFoundException e) {
-                Util.prt("First file");
+                System.out.println("First file");
             }
         }
         for (int i = 0; i < span.getNsamp(); i++) {
@@ -241,7 +242,7 @@ public class WFDiscOutputer extends Outputer {
         }
         try {
             RawDisk wf = new RawDisk(filename.trim() + ".w", "rw");
-            Util.prt("add to waveform file=" + filename + " offset=" + startOffset + " len=" + bb.position());
+            System.out.println("add to waveform file=" + filename + " offset=" + startOffset + " len=" + bb.position());
             wf.seek(startOffset);
             wf.write(buf, 0, bb.position());
             wf.close();
@@ -251,9 +252,9 @@ public class WFDiscOutputer extends Outputer {
             wf.setLength(wfdisc.length());
             wf.close();
         } catch (FileNotFoundException e) {
-            Util.IOErrorPrint(e, "File not found opening " + filename);
+            System.err.println(e + "File not found opening " + filename);
         } catch (IOException e) {
-            Util.IOErrorPrint(e, "Writing file=" + filename);
+            System.err.println(e + " Writing file=" + filename);
         }
         // Now march through the data creating .w and .wfdisc records
 

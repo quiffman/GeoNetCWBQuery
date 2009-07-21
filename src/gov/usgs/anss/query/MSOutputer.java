@@ -13,8 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import gov.usgs.anss.edge.*;
-import gov.usgs.anss.util.*;
+//import gov.usgs.anss.util.*;
 
 /**
  *
@@ -63,7 +62,7 @@ public class MSOutputer extends Outputer {
         for (int i = 0; i < blks.size(); i++) {
             ms2 = (MiniSeed) blks.get(i);
             if (dbg) {
-                Util.prt("Out:" + ms2.getSeedName() + " " + ms2.getTimeString() +
+                System.out.println("Out:" + ms2.getSeedName() + " " + ms2.getTimeString() +
                         " ns=" + ms2.getNsamp() + " rt=" + ms2.getRate());
             }
             out.write(ms2.getBuf(), 0, ms2.getBlockSize());

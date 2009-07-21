@@ -8,7 +8,6 @@
  */
 package gov.usgs.anss.query;
 
-import gov.usgs.anss.edge.*;
 import java.util.GregorianCalendar;
 import java.util.Calendar;
 import java.text.DecimalFormat;
@@ -93,18 +92,18 @@ public class QueryRing extends ZeroFilledSpan {
      */
     public int getDataAt(GregorianCalendar starting, int nsamp, int[] d) {
         if (dbg) {
-            Util.prt("Ask for data at " + Util.ascdate(starting) + " " + Util.asctime2(starting) + " ns=" + nsamp + " start=" + Util.ascdate(start) + Util.asctime2(start));
+            System.out.println("Ask for data at " + Util.ascdate(starting) + " " + Util.asctime2(starting) + " ns=" + nsamp + " start=" + Util.ascdate(start) + Util.asctime2(start));
         }
         if (starting.compareTo(start) < 0 ||
                 ((long) (start.getTimeInMillis() + duration * 1000)) < ((long) (starting.getTimeInMillis() + nsamp / rate * 1000.))) {
             if (dbg) {
-                Util.prt("Data not in range buf start=" + Util.ascdate(start) + " " + Util.asctime2(start) + " dur=" + duration);
+                System.out.println("Data not in range buf start=" + Util.ascdate(start) + " " + Util.asctime2(start) + " dur=" + duration);
             }
             GregorianCalendar now = new GregorianCalendar();
             now.setTimeInMillis(starting.getTimeInMillis());
             now.add(Calendar.MILLISECOND, (int) (-preDuration * 1000.));
             if (dbg) {
-                Util.prt("Query for data start=" + Util.ascdate(now) + " " + Util.asctime2(now) + " predur=" + preDuration);
+                System.out.println("Query for data start=" + Util.ascdate(now) + " " + Util.asctime2(now) + " predur=" + preDuration);
             }
             args[8] = "" + now.get(Calendar.YEAR) + "," + now.get(Calendar.DAY_OF_YEAR) + "-" +
                     df2.format(now.get(Calendar.HOUR_OF_DAY)) + ":" + df2.format(now.get(Calendar.MINUTE)) +
@@ -122,6 +121,7 @@ public class QueryRing extends ZeroFilledSpan {
     /** test routine
      *@param args The args */
     public static void main(String[] args) {
+        // TODO not at all sure this will have any effect.
         Util.setModeGMT();
         QueryRing ring = new QueryRing("136.177.24.70", 2061, "USDUG  BHZ  ", new GregorianCalendar(2007, 0, 1, 0, 0, 0), 600., 30.);
         String[] args2 = new String[9];
@@ -143,14 +143,14 @@ public class QueryRing extends ZeroFilledSpan {
             int[] d2 = new int[4000];
             for (int i = 0; i < 86400; i = i + 10) {
                 if (i == 3510) {
-                    Util.prt("3510");
+                    System.out.println("3510");
                 }
-                Util.prt("i=" + i + " " + Util.ascdate(now) + " " + Util.asctime2(now));
+                System.out.println("i=" + i + " " + Util.ascdate(now) + " " + Util.asctime2(now));
                 int ns = ring.getDataAt(now, 4000, d);
                 int ns2 = span.getData(now, 4000, d2);
                 for (int j = 0; j < Math.min(ns2, ns); j++) {
                     if (d[j] != d2[j]) {
-                        Util.prt(j + " " + d[j] + "!=" + d2[j]);
+                        System.out.println(j + " " + d[j] + "!=" + d2[j]);
                     }
                 }
                 now.add(Calendar.MILLISECOND, 10000);

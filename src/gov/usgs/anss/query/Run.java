@@ -127,7 +127,7 @@ public class Run implements Comparable<Run> {
         }
         if (rate > 0. && ms.getRate() > 0. && nweird % 1000 == 0) {
             if (Math.abs(rate - ms.getRate()) / rate > 0.01) {
-                Util.prt("Run diff rates! " + seedname + " nw=" + (nweird++) +
+                System.out.println("Run diff rates! " + seedname + " nw=" + (nweird++) +
                         " exp=" + rate + " ms=" + ms.toString());
             }
         }

@@ -8,14 +8,12 @@
  */
 package gov.usgs.anss.query;
 
-import gov.usgs.anss.edge.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.net.ServerSocket;
-import java.lang.reflect.*;
 import gov.usgs.anss.seed.*;
 import gov.usgs.anss.util.*;
 
@@ -61,20 +59,20 @@ public class VMSServer extends Thread {
                 if (terminate) {
                     break;
                 }
-                Util.prt(Util.asctime() + " VSS: Open Port=" + port);
+                System.out.println(Util.asctime() + " VSS: Open Port=" + port);
                 d = new ServerSocket(port);
                 break;
             } catch (SocketException e) {
                 if (e.getMessage().equals("VSS:Address already in use")) {
                     try {
-                        Util.prt("VSS: Address in use - try again.");
+                        System.out.println("VSS: Address in use - try again.");
                         Thread.sleep(2000);
                         continue;
                     } catch (InterruptedException E) {
                         continue;
                     }
                 } else {
-                    Util.prt("VSS:Error opening TCP listen port =" + port + "-" + e.getMessage());
+                    System.out.println("VSS:Error opening TCP listen port =" + port + "-" + e.getMessage());
                     try {
                         Thread.sleep(2000);
                         continue;
@@ -83,7 +81,7 @@ public class VMSServer extends Thread {
                     }
                 }
             } catch (IOException e) {
-                Util.prt("VSS:ERror opening socket server=" + e.getMessage());
+                System.out.println("VSS:ERror opening socket server=" + e.getMessage());
                 try {
                     Thread.sleep(2000);
                     continue;
@@ -100,14 +98,14 @@ public class VMSServer extends Thread {
             }
             try {
                 Socket s = d.accept();
-                Util.prt("VSS: from " + s);
+                System.out.println("VSS: from " + s);
                 new VMSServerHandler(s);
             } catch (IOException e) {
-                Util.prt("VSS:receive through IO exception");
+                System.out.println("VSS:receive through IO exception");
             }
         }       // end of infinite loop (while(true))
-        //Util.prt("Exiting VMSServers run()!! should never happen!****\n");
-        Util.prt("VSS:read loop terminated");
+        //System.out.println("Exiting VMSServers run()!! should never happen!****\n");
+        System.out.println("VSS:read loop terminated");
     }
 
     private class ShutdownVMSServer extends Thread {
@@ -121,10 +119,10 @@ public class VMSServer extends Thread {
         public void run() {
             terminate = true;
             interrupt();
-            Util.prta("VSS: Shutdown started");
+            System.out.println("VSS: Shutdown started");
             int nloop = 0;
 
-            Util.prta("VSS:Shutdown Done. Client");
+            System.out.println("VSS:Shutdown Done. Client");
 
         }
     }
@@ -139,7 +137,7 @@ public class VMSServer extends Thread {
                 s.setSendBufferSize(512000);
                 //s.setTcpNoDelay(true);
             } catch (SocketException e) {
-                Util.prt("VSH: setSendBuffer problem=" + e.getMessage());
+                System.out.println("VSH: setSendBuffer problem=" + e.getMessage());
             }
             start();
         }
@@ -155,7 +153,7 @@ public class VMSServer extends Thread {
                 try {
                     int l = s.getInputStream().read(line, off, 1000 - off);
                     if (l < 0) {
-                        Util.prt("VSH: error getting command line abort");
+                        System.out.println("VSH: error getting command line abort");
                         return;
                     }
                     off += l;
@@ -167,7 +165,7 @@ public class VMSServer extends Thread {
                         }
                     }
                 } catch (IOException e) {
-                    Util.prt("VSH: IOexception reading command line- abort.");
+                    System.out.println("VSH: IOexception reading command line- abort.");
                     try {
                         s.close();
                     } catch (IOException e2) {
@@ -177,7 +175,7 @@ public class VMSServer extends Thread {
             }
 
             // The new line is found, parse the line!
-            Util.prta("VSH: Input command line=" + argline);
+            System.out.println("VSH: Input command line=" + argline);
             String[] args2 = argline.split(" ");
             String[] args = new String[args2.length];
 
@@ -228,7 +226,7 @@ public class VMSServer extends Thread {
             String begin = "";
             for (int i = 0; i < args.length; i++) {
                 sb.append(args[i] + " ");
-                //Util.prt("VSH: arg="+args[i]+"| i="+i);
+                //System.out.println("VSH: arg="+args[i]+"| i="+i);
                 if (args[i].equals("-s")) {
                     seedname = args[i + 1];
                 } else if (args[i].equals("-b")) {
@@ -243,7 +241,7 @@ public class VMSServer extends Thread {
                     littleEndian = true;
                 }
             }
-            Util.prta("VSH: VMS Query =" + sb.toString());
+            System.out.println("VSH: VMS Query =" + sb.toString());
             ArrayList<ArrayList<MiniSeed>> allBlks = EdgeQueryClient.query(args);
 
             try {
@@ -261,17 +259,17 @@ public class VMSServer extends Thread {
                         int NODATA = 2127000000;
                         ZeroFilledSpan span = new ZeroFilledSpan(blks, start, duration, NODATA);
                         if (dbg) {
-                            Util.prt("ZeroSpan=" + span.toString());
+                            System.out.println("ZeroSpan=" + span.toString());
                         }
                         int noval = span.getNMissingData();
                         int[] samples = span.getData();
                         int ipnt = 0;
                         byte[] buf = new byte[span.getNsamp() * 4];
                         ByteBuffer bb = ByteBuffer.wrap(buf);
-                        //Util.prt("bborder="+bb.order()+" ByteOrder.LITTLE="+ByteOrder.LITTLE_ENDIAN);
+                        //System.out.println("bborder="+bb.order()+" ByteOrder.LITTLE="+ByteOrder.LITTLE_ENDIAN);
                         if (littleEndian) {
                             bb.order(ByteOrder.LITTLE_ENDIAN);
-                            Util.prt("bborder=" + bb.order() + " ByteOrder.LITTLE=" + ByteOrder.LITTLE_ENDIAN);
+                            System.out.println("bborder=" + bb.order() + " ByteOrder.LITTLE=" + ByteOrder.LITTLE_ENDIAN);
                         }
                         long sum = 0;
                         for (int i = 0; i <= span.getNsamp(); i++) {
@@ -296,7 +294,7 @@ public class VMSServer extends Thread {
                                     bb.putInt(samples[k]);
                                 }
                                 out.write(bb.array(), 0, (i - ipnt) * 4);
-                                Util.prta("VSH: " + blks.get(0).getSeedName() + " " + now.get(Calendar.YEAR) + " " +
+                                System.out.println("VSH: " + blks.get(0).getSeedName() + " " + now.get(Calendar.YEAR) + " " +
                                         now.get(Calendar.DAY_OF_YEAR) + " " + now.get(Calendar.HOUR_OF_DAY) +
                                         ":" + now.get(Calendar.MINUTE) + ":" + now.get(Calendar.SECOND) + "." +
                                         now.get(Calendar.MILLISECOND) + " ns=" + (i - ipnt) + " sum=" + sum);
@@ -306,15 +304,15 @@ public class VMSServer extends Thread {
                     }
                 }
             } catch (IOException e) {
-                Util.SocketIOErrorPrint(e, "in VMSServerHandler - aborting");
+                System.err.println(e + "in VMSServerHandler - aborting");
             }
-            Util.prta("VSH: VMSServerHandler has exit on s=" + s);
+            System.out.println("VSH: VMSServerHandler has exit on s=" + s);
             if (s != null) {
                 if (!s.isClosed()) {
                     try {
                         s.close();
                     } catch (IOException e) {
-                        Util.prta("VSS: IOError closing socket");
+                        System.out.println("VSS: IOError closing socket");
                     }
                 }
             }
@@ -325,10 +323,15 @@ public class VMSServer extends Thread {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        Util.prt(Util.asctime());
+        System.out.println(Util.asctime());
+        //  TODO not sure if this has any effect.
         Util.setModeGMT();
-        Util.setNoInteractive(true);
-        Util.prt(Util.asctime());
+
+        // TODO - this would stop output on stderr if Util.prt was used
+        // needs to be considered for any logging.
+        // However, it seems very likely that we will remove this class.
+        //Util.setNoInteractive(true);
+        System.out.println(Util.asctime());
         //ServerThread server = new ServerThread(AnssPorts.PROCESS_SERVER_PORT, false);
 
         int port = 7777;
@@ -339,8 +342,8 @@ public class VMSServer extends Thread {
                 port = Integer.parseInt(args[i + 1]);
             }
             if (args[i].equals("-?") || args[i].indexOf("help") > 0) {
-                Util.prt("-p nnnn Set port name to something other than 7984");
-                Util.prt("-?            Print this message");
+                System.out.println("-p nnnn Set port name to something other than 7984");
+                System.out.println("-?            Print this message");
                 System.exit(0);
             }
         }

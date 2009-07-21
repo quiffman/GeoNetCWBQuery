@@ -8,11 +8,9 @@
  */
 package gov.usgs.anss.query;
 
-import gov.usgs.anss.edge.*;
 import java.util.ArrayList;
 import java.io.IOException;
 import gov.usgs.anss.seed.MiniSeed;
-import gov.usgs.anss.util.*;
 
 /**
  *

@@ -7,19 +7,9 @@
  * and open the template in the editor.
  */
 package gov.usgs.anss.query;
-//import java.util.GregorianCalendar;
-//import java.util.Calendar;
 import java.io.IOException;
-//import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-//import java.io.BufferedReader;
-//import java.io.StringReader;
-//import java.util.ArrayList;
-//import java.util.Date;
-//import java.nio.ByteOrder;
-import gov.usgs.anss.edge.*;
-import gov.usgs.anss.util.*;
-//import gov.usgs.anss.seed.*;
+import gov.usgs.anss.util.StaSrv;
 
 /**
  *
@@ -49,7 +39,7 @@ public class SacPZ {
         int loop = 0;
         while (s.indexOf("MetaDataServer not up") >= 0) {
             if (loop++ % 15 == 1) {
-                Util.prta("MetaDataServer is not up - waiting for connection");
+                System.out.println("MetaDataServer is not up - waiting for connection");
             }
             try {
                 Thread.sleep(2000);
@@ -82,7 +72,7 @@ public class SacPZ {
             fout.write(s);
             fout.close();
         } catch (IOException e) {
-            Util.prta("OUtput error writing sac response file " + filename + ".resp e=" + e.getMessage());
+            System.out.println("OUtput error writing sac response file " + filename + ".resp e=" + e.getMessage());
         }
     }
 }

@@ -15,7 +15,7 @@ import java.net.*;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import gov.usgs.anss.edge.*;
-import gov.usgs.anss.util.*;
+//import gov.usgs.anss.util.*;
 
 /**
  * This outputer just sends the blocks to the TCP/IP based holdings server.  The user
@@ -52,7 +52,7 @@ public class HoldingOutputer extends Outputer {
             try {
                 hs = new HoldingSender("-h " + holdingIP + " -p " + holdingPort + " -t " + holdingType + " -q 10000 -tcp", "");
             } catch (UnknownHostException e) {
-                Util.prt("Unknown host exception host=" + holdingIP);
+                System.out.println("Unknown host exception host=" + holdingIP);
                 System.exit(1);
             }
         }

@@ -15,7 +15,7 @@ import java.io.FileNotFoundException;
 import java.io.BufferedReader;
 import java.io.StringReader;
 import java.util.ArrayList;
-import gov.usgs.anss.util.*;
+import gov.usgs.anss.util.PNZ;
 import gov.usgs.anss.seed.*;
 import edu.sc.seis.TauP.SacTimeSeries;
 
@@ -94,12 +94,12 @@ public class SacOutputer extends Outputer {
             return;         // There is no real data to put in SAC
         }
         if (dbg) {
-            Util.prt("ZeroSpan=" + span.toString());
+            System.out.println("ZeroSpan=" + span.toString());
         }
         int noval = span.getNMissingData();
 
         if (nogaps && span.hasGapsBeforeEnd()) {
-            Util.prt("  ** " + lastComp + " has gaps - discarded # missing =" + noval);
+            System.out.println("  ** " + lastComp + " has gaps - discarded # missing =" + noval);
             return;
         }
         if (filemask.equals("%N")) {
@@ -136,7 +136,7 @@ public class SacOutputer extends Outputer {
             int loop = 0;
             while (s.indexOf("MetaDataServer not up") >= 0) {
                 if (loop++ % 15 == 1) {
-                    Util.prta("MetaDataServer is not up - waiting for connection");
+                    System.out.println("MetaDataServer is not up - waiting for connection");
                 }
                 try {
                     Thread.sleep(2000);
@@ -162,9 +162,9 @@ public class SacOutputer extends Outputer {
                         orient[2] = Double.parseDouble(line.substring(15));
                     }
                 }
-                //Util.prt("coord="+coord[0]+" "+coord[1]+" "+coord[2]+" orient="+orient[0]+" "+orient[1]+" "+orient[2]);
+                //System.out.println("coord="+coord[0]+" "+coord[1]+" "+coord[2]+" orient="+orient[0]+" "+orient[1]+" "+orient[2]);
             } catch (IOException e) {
-                Util.prta("OUtput error writing sac response file " + lastComp + ".resp e=" + e.getMessage());
+                System.out.println("OUtput error writing sac response file " + lastComp + ".resp e=" + e.getMessage());
             }
         }
 
@@ -203,7 +203,7 @@ public class SacOutputer extends Outputer {
         }
         if (coord[0] == SacTimeSeries.DOUBLE_UNDEF && coord[1] == SacTimeSeries.DOUBLE_UNDEF && coord[2] == SacTimeSeries.DOUBLE_UNDEF) {
             if (!noStaSrv) {
-                Util.prt("   **** " + lastComp + " did not get lat/long.  Is server down?");
+                System.out.println("   **** " + lastComp + " did not get lat/long.  Is server down?");
             }
         }
         if (orient != null) {
@@ -219,35 +219,35 @@ public class SacOutputer extends Outputer {
         } else {
             if (orient[0] == SacTimeSeries.DOUBLE_UNDEF && orient[1] == SacTimeSeries.DOUBLE_UNDEF) {
                 if (!noStaSrv) {
-                    Util.prt("      ***** " + lastComp + " Did not get orientation.  Is server down?");
+                    System.out.println("      ***** " + lastComp + " Did not get orientation.  Is server down?");
                 }
             }
         }
-        //Util.prt("Sac stla="+sac.stla+" stlo="+sac.stlo+" stel="+sac.stel+" cmpaz="+sac.cmpaz+" cmpinc="+sac.cmpinc+" stdp="+sac.stdp);
+        //System.out.println("Sac stla="+sac.stla+" stlo="+sac.stlo+" stel="+sac.stel+" cmpaz="+sac.cmpaz+" cmpinc="+sac.cmpinc+" stdp="+sac.stdp);
         sac.y = new double[span.getNsamp()];   // allocate space for data
         int nodata = 0;
         for (int i = 0; i < span.getNsamp(); i++) {
             sac.y[i] = span.getData(i);
             if (sac.y[i] == fill) {
                 nodata++;
-                //if(nodata <3) Util.prt(i+" nodata len="+span.getNsamp());
+                //if(nodata <3) System.out.println(i+" nodata len="+span.getNsamp());
             }
         }
         if (nodata > 0 && !quiet) {
-            Util.prt("#No data points = " + nodata + " fill=" + fill + " npts=" + sac.npts);
+            System.out.println("#No data points = " + nodata + " fill=" + fill + " npts=" + sac.npts);
         }
         if (sactrim) {
             int trimmed = sac.trimNodataEnd(fill);
             if (trimmed > 0) {
-                Util.prt(trimmed + " data points trimmed from end containing no data");
+                System.out.println(trimmed + " data points trimmed from end containing no data");
             }
         }
         try {
             sac.write(filename);
         } catch (FileNotFoundException e) {
-            Util.IOErrorPrint(e, "File Not found writing SAC");
+            System.err.println(e + " File Not found writing SAC");
         } catch (IOException e) {
-            Util.IOErrorPrint(e, "IO exception writing SAC");
+            System.err.println(e + " IO exception writing SAC");
             throw e;
         }
 

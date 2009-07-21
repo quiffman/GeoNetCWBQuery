@@ -124,7 +124,7 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
         for (int i = blks.size() - 1; i >= 0; i--) {
             if (blks.get(i).getRate() < 1.001) {
                 if (blks.get(i).getSeedName().substring(7, 9).equals("BH")) {
-                    Util.prt("DCC rate=1 and BH" + blks.get(i).toString());
+                    System.out.println("DCC rate=1 and BH" + blks.get(i).toString());
                     blks.remove(i);
                     continue;
                 }
@@ -149,17 +149,17 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
                     samples = Steim2.decode(frames, ms2.getNsamp(), ms2.isSwapBytes(), reverse);
                 }
             } catch (SteimException e) {
-                Util.prt("Got Steim error e=" + e);
+                System.out.println("Got Steim error e=" + e);
                 steimError = true;
             }
             if (ms2.getEncoding() == 11) {
                 if (Steim2.hadSampleCountError() || steimError) {
-                    Util.prt("Culling bad Steim II decomp blk ms=" + ms2);
+                    System.out.println("Culling bad Steim II decomp blk ms=" + ms2);
                     blks.remove(i);
                     continue;
                 }
                 if (Steim2.hadReverseError()) {
-                    Util.prt("Fix Steim II reverse integration error ms=" + ms2);
+                    System.out.println("Fix Steim II reverse integration error ms=" + ms2);
                     ms2.fixReverseIntegration();
                 }
             }
@@ -237,9 +237,9 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
         }
         Collections.sort(runs);
         if (dbg) {
-            Util.prt("\n");
+            System.out.println("\n");
             for (int j = 0; j < runs.size(); j++) {
-                Util.prt(j + " " + runs.get(j).toString());
+                System.out.println(j + " " + runs.get(j).toString());
             }
         }
         // find begining time and ending time of all runs
@@ -263,7 +263,7 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
                 list.add(r.getMS(i));
             }
             if (dbg) {
-                Util.prt("This run ends with " + r.getMS(r.getNBlocks() - 1) + " end tim=" + r.getMS(r.getNBlocks() - 1).getEndTimeString());
+                System.out.println("This run ends with " + r.getMS(r.getNBlocks() - 1) + " end tim=" + r.getMS(r.getNBlocks() - 1).getEndTimeString());
             }
 
             // was that the last run?
@@ -312,15 +312,15 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
                         runs.get(ilatest).getMS(Math.max(iblk - 1, 0)).getEndTime().compareTo(r.getEnd()) > 0) {
                     iblk = iblk - 1;
                     if (dbg) {
-                        Util.prt("ms = " + Util.asctime(runs.get(ilatest).getMS(iblk).getGregorianCalendar()) + " r.end=" + Util.asctime(r.getEnd()) +
+                        System.out.println("ms = " + Util.asctime(runs.get(ilatest).getMS(iblk).getGregorianCalendar()) + " r.end=" + Util.asctime(r.getEnd()) +
                                 " compareTO=" + runs.get(ilatest).getMS(iblk).getGregorianCalendar().compareTo(r.getEnd()) + " ms=" + runs.get(ilatest).getMS(iblk).toString());
                     }
                     if (dbg) {
-                        Util.prt(" latest start with =" + runs.get(ilatest).getMS(iblk).toString());
+                        System.out.println(" latest start with =" + runs.get(ilatest).getMS(iblk).toString());
                     }
                 } else // In this case leave iblk past end so no blocks are processed.
                 if (dbg) {
-                    Util.prt("Last one is still before end ms=" + Util.asctime(runs.get(ilatest).getMS(iblk - 1).getGregorianCalendar()) + " r.end=" + Util.asctime(r.getEnd()) +
+                    System.out.println("Last one is still before end ms=" + Util.asctime(runs.get(ilatest).getMS(iblk - 1).getGregorianCalendar()) + " r.end=" + Util.asctime(r.getEnd()) +
                             " compareTO=" + runs.get(ilatest).getMS(iblk - 1).getGregorianCalendar().compareTo(r.getEnd()) + " ms=" + runs.get(ilatest).getMS(iblk - 1).toString());
                 }
                 if (iblk < 0) {
@@ -330,7 +330,7 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
                 currRun = ilatest;
             } else if (iearliest < 0) {
                 if (dbg) {
-                    Util.prta("No more data beyond run =" + r.toString());
+                    System.out.println("No more data beyond run =" + r.toString());
                 }
                 break;
             } else {
@@ -338,7 +338,7 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
 
                 r = runs.get(iearliest);        // This is the next segment after the gap
                 if (dbg) {
-                    Util.prt("Earliest (with gap) =" + r.getMS(0));
+                    System.out.println("Earliest (with gap) =" + r.getMS(0));
                 }
                 currRun = iearliest;
             }
@@ -348,7 +348,7 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
         }
 
         if (dbg) {
-            Util.prt("#input blocks=" + insize + " of #blks=" + list.size() + " " +
+            System.out.println("#input blocks=" + insize + " of #blks=" + list.size() + " " +
                     ((double) list.size()) / insize * 100 + " %");
         }
 
@@ -413,7 +413,7 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
         try {
             msout = new MiniSeed(dummy);       // This is a place to build miniseed records
         } catch (IllegalSeednameException e) {
-            Util.prt("*** Dummy is not valid e=" + e.getMessage());
+            System.out.println("*** Dummy is not valid e=" + e.getMessage());
             System.exit(0);
         }
 
@@ -448,7 +448,7 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
                     int newnsamp = ms.getNsamp() - offset;
                     GregorianCalendar sss = ms.getGregorianCalendar();
                     if (dbg) {
-                        Util.prt(" Overlapping offset=" + offset + " ns=" + ms.getNsamp() + " new ns=" + newnsamp +
+                        System.out.println(" Overlapping offset=" + offset + " ns=" + ms.getNsamp() + " new ns=" + newnsamp +
                                 " ms=" + ms);
                     }
                     for (int j = 0; j < 64; j++) {
@@ -473,7 +473,7 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
                     }
                     int lastRev = bb.getInt();                          // put value in last
                     if (dbg) {
-                        Util.prt("new buffer computed output time=" + Util.asctime2(sss) + " lastvalue=" + lastRev);
+                        System.out.println("new buffer computed output time=" + Util.asctime2(sss) + " lastvalue=" + lastRev);
                     }
 
                     rtms.process(data, newnsamp,
@@ -489,13 +489,13 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
                         if (outputBytes[j] != 0) {
                             try {
                                 ms = new MiniSeed(outputBytes);
-                                Util.prt("*** Putbuf has been called before forceout!!!!!!" + ms);
+                                System.out.println("*** Putbuf has been called before forceout!!!!!!" + ms);
                                 addBlock(ms);
                                 for (int jj = 0; jj < 64; jj++) {
                                     outputBytes[jj] = 0;   // Insure its a cleared
                                 }
                             } catch (IllegalSeednameException e) {
-                                Util.prt("*** IllegalSeedname =" + e.getMessage());
+                                System.out.println("*** IllegalSeedname =" + e.getMessage());
                                 System.exit(1);
                             }
                             break;
@@ -513,7 +513,7 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
                         if (ok) {
                             ms = new MiniSeed(outputBytes);     // create one from just compressed!
                             if (dbg) {
-                                Util.prt("overlap created little block=" + ms);
+                                System.out.println("overlap created little block=" + ms);
                             }
                             addBlock(ms);                 // Add recompressed block
                             for (int j = 0; j < 64; j++) {
@@ -522,11 +522,11 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
                             lastPartial = true;             // Force output before next block
                         }
                     } catch (IllegalSeednameException e) {
-                        Util.prt("*** IllegalSeedname =" + e.getMessage());
+                        System.out.println("*** IllegalSeedname =" + e.getMessage());
                         System.exit(1);
                     }
                 } catch (SteimException e) {
-                    Util.prt("   *** steim1/2 err=" + e.getMessage() + " i=" + iblk + " ms=" + list.get(i).toString());
+                    System.out.println("   *** steim1/2 err=" + e.getMessage() + " i=" + iblk + " ms=" + list.get(i).toString());
                 }
             } // There is a gap here - flush out block and start new compression sequence
             else {
@@ -539,12 +539,12 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
         //
         if (check) {
             checkOutput = new ZeroFilledSpan(outblks, 2147000000);
-            Util.prt(checkInput.differences(checkOutput));
+            System.out.println(checkInput.differences(checkOutput));
         }
         out.close();
         list.clear();
         if (dbg) {
-            Util.prt("Channel done");
+            System.out.println("Channel done");
         }
     }
 
@@ -565,7 +565,7 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
             int maxns = (int) ((86400000L - (ms.getGregorianCalendar().getTimeInMillis() % 86400000L) + ((long) 1000 / ms.getRate() - 1)) * ms.getRate() / 1000);
             if (maxns < ms.getNsamp()) {    // if we need to shorten this block to make it stop at the day boundardy, do so
                 if (dbg) {
-                    Util.prt("Attempted to make final block too long.  Trimed from " + ms.getNsamp() + " to " + maxns);
+                    System.out.println("Attempted to make final block too long.  Trimed from " + ms.getNsamp() + " to " + maxns);
                 }
                 try {
                     int reverse = 0;
@@ -589,7 +589,7 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
                     nbb.putShort((short) maxns);
                     ms.load(ms.getBuf());
                     if (dbg) {
-                        Util.prt("REvisedms=" + ms);
+                        System.out.println("REvisedms=" + ms);
                     }
 
                     // now create an output buffer for the next day with the rest of the data!
@@ -612,9 +612,9 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
                         ms2 = new MiniSeed(outputBytes);
                     }
                 } catch (SteimException e) {
-                    Util.prt("**** block gave steim decode error. " + e.getMessage());
+                    System.out.println("**** block gave steim decode error. " + e.getMessage());
                 } catch (IllegalSeednameException e) {
-                    Util.prt("WOW! I got an illegal seedname compressing out and end of day.");
+                    System.out.println("WOW! I got an illegal seedname compressing out and end of day.");
                 }
             }
             int nblockettes = ms.getNBlockettes();
@@ -626,7 +626,7 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
                 if (ms.getBlocketteType(j) == 1000) {
                     b1000 = new Blockette1000(ms.getBlockette1000());
                     if (b1000.getEncoding() != encoding) {
-                        Util.prt("*** The encoding of data in this channel is inconsistent!");
+                        System.out.println("*** The encoding of data in this channel is inconsistent!");
                         System.exit(0);
                     }
                 }
@@ -660,11 +660,11 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
             clockFlags |= ms.getIOClockFlags();
             dataQual |= ms.getDataQualityFlags();
             if (rateFactor != ms.getRateFactor()) {
-                Util.prt("Changing rate factor at ms=" + ms);
+                System.out.println("Changing rate factor at ms=" + ms);
                 rateFactor = ms.getRateFactor();
             }
             if (rateMult != ms.getRateMultiplier()) {
-                Util.prt("Changing rate multiplier at ms=" + ms);
+                System.out.println("Changing rate multiplier at ms=" + ms);
                 rateMult = ms.getRateMultiplier();
 
             }
@@ -695,16 +695,16 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
             bbscratch.position(0);
             int rev = bbscratch.getInt();
             if (frameCount != 0 && rev != lastReverse) {
-                Util.prta(" * revs do not agree! rev=" + rev + " lastRev=" + lastReverse);
+                System.out.println(" * revs do not agree! rev=" + rev + " lastRev=" + lastReverse);
             }
             if (dbg) {
-                Util.prt("ms=" + ms);
+                System.out.println("ms=" + ms);
             }
 
             if (frameCount != 0 && ms.getEncoding() == 11) // fixit only works on Steim2
             {
                 if (!fixit(rev, ms.getBuf())) {
-                    Util.prt(" * INFO: Could not fix a reverse integration.  Send as short packet.");
+                    System.out.println(" * INFO: Could not fix a reverse integration.  Send as short packet.");
                     System.arraycopy(scratch, 0, dummy, 72, 4);
                     writeBlock(ms);
                 }
@@ -732,17 +732,17 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
                 lastReverse = samples[samples.length - 1];
             } catch (SteimException e) {
                 steimError = true;
-                Util.prt("**** block gave steim decode error. " + e.getMessage());
+                System.out.println("**** block gave steim decode error. " + e.getMessage());
             }
 
             // Would adding this block "as is" cause a reverse constant error (or steim error)?  If so, restore block
             // to state before adding this one, write it out, and make this block the beginning of next output block
             if (Steim2.hadReverseError() || steimError || Steim2.hadSampleCountError()) {
                 if (Steim2.hadReverseError()) {
-                    Util.prta("addBLock " + Steim2.getReverseError());
+                    System.out.println("addBLock " + Steim2.getReverseError());
                 }
                 if (Steim2.hadSampleCountError()) {
-                    Util.prta("addBlock " + Steim2.getSampleCountError());
+                    System.out.println("addBlock " + Steim2.getSampleCountError());
                 }
                 try {
                     samples = Steim2.decode(frames, nsamp + ms.getNsamp(), ms.isSwapBytes(), 0);
@@ -758,7 +758,7 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
                     }
                     for (int i = 0; i < ms.getNsamp(); i++) {
                         if (aft[i] - samples[nsamp + i] != lastDiff) {
-                            Util.prt(i + " " + aft[i] + " != " + samples[nsamp + i] + " df=" + (aft[i] - samples[nsamp + i]) + " ndiff=" + ndiff + " nsamp=" + nsamp);
+                            System.out.println(i + " " + aft[i] + " != " + samples[nsamp + i] + " df=" + (aft[i] - samples[nsamp + i]) + " ndiff=" + ndiff + " nsamp=" + nsamp);
                             ndiff = 0;
                             lastDiff = aft[i] - samples[nsamp + i];
                         }
@@ -767,18 +767,18 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
                         }
                     }
                     if (ndiff > 0) {
-                        Util.prt("last ndiff=" + ndiff);
+                        System.out.println("last ndiff=" + ndiff);
                     }
                 } catch (SteimException e) {
                 }
                 bbscratch.position(0);
                 if (ms.getSequence() == lastSequence + 1) {
-                    Util.prt("   *** found case of bad decomp at seq+1=" + ms.getSequence() +
+                    System.out.println("   *** found case of bad decomp at seq+1=" + ms.getSequence() +
                             "last=" + lastSequence + " ms=" + ms);
                 } else if (ms.getSequence() % 100000 == 0) {
-                    Util.prt("*** Expected bad decomp occurred(seq=0). sq=" + ms.getSequence() + " " + lastSequence + " ms=" + ms);
+                    System.out.println("*** Expected bad decomp occurred(seq=0). sq=" + ms.getSequence() + " " + lastSequence + " ms=" + ms);
                 } else {
-                    Util.prt("   *** found case of bad decomp and not right sequence=" + ms.getSequence() +
+                    System.out.println("   *** found case of bad decomp and not right sequence=" + ms.getSequence() +
                             "last=" + lastSequence + " ms=" + ms);
                 }
                 // Zero Bytes just added
@@ -833,7 +833,7 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
         switch (type) {
             case 0:
                 if (dbg) {
-                    Util.prt("non data!");    // This should never happen
+                    System.out.println("non data!");    // This should never happen
                 }
                 break;
             case 1:     // 4 one byte differences
@@ -884,7 +884,7 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
         if (forward - diff == rev) // if all is good fwd-diff=reverse
         {
             if (dbg) {
-                Util.prt("Its ok as is");
+                System.out.println("Its ok as is");
             }
             return true;
         }
@@ -898,11 +898,11 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
         }
         if (newdiff < -max || newdiff > max - 1) {
             if (dbg || dbg2) {
-                Util.prt("     key=" + Util.toHex(keys) + " wk=" + Util.toHex(diffwork) + " diffs=" + Util.toHex(diffs) +
+                System.out.println("     key=" + Util.toHex(keys) + " wk=" + Util.toHex(diffwork) + " diffs=" + Util.toHex(diffs) +
                         " diff=" + Util.toHex(diff) + " nb=" + nbits + " ty=" + type);
             }
             if (dbg || dbg2) {
-                Util.prt("***** its out of range! " + msg + " not zero=" + dbg2);
+                System.out.println("***** its out of range! " + msg + " not zero=" + dbg2);
             }
             return false;
         }
@@ -929,17 +929,17 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
         bb2.position(76);
         bb2.putInt(newdiffwork);
         if (dbg || dbg2) {
-            Util.prt("     key=" + Util.toHex(keys) + " wk=" + Util.toHex(diffwork) +
+            System.out.println("     key=" + Util.toHex(keys) + " wk=" + Util.toHex(diffwork) +
                     " newwk=" + Util.toHex(newdiffwork) + " diffs=" + Util.toHex(diffs) +
                     " diff=" + Util.toHex(diff) + " nb=" + nbits + " ty=" + type);
         }
         if (dbg) {
-            Util.prt("* Its fixed! " + msg);
+            System.out.println("* Its fixed! " + msg);
         }
         return true;
         /*}
         else {
-        if(dbg) Util.prt("****cannot fix it!");
+        if(dbg) System.out.println("****cannot fix it!");
         return false;
         }*/
     }
@@ -955,7 +955,7 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
         // Set the current version of blockette 1000, 1001
         if (frameCount > 0) {
             if (b1000 == null) {
-                Util.prt("IMpossible b1000 is null");
+                System.out.println("IMpossible b1000 is null");
             }
             b1000.setRecordLength(4096);
             if (b1000.getNextOffset() != 56) {
@@ -1011,11 +1011,11 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
                     samples = Steim2.decode(frames, ms2.getNsamp(), ms2.isSwapBytes(), reverse);
                 }
             } catch (IllegalSeednameException e) {
-                Util.prt("**** final check block gave badd seedname exception e=" + e.getMessage());
+                System.out.println("**** final check block gave badd seedname exception e=" + e.getMessage());
                 badSeedname = true;
             } catch (SteimException e) {
                 steimError = true;
-                Util.prt("**** final check block gave steim decode error. " + e.getMessage());
+                System.out.println("**** final check block gave steim decode error. " + e.getMessage());
             }
             if (!Steim2.hadReverseError() && !Steim2.hadSampleCountError() && !steimError && !badSeedname) {
                 try {
@@ -1024,17 +1024,17 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
                         try {
                             MiniSeed ms3 = new MiniSeed(dummy);
                             outblks.add(ms3);
-                            Util.prt("ms=" + ms3);
+                            System.out.println("ms=" + ms3);
                         } catch (IllegalSeednameException e) {
-                            Util.prt("*** Illegal seedname in output block durring check=" + e.getMessage());
+                            System.out.println("*** Illegal seedname in output block durring check=" + e.getMessage());
                         }
                     }
                 } catch (IOException e) {
-                    Util.prta("*** IOException : " + e.getMessage());
+                    System.out.println("*** IOException : " + e.getMessage());
                     System.exit(1);
                 }
             } else {
-                Util.prt("  *** Skip block Steim=" + steimError + " rev=" + Steim2.getReverseError() +
+                System.out.println("  *** Skip block Steim=" + steimError + " rev=" + Steim2.getReverseError() +
                         " nsamperr=" + Steim2.getSampleCountError() + " badSeedname=" + badSeedname + "\n   *** Skip " + ms2);
             }
         }

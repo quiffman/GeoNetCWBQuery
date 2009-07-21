@@ -17,7 +17,7 @@ import java.util.GregorianCalendar;
 import java.util.Calendar;
 import java.util.Collections;
 
-import gov.usgs.anss.util.*;
+import gov.usgs.anss.util.SeedUtil;
 import java.text.DecimalFormat;
 
 /** This class is the main class for CWBQuery which allows the user to make queries
@@ -153,7 +153,7 @@ public class EdgeQueryClient {
      */
     static public ArrayList<ArrayList<MiniSeed>> query(String line) {
         String[] arg = line.split(" ");
-        Util.prt("line=" + line);
+        System.out.println("line=" + line);
         for (int i = 0; i < arg.length; i++) {
             arg[i] = "";
         }
@@ -186,7 +186,7 @@ public class EdgeQueryClient {
             end++;
         }
         if (inQuote) {
-            Util.prt("Query argument list has open quotes!");
+            System.out.println("Query argument list has open quotes!");
             return new ArrayList<ArrayList<MiniSeed>>(1);
         }
         arg[narg++] = line.substring(beg, end).trim();
@@ -201,7 +201,7 @@ public class EdgeQueryClient {
         for (int i = 0; i < narg; i++) {
             if (!arg[i].equals("")) {
                 if (line.indexOf("dbg") >= 0) {
-                    Util.prt(n + "=" + arg[i] + "|");
+                    System.out.println(n + "=" + arg[i] + "|");
                 }
                 args[n++] = arg[i];
             }
@@ -240,7 +240,7 @@ public class EdgeQueryClient {
             if (addr != null) {
                 addrc = InetAddress.getByName(addr.getCanonicalHostName());
             } else {
-                Util.prt("WARNING : getLocalHost() returned null -- This should never happen!  You must use a query.prop!");
+                System.out.println("WARNING : getLocalHost() returned null -- This should never happen!  You must use a query.prop!");
             }
             if (addr != null) {
                 addrall = InetAddress.getAllByName(addr.getCanonicalHostName());
@@ -249,7 +249,7 @@ public class EdgeQueryClient {
         }
         if (Util.getProperty("cwbip") == null || Util.getProperty("cwbip").length() == 0) {
             ipaddr = addr.getAddress();
-            //Util.prt(ipaddr[0]+"."+ipaddr[1]+"."+ipaddr[2]+"."+ipaddr[3]);
+            //System.out.println(ipaddr[0]+"."+ipaddr[1]+"."+ipaddr[2]+"."+ipaddr[3]);
             if (ipaddr[0] == -120 && ipaddr[1] == -79 && (ipaddr[2] == 24 || ipaddr[2] == 30 || ipaddr[2] == 20 || ipaddr[2] == 31)) {
                 host = "136.177.24.70";
             }
@@ -260,14 +260,14 @@ public class EdgeQueryClient {
             {
                 host = "136.177.24.70";
             }
-            //for(int i=0; i<addrall.length; i++) Util.prt(i+" "+addrall[i]+" "+addrall[i].getHostAddress());
+            //for(int i=0; i<addrall.length; i++) System.out.println(i+" "+addrall[i]+" "+addrall[i].getHostAddress());
             if (host.equals("136.177.24.70")) {
                 cwb = "Internal (gcwb)";
             }
         } else {
             host = Util.getProperty("cwbip");
         }
-        //Util.prt("Using host "+host);
+        //System.out.println("Using host "+host);
         byte[] b = new byte[4096];
         Outputer out = null;
         if (df6 == null) {
@@ -279,87 +279,87 @@ public class EdgeQueryClient {
             port = Integer.parseInt(Util.getProperty("queryport"));
         }
         if (args.length == 0) {
-            Util.prt("Version 1.11 10/20/2008");
-            Util.prt("EdgeQuery [-f filename][ -b date_time -s NSCL -d duration] -t [ms | msz | sac(def)] [-o filemask]");
-            Util.prt("   e.g.  java -jar /home/jsmith/bin/CWBQuery.jar -s \"IIAAK  LHZ00\" -b \"2007/05/06 21:11:52\" -d 3600 -t sac -o %N_%y_%j");
-            Util.prt("   OR    java -jar /home/jsmith/bin/CWBQuery.jar -f my_batch_file");
-            Util.prt("Directory/Holdings:");
-            Util.prt("   -ls  List the data files available for queries (not generally useful to users)");
-            Util.prt("   -lsc List every channel its days of availability from begin time through duration (default last 15 days)");
-            Util.prt("        Use the -b and -d options to set limits on time interval of the channel list ");
-            Util.prt("        This option can be cpu intensive if you ask for a long interval, so use only as needed.");
-            Util.prt("Query Modes of operation :");
-            Util.prt("  Line mode (command line mode) do not use -f and include -s NSCL -b yyyy/mm/dd hh:mm:ss -d secs on line");
-            Util.prt("  File mode or batch mode:");
-            Util.prt("    Create a file with one line per query with lines like [QUERY SWITCHES][OUTPUT SWITCHES]:");
-            Util.prt("      example line :   '-s NSCL -b yyyy/mm/dd hh:mm:ss -d duration -t sac -o %N_%y_%j'");
-            Util.prt("    Then run EdgeQuery with  '-f filename' filename with list of SNCL start times and durations");
-            Util.prt("Server selection (please use9 query.prop for this and not these switches) :");
-            Util.prt("   -h host IP or name of server default=" + host + " " + cwb + " which is set differently inside and outside the NEIC subnets.");
-            Util.prt("   #-hp    The public server is cwb-pub.cr.usgs.gov (137.227.230.1) do not get Meta-data (obsolete - use query.prop) ");
-            Util.prt("   #-hi    internal is gcwb (136.177.24.70)");
-            Util.prt("   #-hr    The research CWB (136.177.30.235");
-            Util.prt("   -p port on server where server is running default=" + port);
-            Util.prt("       This computer reports is IP address as " + Util.getProperty("HostIP"));
-            Util.prt("Query Switches (station and time interval limits) :");
-            Util.prt("   -s NSCL or REGEXP  (note: on many shells its best to put this argument in double quotes)");
-            Util.prt("      NNSSSSSCCCLL to specify a seed channel name. If < 12 characters, match any seednames starting");
-            Util.prt("          with those characters.  Example : '-s IUA' would return all IU stations starting with 'A' (ADK,AFI,ANMO,ANTO) ");
-            Util.prt("      OR ");
-            Util.prt("      REGEXP :'.' matches any character, [ABC] means one character which is A, or B or C The regexp is right padded with '.'");
-            Util.prt("          Example: '-s IUANMO.LH[ZN]..' returns the vertical and north component for LH channels at station(s) starting with 'ANMO'");
-            Util.prt("          '.*' matchs zero or more following characters (include in quotes as * has many meanings!");
-            Util.prt("          'AA|BB' means matches pattern AA or BB e.g.  'US.*|IU.*' matches the US and IU networks");
-            Util.prt("   -b begin time yyyy/mm/dd hh:mm:ss (normally enclose in quotes) or yyyy,doy-hh:mm:ss");
-            Util.prt("   -d nnnn[d] seconds of duration(default is 300 seconds) end with 'd' to indicate nnnn is in days");
-            Util.prt("   -nodups Eliminate any duplications on input.  Only use this if the duplications are massive!");
-            Util.prt("   -dbgdup Print out all duplicate packets as they are eliminated");
-            Util.prt("   -sacpz nm|um Request sac style response files in either nanometers (nm) or micrometers(um)");
-            Util.prt("Output Controls : ");
-            Util.prt("   -q Run in quiet mode (No progress or file status reporting)");
-            Util.prt("   -t [ms | msz | sac | dcc|dcc512|wf|wf1] output type.  ");
-            Util.prt("       ms is raw blocks with gaps/overlaps (ext='.ms')");
-            Util.prt("       msz = is data output as continuous mini-seed with filling use -fill to set other fill values (ext='.msz')");
-            Util.prt("             can also be output as gappy miniseed with -msgaps NOTE: msz rounds times to nearest millsecond");
-            Util.prt("       sac = is Seismic Analysis Code format (see -fill for info on nodata code) (ext='.sac')");
-            Util.prt("       dcc = best effort reconciliation to 4096 byte mini-seed form.  Overlaps are eliminated. (ext='.msd'");
-            Util.prt("       dcc512 = best effort reconciliation to 512 byte mini-seed form.  Overlaps are eliminated. (ext='.msd'");
-            Util.prt("       null = do not create data file, return blocks to caller (for use from a user program)");
-            Util.prt("       wf or wf1 creates wfdisc and .w files - always use -o with -t wf1!");
-            Util.prt("   -o mask Put the output in the given filename described by the mask/tokens (Default : %N");
-            Util.prt("      Tokens: (Any non-tokens will be literally in the file name)");
-            Util.prt("        %N the whole seedname NNSSSSSCCCLL");
-            Util.prt("        %n the two letter SEED network          %s the 5 character SEED station code");
-            Util.prt("        %c the 3 character SEED channel         %l the two character location");
-            Util.prt("        %y Year as 4 digits                     %Y 2 character Year");
-            Util.prt("        %j Day of year (1-366)                  %J Julian day (since 1572)");
-            Util.prt("        %M 2 digit month                        %D 2 digit day of month");
-            Util.prt("        %h 2 digit hour                         %m 2 digit minute");
-            Util.prt("        %S 2 digit second                       %z zap all underscores from name");
-            Util.prt("  WF options :");
-            Util.prt("    -fap  output a frequency, amplitude, and phase file if metadata has an PNZ response");
-            Util.prt("  DCC[512] debug options:");
-            Util.prt("    -chk  Do a check of the input and output buffers(DEBUGGING)");
-            Util.prt("    -dccdbg Turn on debugging output(DEBUGGING)");
-            Util.prt("  SAC options :");
-            Util.prt("    -fill nnnnnn use nnnnnn as the fill value instead of -12345");
-            Util.prt("    -nogaps if present, any missing data in the interval except at the end results in no output file. A -sactrim is also done");
-            Util.prt("    -sactrim Trim length of returned time series so that no 'nodata' points are at the end of the buffer");
-            Util.prt("    -sacpz nm|um Request sac response files in either nanometers (nm) or micrometers(um)");
-            Util.prt("    -nometa Do not try to look up meta-data for orientation or coordinates or response");
-            Util.prt("  MSZ options :  NOTE : msz data has its times rounded to the nearest millisecond");
-            Util.prt("    -fill nnnnnn use nnnnnn as the fill value instead of -12345");
-            Util.prt("    -gaps if present, only displays a list of any gaps in the data - no output file is created.");
-            Util.prt("    -msb nnnn Set mini-seed block size to nnnn (512 and 4096 only)");
-            Util.prt("    -msgaps Process the data and have gaps in the output miniseed rather than filled values\n");
-            Util.prt("Miscellaneous:");
-            Util.prt("    -e Exclude the non-public stations from a query (not valid outside of NEIC subnets)");
-            Util.prt("    -dbg Turn on debugging output to stdout");
-            Util.prt("    -hold[:nnn.nnn.nnn.nnn:pppp:type] send holdings from request to indicated server (NEIC use only)");
-            Util.prt("Properties with defaults (Current setting in parenthesis possibly set by query.prop file) :");
-            Util.prt("   cwbip='' ( " + Util.getProperty("cwbip") + " host=" + host + ")");
-            Util.prt("   queryport=2061 (" + Util.getProperty("queryport") + ")");
-            Util.prt("   metadataserver=136.177.24.70 (" + Util.getProperty("metadataserver") + ")");
+            System.out.println("Version 1.11 10/20/2008");
+            System.out.println("EdgeQuery [-f filename][ -b date_time -s NSCL -d duration] -t [ms | msz | sac(def)] [-o filemask]");
+            System.out.println("   e.g.  java -jar /home/jsmith/bin/CWBQuery.jar -s \"IIAAK  LHZ00\" -b \"2007/05/06 21:11:52\" -d 3600 -t sac -o %N_%y_%j");
+            System.out.println("   OR    java -jar /home/jsmith/bin/CWBQuery.jar -f my_batch_file");
+            System.out.println("Directory/Holdings:");
+            System.out.println("   -ls  List the data files available for queries (not generally useful to users)");
+            System.out.println("   -lsc List every channel its days of availability from begin time through duration (default last 15 days)");
+            System.out.println("        Use the -b and -d options to set limits on time interval of the channel list ");
+            System.out.println("        This option can be cpu intensive if you ask for a long interval, so use only as needed.");
+            System.out.println("Query Modes of operation :");
+            System.out.println("  Line mode (command line mode) do not use -f and include -s NSCL -b yyyy/mm/dd hh:mm:ss -d secs on line");
+            System.out.println("  File mode or batch mode:");
+            System.out.println("    Create a file with one line per query with lines like [QUERY SWITCHES][OUTPUT SWITCHES]:");
+            System.out.println("      example line :   '-s NSCL -b yyyy/mm/dd hh:mm:ss -d duration -t sac -o %N_%y_%j'");
+            System.out.println("    Then run EdgeQuery with  '-f filename' filename with list of SNCL start times and durations");
+            System.out.println("Server selection (please use9 query.prop for this and not these switches) :");
+            System.out.println("   -h host IP or name of server default=" + host + " " + cwb + " which is set differently inside and outside the NEIC subnets.");
+            System.out.println("   #-hp    The public server is cwb-pub.cr.usgs.gov (137.227.230.1) do not get Meta-data (obsolete - use query.prop) ");
+            System.out.println("   #-hi    internal is gcwb (136.177.24.70)");
+            System.out.println("   #-hr    The research CWB (136.177.30.235");
+            System.out.println("   -p port on server where server is running default=" + port);
+            System.out.println("       This computer reports is IP address as " + Util.getProperty("HostIP"));
+            System.out.println("Query Switches (station and time interval limits) :");
+            System.out.println("   -s NSCL or REGEXP  (note: on many shells its best to put this argument in double quotes)");
+            System.out.println("      NNSSSSSCCCLL to specify a seed channel name. If < 12 characters, match any seednames starting");
+            System.out.println("          with those characters.  Example : '-s IUA' would return all IU stations starting with 'A' (ADK,AFI,ANMO,ANTO) ");
+            System.out.println("      OR ");
+            System.out.println("      REGEXP :'.' matches any character, [ABC] means one character which is A, or B or C The regexp is right padded with '.'");
+            System.out.println("          Example: '-s IUANMO.LH[ZN]..' returns the vertical and north component for LH channels at station(s) starting with 'ANMO'");
+            System.out.println("          '.*' matchs zero or more following characters (include in quotes as * has many meanings!");
+            System.out.println("          'AA|BB' means matches pattern AA or BB e.g.  'US.*|IU.*' matches the US and IU networks");
+            System.out.println("   -b begin time yyyy/mm/dd hh:mm:ss (normally enclose in quotes) or yyyy,doy-hh:mm:ss");
+            System.out.println("   -d nnnn[d] seconds of duration(default is 300 seconds) end with 'd' to indicate nnnn is in days");
+            System.out.println("   -nodups Eliminate any duplications on input.  Only use this if the duplications are massive!");
+            System.out.println("   -dbgdup Print out all duplicate packets as they are eliminated");
+            System.out.println("   -sacpz nm|um Request sac style response files in either nanometers (nm) or micrometers(um)");
+            System.out.println("Output Controls : ");
+            System.out.println("   -q Run in quiet mode (No progress or file status reporting)");
+            System.out.println("   -t [ms | msz | sac | dcc|dcc512|wf|wf1] output type.  ");
+            System.out.println("       ms is raw blocks with gaps/overlaps (ext='.ms')");
+            System.out.println("       msz = is data output as continuous mini-seed with filling use -fill to set other fill values (ext='.msz')");
+            System.out.println("             can also be output as gappy miniseed with -msgaps NOTE: msz rounds times to nearest millsecond");
+            System.out.println("       sac = is Seismic Analysis Code format (see -fill for info on nodata code) (ext='.sac')");
+            System.out.println("       dcc = best effort reconciliation to 4096 byte mini-seed form.  Overlaps are eliminated. (ext='.msd'");
+            System.out.println("       dcc512 = best effort reconciliation to 512 byte mini-seed form.  Overlaps are eliminated. (ext='.msd'");
+            System.out.println("       null = do not create data file, return blocks to caller (for use from a user program)");
+            System.out.println("       wf or wf1 creates wfdisc and .w files - always use -o with -t wf1!");
+            System.out.println("   -o mask Put the output in the given filename described by the mask/tokens (Default : %N");
+            System.out.println("      Tokens: (Any non-tokens will be literally in the file name)");
+            System.out.println("        %N the whole seedname NNSSSSSCCCLL");
+            System.out.println("        %n the two letter SEED network          %s the 5 character SEED station code");
+            System.out.println("        %c the 3 character SEED channel         %l the two character location");
+            System.out.println("        %y Year as 4 digits                     %Y 2 character Year");
+            System.out.println("        %j Day of year (1-366)                  %J Julian day (since 1572)");
+            System.out.println("        %M 2 digit month                        %D 2 digit day of month");
+            System.out.println("        %h 2 digit hour                         %m 2 digit minute");
+            System.out.println("        %S 2 digit second                       %z zap all underscores from name");
+            System.out.println("  WF options :");
+            System.out.println("    -fap  output a frequency, amplitude, and phase file if metadata has an PNZ response");
+            System.out.println("  DCC[512] debug options:");
+            System.out.println("    -chk  Do a check of the input and output buffers(DEBUGGING)");
+            System.out.println("    -dccdbg Turn on debugging output(DEBUGGING)");
+            System.out.println("  SAC options :");
+            System.out.println("    -fill nnnnnn use nnnnnn as the fill value instead of -12345");
+            System.out.println("    -nogaps if present, any missing data in the interval except at the end results in no output file. A -sactrim is also done");
+            System.out.println("    -sactrim Trim length of returned time series so that no 'nodata' points are at the end of the buffer");
+            System.out.println("    -sacpz nm|um Request sac response files in either nanometers (nm) or micrometers(um)");
+            System.out.println("    -nometa Do not try to look up meta-data for orientation or coordinates or response");
+            System.out.println("  MSZ options :  NOTE : msz data has its times rounded to the nearest millisecond");
+            System.out.println("    -fill nnnnnn use nnnnnn as the fill value instead of -12345");
+            System.out.println("    -gaps if present, only displays a list of any gaps in the data - no output file is created.");
+            System.out.println("    -msb nnnn Set mini-seed block size to nnnn (512 and 4096 only)");
+            System.out.println("    -msgaps Process the data and have gaps in the output miniseed rather than filled values\n");
+            System.out.println("Miscellaneous:");
+            System.out.println("    -e Exclude the non-public stations from a query (not valid outside of NEIC subnets)");
+            System.out.println("    -dbg Turn on debugging output to stdout");
+            System.out.println("    -hold[:nnn.nnn.nnn.nnn:pppp:type] send holdings from request to indicated server (NEIC use only)");
+            System.out.println("Properties with defaults (Current setting in parenthesis possibly set by query.prop file) :");
+            System.out.println("   cwbip='' ( " + Util.getProperty("cwbip") + " host=" + host + ")");
+            System.out.println("   queryport=2061 (" + Util.getProperty("queryport") + ")");
+            System.out.println("   metadataserver=136.177.24.70 (" + Util.getProperty("metadataserver") + ")");
             return null;
         }
         ArrayList<ArrayList<MiniSeed>> blksAll = null;
@@ -414,12 +414,12 @@ public class EdgeQueryClient {
             } else if (args[i].equals("-p")) {
                 port = Integer.parseInt(args[i + 1]);
                 i++;
-            } else if (args[i].equals("-dbg")) {
-                dbg = true;
-                MiniSeed.setDebug(true);
-                IndexFile.setDebug(true);
-                IndexBlock.setDebug(true);
-                Util.debug(true);
+//            } else if (args[i].equals("-dbg")) {
+//                dbg = true;
+//                MiniSeed.setDebug(true);
+//                IndexFile.setDebug(true);
+//                IndexBlock.setDebug(true);
+//                Util.debug(true);
             } else if (args[i].equals("-eqdbg")); else if (args[i].equals("-t")) {
                 type = args[i + 1];
                 i++;
@@ -475,7 +475,7 @@ public class EdgeQueryClient {
             } else if (args[i].equals("-sacpz")) {
                 sacpz = true;
                 if (i + 1 > args.length) {
-                    Util.prt(" ***** -sacpz units must be either um or nm and is required!");
+                    System.out.println(" ***** -sacpz units must be either um or nm and is required!");
                     System.exit(0);
                 }
 
@@ -484,7 +484,7 @@ public class EdgeQueryClient {
                     stahost = "137.227.230.1";
                 }
                 if (!args[i + 1].equalsIgnoreCase("nm") && !args[i + 1].equalsIgnoreCase("um")) {
-                    Util.prt("   ****** -sacpz units must be either um or nm switch values is " + args[i + 1]);
+                    System.out.println("   ****** -sacpz units must be either um or nm switch values is " + args[i + 1]);
                     System.exit(0);
                 }
                 stasrv = new SacPZ(stahost, pzunit);
@@ -495,9 +495,9 @@ public class EdgeQueryClient {
                 holdingMode = true;
                 gapsonly = true;
                 type = "HOLD";
-                Util.prt("Holdings server=" + holdingIP + "/" + holdingPort + " type=" + holdingType);
+                System.out.println("Holdings server=" + holdingIP + "/" + holdingPort + " type=" + holdingType);
             } else {
-                Util.prt("Unknown CWB Query argument=" + args[i]);
+                System.out.println("Unknown CWB Query argument=" + args[i]);
             }
 
         }
@@ -512,7 +512,7 @@ public class EdgeQueryClient {
                 outtcp.write(line.getBytes());
                 return null;
             } catch (IOException e) {
-                Util.IOErrorPrint(e, "Getting a directory");
+                System.err.print(e + " Getting a directory");
             }
             return null;
         }
@@ -543,17 +543,17 @@ public class EdgeQueryClient {
                 } else {
                     line += "'-ls'\n";
                 }
-                Util.prta("line=" + line + ":");
+                System.out.println("line=" + line + ":");
                 outtcp.write(line.getBytes());
                 StringBuffer sb = new StringBuffer(100000);
                 int len = 0;
                 while ((len = in.read(b, 0, 512)) > 0) {
                     sb.append(new String(b, 0, len));
                 }
-                Util.prt(sb.toString());
+                System.out.println(sb.toString());
                 return null;
             } catch (IOException e) {
-                Util.IOErrorPrint(e, "Getting a directory");
+                System.err.println(e + " Getting a directory");
                 return null;
             }
         }
@@ -569,7 +569,7 @@ public class EdgeQueryClient {
             try {
                 infile = new BufferedReader(new FileReader(filenamein));
             } catch (FileNotFoundException e) {
-                Util.prt("did not find the input file=" + filenamein);
+                System.out.println("did not find the input file=" + filenamein);
                 return null;
             }
         }
@@ -590,13 +590,13 @@ public class EdgeQueryClient {
                     if (e != null) {
                         if (e.getMessage() != null) {
                             if (e.getMessage().indexOf("Connection refused") >= 0) {
-                                Util.prta("Got a connection refused. " + host + "/" + port + "  Is the server up?  Wait 20 and try again");
+                                System.out.println("Got a connection refused. " + host + "/" + port + "  Is the server up?  Wait 20 and try again");
                             }
                         } else {
-                            Util.prta("Got IOError opening socket to server e=" + e);
+                            System.out.println("Got IOError opening socket to server e=" + e);
                         }
                     } else {
-                        Util.prta("Got IOError opening socket to server e=" + e);
+                        System.out.println("Got IOError opening socket to server e=" + e);
                     }
                     Util.sleep(20000);
                 }
@@ -664,21 +664,21 @@ public class EdgeQueryClient {
                     }
                 }
                 if (blocksize != 512 && blocksize != 4096) {
-                    Util.prt("-msb must be 512 or 4096 and is only meaningful for msz type");
+                    System.out.println("-msb must be 512 or 4096 and is only meaningful for msz type");
                     return null;
                 }
                 if (begin.equals("")) {
-                    Util.prt("You must enter a beginning time @line " + nline);
+                    System.out.println("You must enter a beginning time @line " + nline);
                     return null;
                 } else {
                     beg = Util.stringToDate2(begin);
                     if (beg.before(Util.stringToDate2("1970/12/31/ 23:59"))) {
-                        Util.prt("the -b field date did not parse correctly. @line" + nline);
+                        System.out.println("the -b field date did not parse correctly. @line" + nline);
                         return null;
                     }
                 }
                 if (seedname.equals("")) {
-                    Util.prt("-s SCNL is not optional.  Specify a seedname @line" + nline);
+                    System.out.println("-s SCNL is not optional.  Specify a seedname @line" + nline);
                     return null;
                 }
                 if (type.equals("ms") || type.equals("msz") || type.equals("sac") ||
@@ -712,7 +712,7 @@ public class EdgeQueryClient {
                     out = null;
                     blksAll = new ArrayList<ArrayList<MiniSeed>>(20);
                 } else {
-                    Util.prt("Output format not supported.  Choose dcc, dcc512, ms, msz, or sac");
+                    System.out.println("Output format not supported.  Choose dcc, dcc512, ms, msz, or sac");
                     return null;
                 }
 
@@ -736,7 +736,7 @@ public class EdgeQueryClient {
 
                 // If doing wfdisc in one file, the user must use -o
                 if (type.equals("wf1") && filemask.equals("%N")) {
-                    Util.prt("     ****** -t wf1 requires a -o with a filemask.  Overriding to wf1.%y%j%h%m%S");
+                    System.out.println("     ****** -t wf1 requires a -o with a filemask.  Overriding to wf1.%y%j%h%m%S");
                     filemask = "wf1.%y%j%h%m%S";
                 }
 
@@ -762,13 +762,13 @@ public class EdgeQueryClient {
                     MiniSeed ms = null;
                     if (type.equals("sac")) {
                         if (compareLength < 10) {
-                            Util.prt("\n    ***** Sac files must have names including the channel! *****");
+                            System.out.println("\n    ***** Sac files must have names including the channel! *****");
                             return null;
                         }
 
                     }
                     if (type.equals("msz") && compareLength < 10) {
-                        Util.prt("\n    ***** msz files must have names including the channel! *****");
+                        System.out.println("\n    ***** msz files must have names including the channel! *****");
                         return null;
                     }
                     int npur = 0;
@@ -782,11 +782,11 @@ public class EdgeQueryClient {
                                     eof = true;
                                     ms = null;
                                     if (dbg) {
-                                        Util.prt("EOR found");
+                                        System.out.println("EOR found");
                                     }
                                 } else {
                                     ms = new MiniSeed(b);
-                                    //SUtil.prt(""+ms);
+                                    //SSystem.out.println(""+ms);
                                     if (!gapsonly && ms.getBlockSize() != 512) {
                                         read(in, b, 512, ms.getBlockSize() - 512);
                                         ms = new MiniSeed(b);
@@ -797,7 +797,7 @@ public class EdgeQueryClient {
                             } else {
                                 eof = true;         // still need to process this last channel THIS SHOULD NEVER  HAPPEN unless socket is lost
                                 ms = null;
-                                Util.prt("   *** Unexpected EOF Found");
+                                System.out.println("   *** Unexpected EOF Found");
                                 if (out != null) {
                                     System.exit(1);      // error out with no file
                                 }
@@ -808,7 +808,7 @@ public class EdgeQueryClient {
                                 perfStart = false;
 
                             }
-                            //Util.prt(iblk+" "+ms.toString());
+                            //System.out.println(iblk+" "+ms.toString());
                             if (!quiet && iblk % 1000 == 0 && iblk > 0) {
                                 System.out.print("\r            \r" + iblk + "...");
                             }
@@ -821,18 +821,18 @@ public class EdgeQueryClient {
                                     int nsgot = 0;
                                     if (blks.size() > 0) {
                                         Collections.sort(blks);
-                                        //Util.prt(blks.size() +" "+iblk);
+                                        //System.out.println(blks.size() +" "+iblk);
                                         for (int i = 0; i < blks.size(); i++) {
                                             nsgot += (blks.get(i)).getNsamp();
                                         }
-                                        //Util.prt(""+(MiniSeed) blks.get(blks.size()-1));
-                                        Util.prt("\r" + Util.asctime() + " Query on " + lastComp.substring(0, compareLength) + " " +
+                                        //System.out.println(""+(MiniSeed) blks.get(blks.size()-1));
+                                        System.out.println("\r" + Util.asctime() + " Query on " + lastComp.substring(0, compareLength) + " " +
                                                 df6.format(blks.size()) + " mini-seed blks " +
                                                 (blks.get(0) == null ? "Null" : ((MiniSeed) blks.get(0)).getTimeString()) + " " +
                                                 (blks.get((blks.size() - 1)) == null ? "Null" : (blks.get(blks.size() - 1)).getEndTimeString()) + " " +
                                                 " ns=" + nsgot);
                                     } else {
-                                        Util.prta("\rQuery on " + seedname + " returned 0 blocks!");
+                                        System.out.println("\rQuery on " + seedname + " returned 0 blocks!");
                                     }
 
 
@@ -856,7 +856,7 @@ public class EdgeQueryClient {
                                         //filename = lastComp;
                                         filename = filename.replaceAll(" ", "_");
                                         if (dbg) {
-                                            Util.prt(((MiniSeed) blks.get(0)).getTimeString() + " to " +
+                                            System.out.println(((MiniSeed) blks.get(0)).getTimeString() + " to " +
                                                     ((MiniSeed) blks.get(blks.size() - 1)).getTimeString() +
                                                     " " + (((MiniSeed) blks.get(0)).getGregorianCalendar().getTimeInMillis() -
                                                     ((MiniSeed) blks.get(blks.size() - 1)).getGregorianCalendar().getTimeInMillis()) / 1000L);
@@ -876,9 +876,9 @@ public class EdgeQueryClient {
                                                 }
                                             }
                                         }
-                                        //Util.prt("Found "+npur+" recs with on first block of 4096 valid");
+                                        //System.out.println("Found "+npur+" recs with on first block of 4096 valid");
                                         blks.trimToSize();
-                                        //for(int i=0; i<blks.size(); i++) Util.prt(((MiniSeed) blks.get(i)).toString());
+                                        //for(int i=0; i<blks.size(); i++) System.out.println(((MiniSeed) blks.get(i)).toString());
                                         if (sacpz && out.getClass().getSimpleName().indexOf("SacOutputer") < 0) {   // if asked for write out the sac response file
                                             String time = blks.get(0).getTimeString();
                                             time = time.substring(0, 4) + "," + time.substring(5, 8) + "-" + time.substring(9, 17);
@@ -919,7 +919,7 @@ public class EdgeQueryClient {
                                         }
                                     }
                                     if (dbgdup && isDuplicate) {
-                                        Util.prt("Dup:" + ms);
+                                        System.out.println("Dup:" + ms);
                                     }
                                     if (!isDuplicate && ms.getIndicator().compareTo("D ") >= 0) {
                                         blks.add(ms);
@@ -935,11 +935,11 @@ public class EdgeQueryClient {
                                 lastComp = ms.getSeedName();
                             }
                         } catch (IllegalSeednameException e) {
-                            Util.prt("Seedname exception making a seed record e=" + e.getMessage());
+                            System.out.println("Seedname exception making a seed record e=" + e.getMessage());
                         }
                     }   // while(!eof)
                     if (!quiet && iblk > 0) {
-                        Util.prt(iblk + " Total blocks transferred in " +
+                        System.out.println(iblk + " Total blocks transferred in " +
                                 (System.currentTimeMillis() - startTime) + " ms " +
                                 (iblk * 1000L / Math.max(System.currentTimeMillis() - startTime, 1)) + " b/s " + npur + " #dups=" + ndups);
                     }
@@ -948,17 +948,17 @@ public class EdgeQueryClient {
                     }
                     blks.clear();
                 } catch (UnknownHostException e) {
-                    Util.prt("EQC main: Host is unknown=" + host + "/" + port);
+                    System.out.println("EQC main: Host is unknown=" + host + "/" + port);
                     if (out != null) {
                         System.exit(1);
                     }
                     return null;
                 } catch (IOException e) {
                     if (e.getMessage().equalsIgnoreCase("Connection refused")) {
-                        Util.prta("The connection was refused.  Server is likely down or is blocked. This should never happen.");
+                        System.out.println("The connection was refused.  Server is likely down or is blocked. This should never happen.");
                         return null;
                     } else {
-                        Util.IOErrorPrint(e, "EQC main: IO error opening/reading socket=" + host + "/" + port);
+                        System.err.println(e + " EQC main: IO error opening/reading socket=" + host + "/" + port);
                         if (out != null) {
                             System.exit(1);
                         }
@@ -974,12 +974,12 @@ public class EdgeQueryClient {
             }
             if (perfMonitor) {
                 long msEnd = System.currentTimeMillis() - startPhase;
-                Util.prta("Perf setup=" + msSetup + " connect=" + msConnect + " Cmd=" + msCommand + " xfr=" + msTransfer + " out=" + msOutput +
+                System.out.println("Perf setup=" + msSetup + " connect=" + msConnect + " Cmd=" + msCommand + " xfr=" + msTransfer + " out=" + msOutput +
                         " last=" + msEnd + " tot=" + (msSetup + msConnect + msTransfer + msOutput + msEnd) + " #blks=" + totblks + " #lines=" + nline);
             }
             return null;
         } catch (IOException e) {
-            Util.SocketIOErrorPrint(e, "IOError reading input lines.");
+            System.err.println(e + " IOError reading input lines.");
         }
         return null;
     }
@@ -999,9 +999,9 @@ public class EdgeQueryClient {
 
     public static void main(String[] args) {
         Util.init("query.prop");
-        Util.debug(false);
+ //       Util.debug(false);
         Util.setModeGMT();
-        Util.setProcess("CWBQuery");
+ //       Util.setProcess("CWBQuery");
         /*query("-s USISCO LHZ  -b 2007,1-00:00 -d 1d -t ms");
         query("-s \"USISCO LHZ\"  -b 2007,1-00:00 -d 1d -t ms");
         query("-s \"USISCO LHZ  -b 2007,1-00:00 -d 1d -t ms");
@@ -1010,13 +1010,13 @@ public class EdgeQueryClient {
 
         VMSServer vms = null;
         String host = "137.227.230.1";
-        Util.setNoconsole(false);
-        Util.setNoInteractive(true);
+//        Util.setNoconsole(false);
+//        Util.setNoInteractive(true);
 
         int port = 7808;
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("-vms")) {
-                Util.prt("In VMS server mode");
+                System.out.println("In VMS server mode");
                 vms = new VMSServer(port);
             }
         }

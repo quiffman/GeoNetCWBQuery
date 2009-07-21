@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import gov.usgs.anss.util.PNZ;
 import gov.usgs.anss.seed.*;
 import edu.sc.seis.TauP.SacTimeSeries;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  *
@@ -29,6 +31,8 @@ public class SacOutputer extends Outputer {
     private static SacPZ stasrv;
     private static String stasrvHost;
     private static int stasrvPort;
+
+        private static ResourceBundle props;
 
     /** Creates a new instance of SacOutputer */
     public SacOutputer() {
@@ -49,7 +53,9 @@ public class SacOutputer extends Outputer {
         boolean sactrim = false;      // return full length padded with no data value
         String pzunit = "nm";
 
-        String stahost = Util.getProperty("metadataserver");
+        props = ResourceBundle.getBundle("resources.geonetCwbQuery");
+
+        String stahost = props.getString("metadataserver");
         int staport = 2052;
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("-fill")) {

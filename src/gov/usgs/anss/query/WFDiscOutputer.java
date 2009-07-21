@@ -16,11 +16,14 @@ import java.io.IOException;
 import java.io.FileNotFoundException;
 
 import java.util.ArrayList;
-//import gov.usgs.anss.util.*;
+import gov.usgs.anss.util.Util;
 import gov.usgs.anss.edge.RawDisk;
 import gov.usgs.anss.seed.*;
 import gov.usgs.anss.util.Complex;
 import gov.usgs.anss.util.PNZ;
+import java.util.Locale;
+import java.util.PropertyResourceBundle;
+import java.util.ResourceBundle;
 
 /**
  *
@@ -31,6 +34,8 @@ public class WFDiscOutputer extends Outputer {
     boolean dbg;
     private static SacPZ stasrv;
     private boolean firstCall = true;
+
+    private static ResourceBundle props;
 
     /** Creates a new instance of WFDiscOutputer */
     public WFDiscOutputer() {
@@ -51,7 +56,11 @@ public class WFDiscOutputer extends Outputer {
         DecimalFormat df2 = new DecimalFormat("00");
         DecimalFormat ef6 = new DecimalFormat("0.00000E00");
         String begin = "";
-        String stahost = Util.getProperty("metadataserver");
+
+        props = PropertyResourceBundle.getBundle("resources.geonetCwbQuery");
+
+        String stahost = props.getString("metadataserver");
+ 
         int staport = 2052;
         boolean doFap = false;
         boolean oneFile = false;

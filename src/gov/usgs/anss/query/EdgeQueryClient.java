@@ -18,7 +18,11 @@ import java.util.Calendar;
 import java.util.Collections;
 
 import gov.usgs.anss.util.SeedUtil;
+import gov.usgs.anss.util.Util;
 import java.text.DecimalFormat;
+import java.util.Locale;
+import java.util.PropertyResourceBundle;
+import java.util.ResourceBundle;
 
 /** This class is the main class for CWBQuery which allows the user to make queries
  * against all files on a CWB or Edge computer.  The program has two modes :
@@ -63,6 +67,8 @@ public class EdgeQueryClient {
     static DecimalFormat df2;
     static DecimalFormat df4;
     static DecimalFormat df6;
+
+    private static ResourceBundle props;
 
     public static String makeFilename(String mask, String seedname, MiniSeed ms) {
         StringBuffer sb = new StringBuffer(100);
@@ -219,10 +225,14 @@ public class EdgeQueryClient {
         String line = "";
         String host = "137.227.230.1";
         //   Util.loadProperties("query.prop");
-        Util.loadProperties("");
-        Util.addDefaultProperty("cwbip", "161.65.59.66");
-        Util.addDefaultProperty("queryport", "80");
-        Util.addDefaultProperty("metadataserver", "137.227.230.1");
+//        Util.loadProperties("");
+//        Util.addDefaultProperty("cwbip", "161.65.59.66");
+//        Util.addDefaultProperty("queryport", "80");
+//        Util.addDefaultProperty("metadataserver", "137.227.230.1");
+
+
+         props = ResourceBundle.getBundle("resources.geonetCwbQuery", Locale.ENGLISH);
+
         byte[] ipaddr = new byte[4];
         InetAddress addr = null;
         InetAddress addrc = null;
@@ -247,7 +257,7 @@ public class EdgeQueryClient {
             }
         } catch (UnknownHostException e) {
         }
-        if (Util.getProperty("cwbip") == null || Util.getProperty("cwbip").length() == 0) {
+        if (props.getString("cwbip") == null || props.getString("cwbip").length() == 0) {
             ipaddr = addr.getAddress();
             //System.out.println(ipaddr[0]+"."+ipaddr[1]+"."+ipaddr[2]+"."+ipaddr[3]);
             if (ipaddr[0] == -120 && ipaddr[1] == -79 && (ipaddr[2] == 24 || ipaddr[2] == 30 || ipaddr[2] == 20 || ipaddr[2] == 31)) {
@@ -265,7 +275,7 @@ public class EdgeQueryClient {
                 cwb = "Internal (gcwb)";
             }
         } else {
-            host = Util.getProperty("cwbip");
+            host = props.getString("cwbip");
         }
         //System.out.println("Using host "+host);
         byte[] b = new byte[4096];
@@ -275,8 +285,8 @@ public class EdgeQueryClient {
         }
         GregorianCalendar jan_01_2007 = new GregorianCalendar(2007, 0, 1);
         int port = 2061;
-        if (Util.getProperty("queryport").length() > 1) {
-            port = Integer.parseInt(Util.getProperty("queryport"));
+        if (props.getString("queryport").length() > 1) {
+            port = Integer.parseInt(props.getString("queryport"));
         }
         if (args.length == 0) {
             System.out.println("Version 1.11 10/20/2008");
@@ -300,7 +310,7 @@ public class EdgeQueryClient {
             System.out.println("   #-hi    internal is gcwb (136.177.24.70)");
             System.out.println("   #-hr    The research CWB (136.177.30.235");
             System.out.println("   -p port on server where server is running default=" + port);
-            System.out.println("       This computer reports is IP address as " + Util.getProperty("HostIP"));
+            //System.out.println("       This computer reports is IP address as " + Util.getProperty("HostIP"));
             System.out.println("Query Switches (station and time interval limits) :");
             System.out.println("   -s NSCL or REGEXP  (note: on many shells its best to put this argument in double quotes)");
             System.out.println("      NNSSSSSCCCLL to specify a seed channel name. If < 12 characters, match any seednames starting");
@@ -357,9 +367,9 @@ public class EdgeQueryClient {
             System.out.println("    -dbg Turn on debugging output to stdout");
             System.out.println("    -hold[:nnn.nnn.nnn.nnn:pppp:type] send holdings from request to indicated server (NEIC use only)");
             System.out.println("Properties with defaults (Current setting in parenthesis possibly set by query.prop file) :");
-            System.out.println("   cwbip='' ( " + Util.getProperty("cwbip") + " host=" + host + ")");
-            System.out.println("   queryport=2061 (" + Util.getProperty("queryport") + ")");
-            System.out.println("   metadataserver=136.177.24.70 (" + Util.getProperty("metadataserver") + ")");
+            System.out.println("   cwbip='' ( " + props.getString("cwbip") + ")");
+            System.out.println("   queryport=2061 (" + props.getString("queryport") + ")");
+            System.out.println("   metadataserver=136.177.24.70 (" + props.getString("metadataserver") + ")");
             return null;
         }
         ArrayList<ArrayList<MiniSeed>> blksAll = null;
@@ -395,7 +405,7 @@ public class EdgeQueryClient {
         boolean sacpz = false;
         SacPZ stasrv = null;
         String pzunit = "nm";
-        String stahost = Util.getProperty("metadataserver");
+        String stahost = props.getString("metadataserver");
 
         // This loop must validate all arguments on the command line, parsing is really done below
         for (int i = 0; i < args.length; i++) {
@@ -998,16 +1008,14 @@ public class EdgeQueryClient {
     }
 
     public static void main(String[] args) {
-        Util.init("query.prop");
- //       Util.debug(false);
-        Util.setModeGMT();
- //       Util.setProcess("CWBQuery");
-        /*query("-s USISCO LHZ  -b 2007,1-00:00 -d 1d -t ms");
-        query("-s \"USISCO LHZ\"  -b 2007,1-00:00 -d 1d -t ms");
-        query("-s \"USISCO LHZ  -b 2007,1-00:00 -d 1d -t ms");
-        query("-s \"USISCO LHZ\"  -b '2007/1/1 00:00' -d  1d -t  ms");
-         **/
 
+       
+
+        //Util.init("query.prop");
+ //       Util.debug(false);
+        // TODO - not sure this is doing anything.
+        Util.setModeGMT();
+ 
         VMSServer vms = null;
         String host = "137.227.230.1";
 //        Util.setNoconsole(false);

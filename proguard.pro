@@ -1,6 +1,3 @@
--injars      dist/tmp
--outjars     dist/GeoNetCWBQuery.jar
-
 -dontobfuscate
 -dontskipnonpubliclibraryclasses
 -verbose

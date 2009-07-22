@@ -8,6 +8,8 @@
 <!-- You can turn off the Compile on Save (or Deploy on Save) setting -->
 <!-- in the project's Project Properties dialog box.-->
 <project name="CWBQuery" default="default" basedir=".">
+	<description>Builds, tests, and runs the project CWBQuery.</description>
+    <import file="nbproject/build-impl.xml"/>
 
 	<get src="http://repo.geonet.org.nz/ivy/build/build-base.xml"
 		dest="${basedir}/build-base.xml" username="" password=""
@@ -18,9 +20,30 @@
 	<target name="setup-nb-build-environment" depends="ivy-resolve,ivy-generate-nbproject-classpaths"
 		description="Run once after project check-out, or whenever ivy dependencies have changed in ivy.xml"/>
 
+	<target name="proguard" depends="compile"
+		description="initialises and runs the proguard configuration for this project.">
+		<path id="proguard.classpath">
+			<fileset dir="${ivy.lib.dir}">
+				<include name="**/proguard*.jar"/>
+			</fileset>
+		</path>
+		<taskdef resource="proguard/ant/task.properties" classpathref="proguard.classpath"/>
 
-    <description>Builds, tests, and runs the project CWBQuery.</description>
-    <import file="nbproject/build-impl.xml"/>
+		<unjar dest="${build.classes.dir}">
+			<fileset dir="${ivy.lib.dir}">
+				<include name="runtime/*.jar" />
+			</fileset>
+		</unjar>
+
+		<proguard configuration="${basedir}/proguard.pro">
+			<injar path="${build.classes.dir}" />
+			<outjar path="${dist.jar}" />
+		</proguard>
+
+	</target>
+
+
+
     <!--
 
     There exist several targets which are by default empty and which can be 

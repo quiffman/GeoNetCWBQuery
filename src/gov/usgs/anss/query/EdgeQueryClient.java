@@ -685,8 +685,8 @@ public class EdgeQueryClient {
                     return null;
                 }
                 if (type.equals("ms") || type.equals("msz") || type.equals("sac") ||
-                        type.equals("dcc") || type.equals("dcc512") || type.equals("HOLD") ||
-                        type.equals("wf") || type.equals("wf1")) {
+                        type.equals("dcc") || type.equals("dcc512") || type.equals("HOLD")
+                        ) {
                     if (seedname.length() < 12) {
                         seedname = (seedname + ".............").substring(0, 12);
                     }

@@ -65,7 +65,6 @@ public class EdgeQueryClient {
     static DecimalFormat df2;
     static DecimalFormat df4;
     static DecimalFormat df6;
-
     private static ResourceBundle props;
 
     public static String makeFilename(String mask, String seedname, MiniSeed ms) {
@@ -220,16 +219,21 @@ public class EdgeQueryClient {
      *@return The ArrayList with ArrayLists of miniseed one for each channel returned.
      */
     static public ArrayList<ArrayList<MiniSeed>> query(String[] args) {
+
+        if (args.length == 0) {
+            System.out.println(props.getString("usage"));
+            return null;
+        }
+
         String line = "";
-        String host = "137.227.230.1";
 
         props = ResourceBundle.getBundle("resources.geonetCwbQuery");
 
-        byte[] ipaddr = new byte[4];
-        InetAddress addr = null;
-        InetAddress addrc = null;
-        InetAddress[] addrall = null;
-        String cwb = "Public (cwb-pub)";
+        // TODO should check that these are set and exit if not.
+        // TODO if they are set log a message and continue
+        String host = props.getString("cwbip");
+        int port = Integer.parseInt(props.getString("queryport"));
+
         long msSetup = 0;
         long msConnect = 0;
         long msTransfer = 0;
@@ -237,53 +241,14 @@ public class EdgeQueryClient {
         long msCommand = 0;
         long startTime = System.currentTimeMillis();
         long startPhase = startTime;
-        try {
-            addr = InetAddress.getLocalHost();
-            if (addr != null) {
-                addrc = InetAddress.getByName(addr.getCanonicalHostName());
-            } else {
-                System.out.println("WARNING : getLocalHost() returned null -- This should never happen!  You must use a query.prop!");
-            }
-            if (addr != null) {
-                addrall = InetAddress.getAllByName(addr.getCanonicalHostName());
-            }
-        } catch (UnknownHostException e) {
-        }
-        if (props.getString("cwbip") == null || props.getString("cwbip").length() == 0) {
-            ipaddr = addr.getAddress();
-            //System.out.println(ipaddr[0]+"."+ipaddr[1]+"."+ipaddr[2]+"."+ipaddr[3]);
-            if (ipaddr[0] == -120 && ipaddr[1] == -79 && (ipaddr[2] == 24 || ipaddr[2] == 30 || ipaddr[2] == 20 || ipaddr[2] == 31)) {
-                host = "136.177.24.70";
-            }
-            if (ipaddr[0] == -84 && ipaddr[1] == 24 && ipaddr[2] == 24) {
-                host = "136.177.24.70";
-            }
-            if (ipaddr[0] == 127 && ipaddr[1] == 0 && ipaddr[2] == 0 && ipaddr[3] == 1) // if 127.0.0.1 must be linux, assume inside
-            {
-                host = "136.177.24.70";
-            }
-            //for(int i=0; i<addrall.length; i++) System.out.println(i+" "+addrall[i]+" "+addrall[i].getHostAddress());
-            if (host.equals("136.177.24.70")) {
-                cwb = "Internal (gcwb)";
-            }
-        } else {
-            host = props.getString("cwbip");
-        }
-        //System.out.println("Using host "+host);
+
         byte[] b = new byte[4096];
         Outputer out = null;
         if (df6 == null) {
             df6 = new DecimalFormat("000000");
         }
         GregorianCalendar jan_01_2007 = new GregorianCalendar(2007, 0, 1);
-        int port = 2061;
-        if (props.getString("queryport").length() > 1) {
-            port = Integer.parseInt(props.getString("queryport"));
-        }
-        if (args.length == 0) {
-            System.out.println(props.getString("usage"));
-            return null;
-        }
+
         ArrayList<ArrayList<MiniSeed>> blksAll = null;
         double duration = 300.;
         String seedname = "";
@@ -604,8 +569,7 @@ public class EdgeQueryClient {
                     return null;
                 }
                 if (type.equals("ms") || type.equals("msz") || type.equals("sac") ||
-                        type.equals("dcc") || type.equals("dcc512") || type.equals("HOLD")
-                        ) {
+                        type.equals("dcc") || type.equals("dcc512") || type.equals("HOLD")) {
                     if (seedname.length() < 12) {
                         seedname = (seedname + ".............").substring(0, 12);
                     }
@@ -913,12 +877,12 @@ public class EdgeQueryClient {
 
         // TODO - not sure this is doing anything.
         Util.setModeGMT();
- 
-            ArrayList<ArrayList<MiniSeed>> mss = EdgeQueryClient.query(args);
-            if (mss == null) {
-                // TODO Evil - needs a log message.
-                System.exit(1);
-            }
-            System.exit(0);
+
+        ArrayList<ArrayList<MiniSeed>> mss = EdgeQueryClient.query(args);
+        if (mss == null) {
+            // TODO Evil - needs a log message.
+            System.exit(1);
+        }
+        System.exit(0);
     }
 }

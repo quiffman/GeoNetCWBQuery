@@ -289,24 +289,6 @@ public class EdgeQueryClient {
             if (args[i].equals("-f")) {
                 filenamein = args[i + 1];
                 i++;
-            } else if (args[i].equals("-h")) {
-                host = args[i + 1];
-                i++;
-            } else if (args[i].equals("-hp")) {
-                host = "137.227.230.1";
-            } else if (args[i].equals("-hr")) {
-                host = "136.177.30.235";
-            } else if (args[i].equals("-hi")) {
-                host = "136.177.24.70";
-            } else if (args[i].equals("-p")) {
-                port = Integer.parseInt(args[i + 1]);
-                i++;
-//            } else if (args[i].equals("-dbg")) {
-//                dbg = true;
-//                MiniSeed.setDebug(true);
-//                IndexFile.setDebug(true);
-//                IndexBlock.setDebug(true);
-//                Util.debug(true);
             } else if (args[i].equals("-eqdbg")); else if (args[i].equals("-t")) {
                 type = args[i + 1];
                 i++;

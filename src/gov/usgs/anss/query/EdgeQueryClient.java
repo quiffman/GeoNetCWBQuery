@@ -67,6 +67,9 @@ public class EdgeQueryClient {
     static DecimalFormat df6;
     private static ResourceBundle props;
 
+
+    // TODO the two following methods need to go into their own class
+    // and be unit tested.  They should also use Joda time.
     public static String makeFilename(String mask, String seedname, MiniSeed ms) {
         StringBuffer sb = new StringBuffer(100);
         if (df2 == null) {
@@ -155,6 +158,12 @@ public class EdgeQueryClient {
      *@return ArrayList<ArrayList<MiniSeed>> with each channels data on each array list
      */
     static public ArrayList<ArrayList<MiniSeed>> query(String line) {
+
+        // TODO This code should go into a class and be tested
+        // I think this is building the string that gets sent to
+        // CWP:port to make the query.  Would be useful to have a
+        // Class that handled this (if there isn't one in the NB.tar
+        // already.
         String[] arg = line.split(" ");
         System.out.println("line=" + line);
         for (int i = 0; i < arg.length; i++) {
@@ -220,14 +229,16 @@ public class EdgeQueryClient {
      */
     static public ArrayList<ArrayList<MiniSeed>> query(String[] args) {
 
+
+        String line = "";
+
+        props = ResourceBundle.getBundle("resources.geonetCwbQuery");
+
         if (args.length == 0) {
             System.out.println(props.getString("usage"));
             return null;
         }
 
-        String line = "";
-
-        props = ResourceBundle.getBundle("resources.geonetCwbQuery");
 
         // TODO should check that these are set and exit if not.
         // TODO if they are set log a message and continue
@@ -283,6 +294,8 @@ public class EdgeQueryClient {
         SacPZ stasrv = null;
         String pzunit = "nm";
         String stahost = props.getString("metadataserver");
+
+        // TODO probably a more elegant way of handling command line args out there.
 
         // This loop must validate all arguments on the command line, parsing is really done below
         for (int i = 0; i < args.length; i++) {

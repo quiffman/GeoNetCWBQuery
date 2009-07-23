@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import gov.usgs.anss.util.PNZ;
 import gov.usgs.anss.seed.*;
 import edu.sc.seis.TauP.SacTimeSeries;
-import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**

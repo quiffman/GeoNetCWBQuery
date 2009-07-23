@@ -21,7 +21,6 @@ import gov.usgs.anss.util.SeedUtil;
 import gov.usgs.anss.util.Util;
 import java.text.DecimalFormat;
 import java.util.Locale;
-import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
 /** This class is the main class for CWBQuery which allows the user to make queries
@@ -224,14 +223,8 @@ public class EdgeQueryClient {
     static public ArrayList<ArrayList<MiniSeed>> query(String[] args) {
         String line = "";
         String host = "137.227.230.1";
-        //   Util.loadProperties("query.prop");
-//        Util.loadProperties("");
-//        Util.addDefaultProperty("cwbip", "161.65.59.66");
-//        Util.addDefaultProperty("queryport", "80");
-//        Util.addDefaultProperty("metadataserver", "137.227.230.1");
 
-
-         props = ResourceBundle.getBundle("resources.geonetCwbQuery", Locale.ENGLISH);
+        props = ResourceBundle.getBundle("resources.geonetCwbQuery", Locale.ENGLISH);
 
         byte[] ipaddr = new byte[4];
         InetAddress addr = null;
@@ -705,9 +698,6 @@ public class EdgeQueryClient {
                     }
                     if (type.equals("msz")) {
                         out = new MSZOutputer(blocksize);
-                    }
-                    if (type.equals("wf") || type.equals("wf1")) {
-                        out = new WFDiscOutputer();
                     }
                     if (type.equals("dcc")) {
                         out = new DCCOutputer();

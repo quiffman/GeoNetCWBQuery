@@ -992,32 +992,14 @@ public class EdgeQueryClient {
 
     public static void main(String[] args) {
 
-       
-
-        //Util.init("query.prop");
- //       Util.debug(false);
         // TODO - not sure this is doing anything.
         Util.setModeGMT();
  
-        VMSServer vms = null;
-        String host = "137.227.230.1";
-//        Util.setNoconsole(false);
-//        Util.setNoInteractive(true);
-
-        int port = 7808;
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("-vms")) {
-                System.out.println("In VMS server mode");
-                vms = new VMSServer(port);
-            }
-        }
-        if (vms == null) {
             ArrayList<ArrayList<MiniSeed>> mss = EdgeQueryClient.query(args);
             if (mss == null) {
+                // TODO Evil - needs a log message.
                 System.exit(1);
             }
             System.exit(0);
-        }
-
     }
 }

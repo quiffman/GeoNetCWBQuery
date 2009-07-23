@@ -734,13 +734,6 @@ public class EdgeQueryClient {
                     compareLength = 12;
                 }
 
-                // If doing wfdisc in one file, the user must use -o
-                if (type.equals("wf1") && filemask.equals("%N")) {
-                    System.out.println("     ****** -t wf1 requires a -o with a filemask.  Overriding to wf1.%y%j%h%m%S");
-                    filemask = "wf1.%y%j%h%m%S";
-                }
-
-
                 // put command line in single quotes.
                 line = "";
                 long maxTime = 0;

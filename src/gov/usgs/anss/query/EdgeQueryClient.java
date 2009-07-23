@@ -551,7 +551,8 @@ public class EdgeQueryClient {
                     return null;
                 }
                 if (type.equals("ms") || type.equals("msz") || type.equals("sac") ||
-                        type.equals("dcc") || type.equals("dcc512") || type.equals("HOLD")) {
+                        type.equals("dcc") || type.equals("dcc512") ||
+						type.equals("HOLD") || type.equals("text")) {
                     if (seedname.length() < 12) {
                         seedname = (seedname + ".............").substring(0, 12);
                     }
@@ -572,6 +573,9 @@ public class EdgeQueryClient {
                     }
                     if (type.equals("HOLD")) {
                         out = new HoldingOutputer();
+                    }
+                    if (type.equals("text")) {
+                        out = new TextOutputer(nosort);
                     }
                 } else if (type.equals("null")) {
                     out = null;

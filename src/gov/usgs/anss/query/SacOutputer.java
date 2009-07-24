@@ -30,8 +30,7 @@ public class SacOutputer extends Outputer {
     private static SacPZ stasrv;
     private static String stasrvHost;
     private static int stasrvPort;
-
-        private static ResourceBundle props;
+    private static ResourceBundle props;
 
     /** Creates a new instance of SacOutputer */
     public SacOutputer() {
@@ -167,7 +166,7 @@ public class SacOutputer extends Outputer {
                         orient[2] = Double.parseDouble(line.substring(15));
                     }
                 }
-                //System.out.println("coord="+coord[0]+" "+coord[1]+" "+coord[2]+" orient="+orient[0]+" "+orient[1]+" "+orient[2]);
+            //System.out.println("coord="+coord[0]+" "+coord[1]+" "+coord[2]+" orient="+orient[0]+" "+orient[1]+" "+orient[2]);
             } catch (IOException e) {
                 System.out.println("OUtput error writing sac response file " + lastComp + ".resp e=" + e.getMessage());
             }
@@ -235,7 +234,7 @@ public class SacOutputer extends Outputer {
             sac.y[i] = span.getData(i);
             if (sac.y[i] == fill) {
                 nodata++;
-                //if(nodata <3) System.out.println(i+" nodata len="+span.getNsamp());
+            //if(nodata <3) System.out.println(i+" nodata len="+span.getNsamp());
             }
         }
         if (nodata > 0 && !quiet) {
@@ -248,6 +247,11 @@ public class SacOutputer extends Outputer {
             }
         }
         try {
+            // TODO I feel like this should return the SAC class and let something
+            // else do the outputting.  Then if someone wants to filter first
+            // before output they can extend the code.
+            // Probably need to package differently and provide access to a
+            // jar.
             sac.write(filename);
         } catch (FileNotFoundException e) {
             System.err.println(e + " File Not found writing SAC");

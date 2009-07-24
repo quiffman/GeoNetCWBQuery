@@ -2,11 +2,9 @@ package gov.usgs.anss.query;
 
 import gov.usgs.anss.seed.MiniSeed;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
 import java.util.GregorianCalendar;
 //import gov.usgs.anss.util.*;
 

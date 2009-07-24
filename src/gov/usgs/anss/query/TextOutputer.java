@@ -1,11 +1,3 @@
-/*
- * MSOutput.java
- *
- * Created on April 20, 2006, 4:23 PM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
 package gov.usgs.anss.query;
 
 import gov.usgs.anss.seed.MiniSeed;
@@ -13,62 +5,71 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Arrays;
+import java.util.GregorianCalendar;
 //import gov.usgs.anss.util.*;
 
 /**
+ * TextOutputer, largely based on MSOutputer.java and SacOutputer.java.
  *
- * @author davidketchum
+ * @author	richardg
+ * @version	$Id$
  */
 public class TextOutputer extends Outputer {
 
     boolean dbg = true;
-    boolean nosort;
-
-    /** Creates a new instance of MSOutput */
-    public void setNosort() {
-        nosort = true;
-    }
-
-    public TextOutputer(boolean nos) {
-        nosort = nos;
-    }
+	public static int NO_DATA = Integer.MIN_VALUE;	// chosen to be the same as Winston Waves.
 
     public void makeFile(String comp, String filename, String filemask, ArrayList<MiniSeed> blks,
             java.util.Date beg, double duration, String[] args) throws IOException {
+
         MiniSeed ms2 = null;
-        boolean nodups = false;
+		int fill = NO_DATA;
+        boolean nogaps = false;		// if true, do not generate a file if it has any gaps!
 
         for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("-nodups")) {
-                nodups = true;
+            if (args[i].equals("-fill")) {
+                fill = Integer.parseInt(args[i + 1]);
+            }
+            if (args[i].equals("-nogaps")) {
+                nogaps = true;
             }
         }
         if (filemask.equals("%N")) {
-            filename += ".ms";
+            filename += ".txt";
         }
         filename = filename.replaceAll("[__]", "_");
-        FileOutputStream out = new FileOutputStream(filename);
-        if (!nosort) {
-            Collections.sort(blks);
+        PrintWriter out = new PrintWriter(new FileOutputStream(filename), false);
+
+        // Use the span to populate a sac file
+        GregorianCalendar start = new GregorianCalendar();
+        start.setTimeInMillis(beg.getTime());
+
+        // build the zero filled area (either with exact limits or with all blocks)
+        ZeroFilledSpan span = new ZeroFilledSpan(blks, start, duration, fill);
+        if (span.getRate() <= 0.00) {
+            return;         // There is no real data to put in SAC
         }
-        if (nodups) {
-            for (int i = blks.size() - 1; i > 0; i--) {
-                if (blks.get(i).isDuplicate(blks.get(i - 1))) {
-                    blks.remove(i);
-                }
-            }
+        if (dbg) {
+            System.out.println("ZeroSpan=" + span.toString());
         }
 
-        for (int i = 0; i < blks.size(); i++) {
-            ms2 = (MiniSeed) blks.get(i);
-            if (dbg) {
-                System.out.println("Out:" + ms2.getSeedName() + " " + ms2.getTimeString() +
-                        " ns=" + ms2.getNsamp() + " rt=" + ms2.getRate() +
-						" ms=" + ms2.getTimeInMillis() + " buf=" + Arrays.toString((ms2.getData(1024))));
-            }
-//            out.write(ms2.getBuf(), 0, ms2.getBlockSize());
-        }
+		GregorianCalendar spanStart = span.getStart();
+
+		double currentTime = spanStart.getTimeInMillis();
+		double period = 1000.0 / span.getRate();
+		int data;
+
+		for (int i = 0; i < span.getNsamp(); i++) {
+			data = span.getData(i);
+			if (nogaps || data != NO_DATA) {
+				out.println((long)Math.round(currentTime) + " " + span.getData(i));
+			}
+			currentTime += period;
+		}
+
+
         out.close();
     }
 }

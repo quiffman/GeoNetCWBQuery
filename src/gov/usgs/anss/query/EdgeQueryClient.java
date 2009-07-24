@@ -588,7 +588,7 @@ public class EdgeQueryClient {
                         out = new HoldingOutputer();
                     }
                     if (type.equals("text")) {
-                        out = new TextOutputer(nosort);
+                        out = new TextOutputer();
                     }
                 } else if (type.equals("null")) {
                     out = null;

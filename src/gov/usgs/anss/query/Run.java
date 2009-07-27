@@ -33,6 +33,7 @@ public class Run implements Comparable<Run> {
     double rate;
     int nweird;
 	protected static final Logger logger = Logger.getLogger(Run.class.getName());
+	static {logger.finest("$Id$");}
 
     /** return the seedname for the run
      *@return The seedname*/

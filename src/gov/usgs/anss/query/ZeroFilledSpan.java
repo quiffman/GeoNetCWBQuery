@@ -39,7 +39,7 @@ public class ZeroFilledSpan {
     boolean dbg = false;
     String missingSummary;
 	protected static final Logger logger = Logger.getLogger(ZeroFilledSpan.class.getName());
-	static {logger.finest("$Id$");}
+	static {logger.fine("$Id$");}
 
     /** string represting this time series
      *@return a String with nsamp, rate and start date/time*/

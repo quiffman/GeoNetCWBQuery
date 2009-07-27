@@ -68,7 +68,7 @@ public class EdgeQueryClient {
     static DecimalFormat df6;
     private static ResourceBundle props;
 	private static final Logger logger = Logger.getLogger(EdgeQueryClient.class.getName());
-	static {logger.finest("$Id$");}
+	static {logger.fine("$Id$");}
 
 
     // TODO the two following methods need to go into their own class

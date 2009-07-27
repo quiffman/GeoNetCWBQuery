@@ -27,7 +27,7 @@ public class HoldingOutputer extends Outputer {
 
     boolean dbg;
     HoldingSender hs;
-	static {logger.finest("$Id$");}
+	static {logger.fine("$Id$");}
 
     /** Creates a new instance of HoldingsOutput */
     public HoldingOutputer() {

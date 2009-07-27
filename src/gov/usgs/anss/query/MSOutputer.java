@@ -23,7 +23,7 @@ public class MSOutputer extends Outputer {
 
     boolean dbg;
     boolean nosort;
-	static {logger.finest("$Id$");}
+	static {logger.fine("$Id$");}
 
     /** Creates a new instance of MSOutput */
     public void setNosort() {

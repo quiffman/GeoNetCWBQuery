@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 abstract public class Outputer {
 
 	protected static final Logger logger = Logger.getLogger(Outputer.class.getName());
-	static {logger.finest("$Id$");}
+	static {logger.fine("$Id$");}
 
     /** Creates a new instance of Outputer */
     public Outputer() {

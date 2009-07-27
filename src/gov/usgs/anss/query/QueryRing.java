@@ -34,7 +34,7 @@ public class QueryRing extends ZeroFilledSpan {
     double duration;
     double preDuration;
     String[] args;
-	static {logger.finest("$Id$");}
+	static {logger.fine("$Id$");}
 
     /**
      * Creates a new instance of QueryRing set the duration to make the reads not happen

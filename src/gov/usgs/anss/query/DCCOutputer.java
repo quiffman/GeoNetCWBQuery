@@ -91,7 +91,7 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
     private byte[] empty1001 = {3, (byte) 233, 0, 0, 0, 0, 0, 7};
     int maxnsamp;                 // storage for the most samples that could be in a block before midnight
     long dropDeadEnd;
-	static {logger.finest("$Id$");}
+	static {logger.fine("$Id$");}
 
     /** Creates a new instance of DCCOutputer */
     public DCCOutputer() {

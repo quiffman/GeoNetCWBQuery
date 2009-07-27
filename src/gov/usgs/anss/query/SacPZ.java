@@ -21,7 +21,7 @@ public class SacPZ {
     private String pzunit;
     private StaSrv stasrv;
 	protected static final Logger logger = Logger.getLogger(SacPZ.class.getName());
-	static {logger.finest("$Id$");}
+	static {logger.fine("$Id$");}
 
     /** Creates a new instance of SacPZ
      * @param stahost The host to use for metadata, if null or "", it uses cwb-pub

@@ -17,14 +17,14 @@ import java.util.GregorianCalendar;
 public class TextOutputer extends Outputer {
 
     boolean dbg = false;
-	public static int WINSTON_NO_DATA = Integer.MIN_VALUE;	// chosen to be the same as Winston Waves.
-//	public static int SAC_UNDEFINED = -12345;		// this is the undefined value for the Sac data format.
+	public static final int WINSTON_NO_DATA = Integer.MIN_VALUE;	// chosen to be the same as Winston Waves.
+//	public static final int SAC_UNDEFINED = -12345;		// this is the undefined value for the Sac data format.
 
     public void makeFile(String comp, String filename, String filemask, ArrayList<MiniSeed> blks,
             java.util.Date beg, double duration, String[] args) throws IOException {
 
         // Process the args for things that affect us
-        if (blks.size() == 0) {
+        if (blks.isEmpty()) {
             return;    // no data to save
         }
 		int fill = WINSTON_NO_DATA;
@@ -42,14 +42,14 @@ public class TextOutputer extends Outputer {
             filename += ".txt";
         }
         filename = filename.replaceAll("[__]", "_");
-        PrintWriter out = new PrintWriter(new FileOutputStream(filename), false);
+        final PrintWriter out = new PrintWriter(new FileOutputStream(filename), false);
 
         // Use the span to populate a sac file
         GregorianCalendar start = new GregorianCalendar();
         start.setTimeInMillis(beg.getTime());
 
         // build the zero filled area (either with exact limits or with all blocks)
-        ZeroFilledSpan span = new ZeroFilledSpan(blks, start, duration, fill);
+        final ZeroFilledSpan span = new ZeroFilledSpan(blks, start, duration, fill);
         if (span.getRate() <= 0.00) {
             return;         // There is no real data to put in SAC
         }
@@ -60,7 +60,7 @@ public class TextOutputer extends Outputer {
 		GregorianCalendar spanStart = span.getStart();
 
 		double currentTime = spanStart.getTimeInMillis();
-		double period = 1000.0 / span.getRate();
+		final double period = 1000.0 / span.getRate();
 		int data;
 
 		for (int i = 0; i < span.getNsamp(); i++) {

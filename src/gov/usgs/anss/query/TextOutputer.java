@@ -18,6 +18,7 @@ public class TextOutputer extends Outputer {
 
 	public static final int WINSTON_NO_DATA = Integer.MIN_VALUE;	// chosen to be the same as Winston Waves.
 //	public static final int SAC_UNDEFINED = -12345;		// this is the undefined value for the Sac data format.
+	static {logger.finest("$Id$");}
 
     public void makeFile(String comp, String filename, String filemask, ArrayList<MiniSeed> blks,
             java.util.Date beg, double duration, String[] args) throws IOException {

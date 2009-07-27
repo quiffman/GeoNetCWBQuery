@@ -31,6 +31,7 @@ public class SacOutputer extends Outputer {
     private static String stasrvHost;
     private static int stasrvPort;
     private static ResourceBundle props;
+	static {logger.finest("$Id$");}
 
     /** Creates a new instance of SacOutputer */
     public SacOutputer() {

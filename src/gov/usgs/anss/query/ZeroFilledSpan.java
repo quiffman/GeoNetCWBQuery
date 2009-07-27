@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.logging.Logger;
 
 /** This class represent a time series chunk which is zero filled if data is
  * missing.  The idea is to allow creation, population by a series of blocks
@@ -37,6 +38,8 @@ public class ZeroFilledSpan {
     double rate = 0.;
     boolean dbg = false;
     String missingSummary;
+	protected static final Logger logger = Logger.getLogger(ZeroFilledSpan.class.getName());
+	static {logger.finest("$Id$");}
 
     /** string represting this time series
      *@return a String with nsamp, rate and start date/time*/

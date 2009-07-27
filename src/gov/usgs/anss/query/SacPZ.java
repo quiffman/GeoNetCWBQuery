@@ -10,6 +10,7 @@ package gov.usgs.anss.query;
 import java.io.IOException;
 import java.io.PrintWriter;
 import gov.usgs.anss.util.StaSrv;
+import java.util.logging.Logger;
 
 /**
  *
@@ -19,6 +20,8 @@ public class SacPZ {
 
     private String pzunit;
     private StaSrv stasrv;
+	protected static final Logger logger = Logger.getLogger(SacPZ.class.getName());
+	static {logger.finest("$Id$");}
 
     /** Creates a new instance of SacPZ
      * @param stahost The host to use for metadata, if null or "", it uses cwb-pub

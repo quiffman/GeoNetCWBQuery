@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.GregorianCalendar;
 import gov.usgs.anss.seed.*;
 import gov.usgs.anss.util.*;
+import java.util.logging.Logger;
 
 /**
  *
@@ -31,6 +32,7 @@ public class Run implements Comparable<Run> {
     String seedname;
     double rate;
     int nweird;
+	protected static final Logger logger = Logger.getLogger(Run.class.getName());
 
     /** return the seedname for the run
      *@return The seedname*/

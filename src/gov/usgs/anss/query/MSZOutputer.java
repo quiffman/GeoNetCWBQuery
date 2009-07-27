@@ -28,6 +28,7 @@ public class MSZOutputer extends Outputer {
     boolean dbg;
     int blocksize;
     DecimalFormat df3;
+	static {logger.finest("$Id$");}
 
     /** Creates a new instance of SacOutputer */
     public MSZOutputer(int blkSize) {

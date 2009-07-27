@@ -89,6 +89,7 @@ public class DCC512Outputer extends Outputer implements MiniSeedOutputHandler {
     private byte[] empty1001 = {3, (byte) 233, 0, 0, 0, 0, 0, 7};
     int maxnsamp;                 // storage for the most samples that could be in a block before midnight
     long dropDeadEnd;
+	static {logger.finest("$Id$");}
 
     public void makeFile(String comp, String filename, String filemask, ArrayList<MiniSeed> blks,
             java.util.Date beg, double duration, String[] args) throws IOException {

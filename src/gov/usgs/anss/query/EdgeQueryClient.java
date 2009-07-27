@@ -21,6 +21,7 @@ import gov.usgs.anss.util.SeedUtil;
 import gov.usgs.anss.util.Util;
 import java.text.DecimalFormat;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 /** This class is the main class for CWBQuery which allows the user to make queries
  * against all files on a CWB or Edge computer.  The program has two modes :
@@ -66,6 +67,7 @@ public class EdgeQueryClient {
     static DecimalFormat df4;
     static DecimalFormat df6;
     private static ResourceBundle props;
+	private static final Logger logger = Logger.getLogger(EdgeQueryClient.class.getName());
 
 
     // TODO the two following methods need to go into their own class
@@ -877,9 +879,12 @@ public class EdgeQueryClient {
         // TODO - not sure this is doing anything.
         Util.setModeGMT();
 
+		logger.finest("Running Edge Query");
+
         ArrayList<ArrayList<MiniSeed>> mss = EdgeQueryClient.query(args);
         if (mss == null) {
             // TODO Evil - needs a log message.
+			logger.severe("Query returned null.");
             System.exit(1);
         }
         System.exit(0);

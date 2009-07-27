@@ -16,7 +16,6 @@ import java.util.GregorianCalendar;
  */
 public class TextOutputer extends Outputer {
 
-    boolean dbg = false;
 	public static final int WINSTON_NO_DATA = Integer.MIN_VALUE;	// chosen to be the same as Winston Waves.
 //	public static final int SAC_UNDEFINED = -12345;		// this is the undefined value for the Sac data format.
 
@@ -41,6 +40,7 @@ public class TextOutputer extends Outputer {
         if (filemask.equals("%N")) {
             filename += ".txt";
         }
+		logger.info("filename=" + filename);
         filename = filename.replaceAll("[__]", "_");
         final PrintWriter out = new PrintWriter(new FileOutputStream(filename), false);
 
@@ -53,9 +53,7 @@ public class TextOutputer extends Outputer {
         if (span.getRate() <= 0.00) {
             return;         // There is no real data to put in SAC
         }
-        if (dbg) {
-            System.out.println("ZeroSpan=" + span.toString());
-        }
+		logger.fine("ZeroSpan=" + span.toString());
 
 		GregorianCalendar spanStart = span.getStart();
 

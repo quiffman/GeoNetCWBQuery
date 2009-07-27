@@ -11,12 +11,15 @@ package gov.usgs.anss.query;
 import java.util.ArrayList;
 import java.io.IOException;
 import gov.usgs.anss.seed.MiniSeed;
+import java.util.logging.Logger;
 
 /**
  *
  * @author davidketchum
  */
 abstract public class Outputer {
+
+	protected static final Logger logger = Logger.getLogger(Outputer.class.getName());
 
     /** Creates a new instance of Outputer */
     public Outputer() {

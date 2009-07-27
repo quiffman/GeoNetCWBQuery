@@ -16,14 +16,18 @@ import java.util.GregorianCalendar;
  */
 public class TextOutputer extends Outputer {
 
-    boolean dbg = true;
-	public static int NO_DATA = Integer.MIN_VALUE;	// chosen to be the same as Winston Waves.
+    boolean dbg = false;
+	public static int WINSTON_NO_DATA = Integer.MIN_VALUE;	// chosen to be the same as Winston Waves.
+//	public static int SAC_UNDEFINED = -12345;		// this is the undefined value for the Sac data format.
 
     public void makeFile(String comp, String filename, String filemask, ArrayList<MiniSeed> blks,
             java.util.Date beg, double duration, String[] args) throws IOException {
 
-        MiniSeed ms2 = null;
-		int fill = NO_DATA;
+        // Process the args for things that affect us
+        if (blks.size() == 0) {
+            return;    // no data to save
+        }
+		int fill = WINSTON_NO_DATA;
         boolean nogaps = false;		// if true, do not generate a file if it has any gaps!
 
         for (int i = 0; i < args.length; i++) {
@@ -61,7 +65,7 @@ public class TextOutputer extends Outputer {
 
 		for (int i = 0; i < span.getNsamp(); i++) {
 			data = span.getData(i);
-			if (nogaps || data != NO_DATA) {
+			if (nogaps || data != fill) {
 				out.println((long)Math.round(currentTime) + " " + span.getData(i));
 			}
 			currentTime += period;

@@ -21,7 +21,6 @@ import gov.usgs.anss.util.SeedUtil;
 import gov.usgs.anss.util.Util;
 import java.text.DecimalFormat;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -399,7 +398,7 @@ public class EdgeQueryClient {
                 outtcp.write(line.getBytes());
                 return null;
             } catch (IOException e) {
-                System.err.print(e + " Getting a directory");
+                logger.severe(e + " Getting a directory");
             }
             return null;
         }
@@ -440,7 +439,7 @@ public class EdgeQueryClient {
                 System.out.println(sb.toString());
                 return null;
             } catch (IOException e) {
-                System.err.println(e + " Getting a directory");
+                logger.severe(e + " Getting a directory");
                 return null;
             }
         }
@@ -456,7 +455,7 @@ public class EdgeQueryClient {
             try {
                 infile = new BufferedReader(new FileReader(filenamein));
             } catch (FileNotFoundException e) {
-                System.out.println("did not find the input file=" + filenamein);
+                logger.severe("did not find the input file=" + filenamein);
                 return null;
             }
         }
@@ -477,13 +476,13 @@ public class EdgeQueryClient {
                     if (e != null) {
                         if (e.getMessage() != null) {
                             if (e.getMessage().indexOf("Connection refused") >= 0) {
-                                System.out.println("Got a connection refused. " + host + "/" + port + "  Is the server up?  Wait 20 and try again");
+                                logger.warning("Got a connection refused. " + host + "/" + port + "  Is the server up?  Wait 20 and try again");
                             }
                         } else {
-                            System.out.println("Got IOError opening socket to server e=" + e);
+                            logger.warning("Got IOError opening socket to server e=" + e);
                         }
                     } else {
-                        System.out.println("Got IOError opening socket to server e=" + e);
+                        logger.warning("Got IOError opening socket to server e=" + e);
                     }
                     Util.sleep(20000);
                 }
@@ -815,7 +814,7 @@ public class EdgeQueryClient {
                                 lastComp = ms.getSeedName();
                             }
                         } catch (IllegalSeednameException e) {
-                            System.out.println("Seedname exception making a seed record e=" + e.getMessage());
+                            logger.severe("Seedname exception making a seed record e=" + e.getMessage());
                         }
                     }   // while(!eof)
                     if (!quiet && iblk > 0) {
@@ -828,17 +827,17 @@ public class EdgeQueryClient {
                     }
                     blks.clear();
                 } catch (UnknownHostException e) {
-                    System.out.println("EQC main: Host is unknown=" + host + "/" + port);
+                    logger.severe("EQC main: Host is unknown=" + host + "/" + port);
                     if (out != null) {
                         System.exit(1);
                     }
                     return null;
                 } catch (IOException e) {
                     if (e.getMessage().equalsIgnoreCase("Connection refused")) {
-                        System.out.println("The connection was refused.  Server is likely down or is blocked. This should never happen.");
+                        logger.severe("The connection was refused.  Server is likely down or is blocked. This should never happen.");
                         return null;
                     } else {
-                        System.err.println(e + " EQC main: IO error opening/reading socket=" + host + "/" + port);
+                        logger.severe(e + " EQC main: IO error opening/reading socket=" + host + "/" + port);
                         if (out != null) {
                             System.exit(1);
                         }
@@ -859,7 +858,7 @@ public class EdgeQueryClient {
             }
             return null;
         } catch (IOException e) {
-            System.err.println(e + " IOError reading input lines.");
+            logger.severe(e + " IOError reading input lines.");
         }
         return null;
     }

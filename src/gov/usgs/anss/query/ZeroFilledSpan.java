@@ -74,9 +74,9 @@ public class ZeroFilledSpan {
         if (offset < 0) {
             return -1;
         }
-        if (dbg) {
-            System.out.println("getData starting =" + Util.asctime2(starting) + " buf start=" + Util.asctime2(start) + " offset=" + offset);
-        }
+
+		logger.fine("getData starting =" + Util.asctime2(starting) + " buf start=" + Util.asctime2(start) + " offset=" + offset);
+
         if (nsamp + offset > data.length) {
             nsamp = data.length - offset;
         }
@@ -364,7 +364,7 @@ public class ZeroFilledSpan {
             j++;
         }
         if (rate == 0.) {
-            System.out.println("There is no data in this span");
+            logger.info("There is no data in this span");
             nsamp = 0;
             data = new int[1];
             start = new GregorianCalendar();
@@ -377,22 +377,22 @@ public class ZeroFilledSpan {
         }
         int begoffset = (int) ((trim.getTimeInMillis() - ms.getGregorianCalendar().getTimeInMillis()) *
                 rate / 1000. + 0.01);
-        if (dbg) {
-            System.out.println(Util.ascdate(trim) + " " + Util.asctime(trim) + " start=" +
-                    Util.ascdate(ms.getGregorianCalendar()) + " " + Util.asctime(ms.getGregorianCalendar()));
-        }
+
+		logger.fine(Util.ascdate(trim) + " " + Util.asctime(trim) + " start=" +
+				Util.ascdate(ms.getGregorianCalendar()) + " " + Util.asctime(ms.getGregorianCalendar()));
+
         // The start time of this span is the time of first sample from first ms after
         // the trim start time
         start = new GregorianCalendar();
         start.setTimeInMillis(ms.getGregorianCalendar().getTimeInMillis());
         start.add(Calendar.MILLISECOND, (int) (begoffset / rate * 1000.));// first in trimmed interval
-        if (dbg) {
-            System.out.println(Util.ascdate(start) + " " + Util.asctime(start) + " begoff=" + begoffset);
-        }
+
+		logger.fine(Util.ascdate(start) + " " + Util.asctime(start) + " begoff=" + begoffset);
+
         byte[] frames;
         MiniSeed msend = (MiniSeed) list.get(list.size() - 1);
         nsamp = (int) (duration * ms.getRate() + 0.5);
-        //System.out.println("duration="+duration+" nsf="+(duration*ms.getRate())+"nsamp="+nsamp);
+        //logger.finer("duration="+duration+" nsf="+(duration*ms.getRate())+"nsamp="+nsamp);
         data = new int[nsamp];
         if (fill != 0) {
             for (int i = 0; i < nsamp; i++) {
@@ -406,10 +406,10 @@ public class ZeroFilledSpan {
                     start.getTimeInMillis() + msover2) * rate / 1000.);
             long mod = (long) ((ms.getGregorianCalendar().getTimeInMillis() -
                     start.getTimeInMillis() + msover2) * rate) % 1000L;
-            if (dbg) {
-                System.out.println(Util.ascdate(start) + " " + Util.asctime(start) + " ms[0]=" +
-                        Util.ascdate(ms.getGregorianCalendar()) + " " + Util.asctime(ms.getGregorianCalendar()) + " offset=" + offset + " ns=" + ms.getNsamp());
-            }
+
+			logger.fine(Util.ascdate(start) + " " + Util.asctime(start) + " ms[0]=" +
+					Util.ascdate(ms.getGregorianCalendar()) + " " + Util.asctime(ms.getGregorianCalendar()) + " offset=" + offset + " ns=" + ms.getNsamp());
+
 
             // get the compression frames
             frames = new byte[ms.getBlockSize() - ms.getDataOffset()];
@@ -422,8 +422,8 @@ public class ZeroFilledSpan {
                     }
                 }
                 if (!skip) {
-                    System.out.println("ZeroFilledSpan: Cannot decode - not Steim I or II type=" + ms.getEncoding() + " blk=" + i);
-                    System.out.println(ms.toString());
+                    logger.warning("ZeroFilledSpan: Cannot decode - not Steim I or II type=" + ms.getEncoding() + " blk=" + i);
+                    logger.warning(ms.toString());
                 }
                 continue;
                 //System.exit(0);
@@ -438,7 +438,7 @@ public class ZeroFilledSpan {
                     samples = Steim2.decode(frames, ms.getNsamp(), ms.isSwapBytes(), reverse);
                 }
                 // if the offset calculated is negative, shorten the transfer to beginning
-                //System.out.println("offset="+offset+" ms.nsamp="+ms.getNsamp()+" bufsiz="+nsamp);
+                //logger.finer("offset="+offset+" ms.nsamp="+ms.getNsamp()+" bufsiz="+nsamp);
                 if (offset < 0) {
                     if (ms.getNsamp() + offset - 1 > 0) {
                         System.arraycopy(samples, -offset + 1, data, 0,
@@ -449,7 +449,7 @@ public class ZeroFilledSpan {
                             Math.min(ms.getNsamp(), nsamp - offset));
                 }
             } catch (SteimException e) {
-                System.out.println("block " + i + " gave steim decode error. " + e.getMessage());
+                logger.severe("block " + i + " gave steim decode error. " + e.getMessage());
             }
         }           // end for each block in list
     }

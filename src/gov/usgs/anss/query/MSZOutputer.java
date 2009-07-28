@@ -82,10 +82,10 @@ public class MSZOutputer extends Outputer {
                 if (doHoldings) {
                     if (hs == null) {
                         try {
-                            //System.out.println("Open HoldingSender "+"-h 136.177.24.92 -p 7996 -t CW -q 10000 -tcp -quiet -noeto");
+                            //logger.fine("Open HoldingSender "+"-h 136.177.24.92 -p 7996 -t CW -q 10000 -tcp -quiet -noeto");
                             hs = new HoldingSender("-h 136.177.24.92 -p 7996 -t CW -q 10000 -tcp -quiet -noeto", "");
                         } catch (UnknownHostException e) {
-                            System.out.println("Unknown host exception host=136.177.24.92");
+                            logger.severe("Unknown host exception host=136.177.24.92");
                             doHoldings = false;
                         }
                     }
@@ -115,13 +115,13 @@ public class MSZOutputer extends Outputer {
             Collections.sort(runs);
             if (dbg) {
                 for (int i = 0; i < runs.size(); i++) {
-                    System.out.println(i + " " + runs.get(i));
+                    logger.info(i + " " + runs.get(i));
                 }
             }
             long expected = runs.get(0).getMS(0).getTimeInMillis();
             long today = expected;
             if (expected % 86400000L > gapThreshold) {
-                System.out.println("Start Day Gap : (" + ((expected % 86400000L) / 1000.) + ")    " + lastComp);
+                logger.info("Start Day Gap : (" + ((expected % 86400000L) / 1000.) + ")    " + lastComp);
             }
             for (int i = 0; i < runs.size(); i++) {
                 if (hs != null) {
@@ -131,18 +131,18 @@ public class MSZOutputer extends Outputer {
                 }
                 // Is the end of this run before the expected - if so skip run
                 if (runs.get(i).getMS(runs.get(i).getNBlocks() - 1).getNextExpectedTimeInMillis() < expected) {
-                    if (dbg) {
-                        System.out.println(i + " not needed. before expected");
-                    }
+
+					logger.fine(i + " not needed. before expected");
+
                     continue;
                 }
                 // does this run span the expected, if yes last block is new expected
                 if (runs.get(i).getMS(0).getTimeInMillis() <= expected &&
                         runs.get(i).getMS(runs.get(i).getNBlocks() - 1).getNextExpectedTimeInMillis() > expected) {
                     expected = runs.get(i).getMS(runs.get(i).getNBlocks() - 1).getNextExpectedTimeInMillis();
-                    if (dbg) {
-                        System.out.println(i + " spanning run new expect=" + runs.get(i).getMS(runs.get(i).getNBlocks() - 1).getEndTimeString());
-                    }
+
+					logger.fine(i + " spanning run new expect=" + runs.get(i).getMS(runs.get(i).getNBlocks() - 1).getEndTimeString());
+
                     continue;
                 }
                 if (runs.get(i).getMS(0).getTimeInMillis() - expected > gapThreshold) {
@@ -156,7 +156,7 @@ public class MSZOutputer extends Outputer {
                     if (df3 == null) {
                         df3 = new DecimalFormat("0.000");
                     }
-                    System.out.println("Gap: " + msEndStr[1] + " " + msEndStr[2] + " " + msEndStr[3] + " " + msEndStr[5] + " " +
+                    logger.info("Gap: " + msEndStr[1] + " " + msEndStr[2] + " " + msEndStr[3] + " " + msEndStr[5] + " " +
                             Integer.toString(msStart.get(Calendar.MILLISECOND)) + " to " +
                             nextStartStr[1] + " " + nextStartStr[2] + " " + nextStartStr[3] + " " + nextStartStr[5] + " " +
                             Integer.toString(msEnd.get(Calendar.MILLISECOND)) +
@@ -167,9 +167,9 @@ public class MSZOutputer extends Outputer {
             }
             long gp = ((today / 86400000L + 1) * 86400000L) - expected;
             if (gp > gapThreshold) {
-                System.out.println("End Day Gap : (" + (gp / 1000.) + ")     " + lastComp);
+                logger.info("End Day Gap : (" + (gp / 1000.) + ")     " + lastComp);
             }
-            System.out.println("expected=" + expected + " bound=" + ((today / 86400000L + 1) * 86400000L) + " gp=" + gp);
+            logger.fine("expected=" + expected + " bound=" + ((today / 86400000L + 1) * 86400000L) + " gp=" + gp);
 
             if (hs != null && doHoldings) {
                 hs.close();
@@ -179,9 +179,9 @@ public class MSZOutputer extends Outputer {
 
         // build the zero filled area (either with exact limits or with all blocks)
         ZeroFilledSpan span = new ZeroFilledSpan(blks, start, duration, fill);
-        if (dbg) {
-            System.out.println("ZeroSpan=" + span.toString());
-        }
+
+		logger.fine("ZeroSpan=" + span.toString());
+
         if (filemask.equals("%N")) {
             filename += ".ms";
         }
@@ -210,7 +210,7 @@ public class MSZOutputer extends Outputer {
         boolean forceout = false;
         for (int off = 0; off < span.getNsamp(); off = off + len) {
             n = span.getData(d, off, len);
-            //System.out.println("comp: n="+n+" "+year+" "+doy+" "+RawToMiniSeed.timeFromUSec(sec*1000000L+micros));
+            //logger.finer("comp: n="+n+" "+year+" "+doy+" "+RawToMiniSeed.timeFromUSec(sec*1000000L+micros));
 
             int offstart = -1;
             int end = 0;

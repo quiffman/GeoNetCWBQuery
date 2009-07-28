@@ -53,7 +53,7 @@ public class HoldingOutputer extends Outputer {
             try {
                 hs = new HoldingSender("-h " + holdingIP + " -p " + holdingPort + " -t " + holdingType + " -q 10000 -tcp", "");
             } catch (UnknownHostException e) {
-                System.out.println("Unknown host exception host=" + holdingIP);
+                logger.severe("Unknown host exception host=" + holdingIP);
                 System.exit(1);
             }
         }

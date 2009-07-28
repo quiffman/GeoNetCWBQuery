@@ -42,7 +42,7 @@ public class SacPZ {
         int loop = 0;
         while (s.indexOf("MetaDataServer not up") >= 0) {
             if (loop++ % 15 == 1) {
-                System.out.println("MetaDataServer is not up - waiting for connection");
+                logger.warning("MetaDataServer is not up - waiting for connection");
             }
             try {
                 Thread.sleep(2000);
@@ -75,7 +75,7 @@ public class SacPZ {
             fout.write(s);
             fout.close();
         } catch (IOException e) {
-            System.out.println("OUtput error writing sac response file " + filename + ".resp e=" + e.getMessage());
+            logger.severe("OUtput error writing sac response file " + filename + ".resp e=" + e.getMessage());
         }
     }
 }

@@ -13,7 +13,11 @@ import java.util.Calendar;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import gov.usgs.anss.seed.MiniSeed;
-import gov.usgs.anss.util.*;
+import java.util.TimeZone;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
+//import gov.usgs.anss.util.*;
 
 /** This class keeps a little buffer of in the clear data and satisfies requests from it.
  * When data is needed which is not in the buffer, a query is made and more data read in from
@@ -36,6 +40,8 @@ public class QueryRing extends ZeroFilledSpan {
     String[] args;
 	static {logger.fine("$Id$");}
 
+    private static DateTimeFormatter dtFormat = ISODateTimeFormat.dateTime().withZone(DateTimeZone.forID("UTC"));
+ 
     /**
      * Creates a new instance of QueryRing set the duration to make the reads not happen
      * too often and the preDuration to be how far in the past you might ask for data from
@@ -93,18 +99,18 @@ public class QueryRing extends ZeroFilledSpan {
      */
     public int getDataAt(GregorianCalendar starting, int nsamp, int[] d) {
 
-		logger.fine("Ask for data at " + Util.ascdate(starting) + " " + Util.asctime2(starting) + " ns=" + nsamp + " start=" + Util.ascdate(start) + Util.asctime2(start));
+		logger.fine("Ask for data at " + dtFormat.print(starting.getTimeInMillis()) + " ns=" + nsamp + " start=" + dtFormat.print(start.getTimeInMillis()));
 
         if (starting.compareTo(start) < 0 ||
                 ((long) (start.getTimeInMillis() + duration * 1000)) < ((long) (starting.getTimeInMillis() + nsamp / rate * 1000.))) {
 
-			logger.fine("Data not in range buf start=" + Util.ascdate(start) + " " + Util.asctime2(start) + " dur=" + duration);
+			logger.fine("Data not in range buf start=" + dtFormat.print(start.getTimeInMillis()) + " dur=" + duration);
 
             GregorianCalendar now = new GregorianCalendar();
             now.setTimeInMillis(starting.getTimeInMillis());
             now.add(Calendar.MILLISECOND, (int) (-preDuration * 1000.));
 
-			logger.fine("Query for data start=" + Util.ascdate(now) + " " + Util.asctime2(now) + " predur=" + preDuration);
+			logger.fine("Query for data start=" + dtFormat.print(now.getTimeInMillis()) + " predur=" + preDuration);
 
             args[8] = "" + now.get(Calendar.YEAR) + "," + now.get(Calendar.DAY_OF_YEAR) + "-" +
                     df2.format(now.get(Calendar.HOUR_OF_DAY)) + ":" + df2.format(now.get(Calendar.MINUTE)) +
@@ -122,8 +128,9 @@ public class QueryRing extends ZeroFilledSpan {
     /** test routine
      *@param args The args */
     public static void main(String[] args) {
-        // TODO not at all sure this will have any effect.
-        Util.setModeGMT();
+        TimeZone tz = TimeZone.getTimeZone("GMT+0");
+        TimeZone.setDefault(tz);
+
         QueryRing ring = new QueryRing("136.177.24.70", 2061, "USDUG  BHZ  ", new GregorianCalendar(2007, 0, 1, 0, 0, 0), 600., 30.);
         String[] args2 = new String[9];
         args2[0] = "-s";
@@ -146,7 +153,7 @@ public class QueryRing extends ZeroFilledSpan {
                 if (i == 3510) {
                     logger.info("3510");
                 }
-                logger.info("i=" + i + " " + Util.ascdate(now) + " " + Util.asctime2(now));
+                logger.info("i=" + i + " " + dtFormat.print(now.getTimeInMillis()));
                 int ns = ring.getDataAt(now, 4000, d);
                 int ns2 = span.getData(now, 4000, d2);
                 for (int j = 0; j < Math.min(ns2, ns); j++) {

@@ -12,10 +12,8 @@ import gov.usgs.anss.seed.MiniSeed;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.net.*;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import gov.usgs.anss.edge.*;
-//import gov.usgs.anss.util.*;
 
 /**
  * This outputer just sends the blocks to the TCP/IP based holdings server.  The user
@@ -62,7 +60,6 @@ public class HoldingOutputer extends Outputer {
         for (int i = 0; i < blks.size(); i++) {
             ms2 = (MiniSeed) blks.get(i);
             while (hs.getNleft() < 100) {
-                //Util.prta("Slept 1 left="+hs.getNleft()+" "+hs.getStatusString());
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {

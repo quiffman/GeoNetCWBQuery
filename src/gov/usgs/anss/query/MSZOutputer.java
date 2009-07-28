@@ -17,7 +17,10 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import gov.usgs.anss.edge.*;
-import gov.usgs.anss.util.*;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
+import gov.usgs.anss.util.SeedUtil;
 
 /**
  *
@@ -29,6 +32,8 @@ public class MSZOutputer extends Outputer {
     int blocksize;
     DecimalFormat df3;
 	static {logger.fine("$Id$");}
+
+    private static DateTimeFormatter dtFormat = ISODateTimeFormat.dateTime().withZone(DateTimeZone.forID("UTC"));
 
     /** Creates a new instance of SacOutputer */
     public MSZOutputer(int blkSize) {
@@ -305,9 +310,10 @@ public class MSZOutputer extends Outputer {
 
         /** string representation
          *@return a String representation of this run */
+        @Override
         public String toString() {
-            return "Run from " + Util.ascdate(start) + " " + Util.asctime2(start) + " to " +
-                    Util.ascdate(end) + " " + Util.asctime2(end) + " " + getLength() + " s #blks=" + blks.size();
+            return "Run from " + dtFormat.print(start.getTimeInMillis()) + " to " +
+                    dtFormat.print(end.getTimeInMillis()) + " " + getLength() + " s #blks=" + blks.size();
         }
 
         /** return the ith miniseed block

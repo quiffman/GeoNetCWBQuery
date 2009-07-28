@@ -21,6 +21,7 @@ import gov.usgs.anss.util.SeedUtil;
 import gov.usgs.anss.util.Util;
 import java.text.DecimalFormat;
 import java.util.ResourceBundle;
+import java.util.TimeZone;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -898,9 +899,9 @@ public class EdgeQueryClient {
 			logger.config("Using custom logging config file: "+customLogConfigFile);
 		}
 
-
-        // TODO - not sure this is doing anything.
-        Util.setModeGMT();
+        //TOSO this any any others should get explicitly set on calendars.
+        TimeZone tz = TimeZone.getTimeZone("GMT+0");
+        TimeZone.setDefault(tz);
 
 		logger.finest("Running Edge Query");
 

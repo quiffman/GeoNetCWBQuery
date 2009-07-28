@@ -44,6 +44,8 @@
 
         <dependency org="joda-time" name="joda-time" rev="1.6" conf="compile->default;foride->sources" />
 
+        <dependency org="junit" name="junit" rev="4.1" conf="test->default"/>
+
         <dependency org="net.sf.proguard" name="proguard" rev="[3.5,)" conf="build->default"/>
 
         <dependency org="com.cenqua.clover" name="clover" rev="latest." conf="optional->default"/>

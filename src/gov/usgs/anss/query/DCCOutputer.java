@@ -95,8 +95,8 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
     long dropDeadEnd;
 	static {logger.fine("$Id$");}
 
-    private DateTimeFormatter hmsFormat = ISODateTimeFormat.time().withZone(DateTimeZone.forID("UTC"));
-    private DateTimeFormatter ymdFormat = ISODateTimeFormat.date().withZone(DateTimeZone.forID("UTC"));
+    private static DateTimeFormatter hmsFormat = ISODateTimeFormat.time().withZone(DateTimeZone.forID("UTC"));
+    private static DateTimeFormatter dtFormat = ISODateTimeFormat.dateTime().withZone(DateTimeZone.forID("UTC"));
 
     /** Creates a new instance of DCCOutputer */
     public DCCOutputer() {
@@ -1109,8 +1109,8 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
          *@return a String representation of this run */
         @Override
         public String toString() {
-            return "Run from " + ymdFormat.print(start.getTimeInMillis()) + " " + hmsFormat.print(start.getTimeInMillis()) + " to " +
-                    ymdFormat.print(end.getTimeInMillis()) + " " + hmsFormat.print(end.getTimeInMillis()) + " " + getLength() + " s #blks=" + blks.size();
+            return "Run from " + dtFormat.print(start.getTimeInMillis()) + " to " +
+                    dtFormat.print(end.getTimeInMillis()) + " " + getLength() + " s #blks=" + blks.size();
         }
 
 

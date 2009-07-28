@@ -8,7 +8,7 @@
  * Open. You can then make changes to the template in the Source Editor.
  */
 package gov.usgs.anss.query;
-//import com.sun.tools.javac.util.List;
+
 import edu.iris.Fissures.codec.*;
 import gov.usgs.anss.seed.MiniSeed;
 import gov.usgs.anss.util.*;
@@ -17,6 +17,10 @@ import java.util.GregorianCalendar;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.logging.Logger;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 
 /** This class represent a time series chunk which is zero filled if data is
  * missing.  The idea is to allow creation, population by a series of blocks
@@ -38,8 +42,13 @@ public class ZeroFilledSpan {
     double rate = 0.;
     boolean dbg = false;
     String missingSummary;
-	protected static final Logger logger = Logger.getLogger(ZeroFilledSpan.class.getName());
-	static {logger.fine("$Id$");}
+    protected static final Logger logger = Logger.getLogger(ZeroFilledSpan.class.getName());
+
+
+    static {logger.fine("$Id$");}
+   
+    private static DateTimeFormatter dtFormat = ISODateTimeFormat.dateTime().withZone(DateTimeZone.forID("UTC"));
+    private static DateTimeFormatter hmsFormat = DateTimeFormat.forPattern("hh:mm:ss.SSS").withZone(DateTimeZone.forID("UTC"));
 
     /** string represting this time series
      *@return a String with nsamp, rate and start date/time*/
@@ -47,13 +56,13 @@ public class ZeroFilledSpan {
     public String toString() {
         getNMissingData();
         return "ZeroFilledSpan:  ns=" + nsamp + " rt=" + rate + " " +
-                Util.ascdate(start) + " " + Util.asctime(start) + " missing: " + missingSummary;
+                dtFormat.print(start.getTimeInMillis()) + " missing: " + missingSummary;
     }
 
     public String timeAt(int i) {
         GregorianCalendar e = new GregorianCalendar();
         e.setTimeInMillis(start.getTimeInMillis() + ((long) (i / rate * 1000. + 0.5)));
-        return Util.asctime2(e);
+        return hmsFormat.print(e.getTimeInMillis());
     }
 
     public GregorianCalendar getGregorianCalendarAt(int i) {
@@ -68,6 +77,16 @@ public class ZeroFilledSpan {
         return rate;
     }
 
+    /**
+     * This setter is only to allow for unit testing timeAt(int i)
+     * properly.
+     *
+     * @param r digitizing rate in HZ
+     */
+    protected void setRate(double r) {
+        this.rate = r;
+    }
+
     public int getData(GregorianCalendar starting, int nsamp, int[] d) {
         long msoff = starting.getTimeInMillis() - start.getTimeInMillis();
         int offset = (int) ((msoff + 1. / rate * 1000 / 2. - 1.) / 1000. * rate);
@@ -75,7 +94,7 @@ public class ZeroFilledSpan {
             return -1;
         }
 
-		logger.fine("getData starting =" + Util.asctime2(starting) + " buf start=" + Util.asctime2(start) + " offset=" + offset);
+        logger.fine("getData starting =" + hmsFormat.print(starting.getTimeInMillis()) + " buf start=" + hmsFormat.print(start.getTimeInMillis()) + " offset=" + offset);
 
         if (nsamp + offset > data.length) {
             nsamp = data.length - offset;
@@ -378,8 +397,7 @@ public class ZeroFilledSpan {
         int begoffset = (int) ((trim.getTimeInMillis() - ms.getGregorianCalendar().getTimeInMillis()) *
                 rate / 1000. + 0.01);
 
-		logger.fine(Util.ascdate(trim) + " " + Util.asctime(trim) + " start=" +
-				Util.ascdate(ms.getGregorianCalendar()) + " " + Util.asctime(ms.getGregorianCalendar()));
+        logger.fine(dtFormat.print(trim.getTimeInMillis()) + " start = " + dtFormat.print(ms.getGregorianCalendar().getTimeInMillis()));
 
         // The start time of this span is the time of first sample from first ms after
         // the trim start time
@@ -387,7 +405,7 @@ public class ZeroFilledSpan {
         start.setTimeInMillis(ms.getGregorianCalendar().getTimeInMillis());
         start.add(Calendar.MILLISECOND, (int) (begoffset / rate * 1000.));// first in trimmed interval
 
-		logger.fine(Util.ascdate(start) + " " + Util.asctime(start) + " begoff=" + begoffset);
+        logger.fine(dtFormat.print(start.getTimeInMillis()) + " begoff= " + begoffset);
 
         byte[] frames;
         MiniSeed msend = (MiniSeed) list.get(list.size() - 1);
@@ -407,8 +425,8 @@ public class ZeroFilledSpan {
             long mod = (long) ((ms.getGregorianCalendar().getTimeInMillis() -
                     start.getTimeInMillis() + msover2) * rate) % 1000L;
 
-			logger.fine(Util.ascdate(start) + " " + Util.asctime(start) + " ms[0]=" +
-					Util.ascdate(ms.getGregorianCalendar()) + " " + Util.asctime(ms.getGregorianCalendar()) + " offset=" + offset + " ns=" + ms.getNsamp());
+            logger.fine(dtFormat.print(start.getTimeInMillis()) + " ms[0] =" +
+                    dtFormat.print(ms.getGregorianCalendar().getTimeInMillis()) + " offset=" + offset + " ns=" + ms.getNsamp());
 
 
             // get the compression frames
@@ -426,7 +444,7 @@ public class ZeroFilledSpan {
                     logger.warning(ms.toString());
                 }
                 continue;
-                //System.exit(0);
+            //System.exit(0);
             }
             try {
                 int reverse = 0;

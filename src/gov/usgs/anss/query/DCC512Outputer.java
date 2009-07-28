@@ -97,8 +97,8 @@ public class DCC512Outputer extends Outputer implements MiniSeedOutputHandler {
     static {
         logger.fine("$Id$");
     }
-    private DateTimeFormatter hmsFormat = ISODateTimeFormat.time().withZone(DateTimeZone.forID("UTC"));
-    private DateTimeFormatter ymdFormat = ISODateTimeFormat.date().withZone(DateTimeZone.forID("UTC"));
+    private static DateTimeFormatter hmsFormat = ISODateTimeFormat.time().withZone(DateTimeZone.forID("UTC"));
+    private static DateTimeFormatter dtFormat = ISODateTimeFormat.dateTime().withZone(DateTimeZone.forID("UTC"));
 
     public void makeFile(String comp, String filename, String filemask, ArrayList<MiniSeed> blks,
             java.util.Date beg, double duration, String[] args) throws IOException {
@@ -767,8 +767,8 @@ public class DCC512Outputer extends Outputer implements MiniSeedOutputHandler {
          *@return a String representation of this run */
         @Override
         public String toString() {
-            return "Run from " + ymdFormat.print(start.getTimeInMillis()) + " " + hmsFormat.print(start.getTimeInMillis()) + " to " +
-                    ymdFormat.print(end.getTimeInMillis()) + " " + hmsFormat.print(end.getTimeInMillis()) + " " + getLength() + " s #blks=" + blks.size();
+            return "Run from " + dtFormat.print(start.getTimeInMillis()) + " to " +
+                    dtFormat.print(end.getTimeInMillis()) + " " + getLength() + " s #blks=" + blks.size();
         }
 
         /** return the ith miniseed block

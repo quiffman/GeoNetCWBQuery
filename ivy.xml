@@ -42,8 +42,9 @@
         <dependency org="gov.usgs.anss" name="EdgeFile" rev="unknown-1" conf="compile->default"/>
         <dependency org="gov.usgs.anss" name="Usgs" rev="unknown-1" conf="compile->default"/>
 
+        <dependency org="joda-time" name="joda-time" rev="1.6" conf="compile->default;foride->sources" />
 
-		<dependency org="net.sf.proguard" name="proguard" rev="[3.5,)" conf="build->default"/>
+        <dependency org="net.sf.proguard" name="proguard" rev="[3.5,)" conf="build->default"/>
 
         <dependency org="com.cenqua.clover" name="clover" rev="latest." conf="optional->default"/>
 

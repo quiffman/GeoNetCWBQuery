@@ -21,6 +21,8 @@ import gov.usgs.anss.util.SeedUtil;
 import gov.usgs.anss.util.Util;
 import java.text.DecimalFormat;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 /** This class is the main class for CWBQuery which allows the user to make queries
@@ -735,9 +737,9 @@ public class EdgeQueryClient {
                                         filename = filename.replaceAll(" ", "_");
                                         if (dbg) {
                                             System.out.println(((MiniSeed) blks.get(0)).getTimeString() + " to " +
-                                                    ((MiniSeed) blks.get(blks.size() - 1)).getTimeString() +
-                                                    " " + (((MiniSeed) blks.get(0)).getGregorianCalendar().getTimeInMillis() -
-                                                    ((MiniSeed) blks.get(blks.size() - 1)).getGregorianCalendar().getTimeInMillis()) / 1000L);
+												((MiniSeed) blks.get(blks.size() - 1)).getTimeString() +
+												" " + (((MiniSeed) blks.get(0)).getGregorianCalendar().getTimeInMillis() -
+												((MiniSeed) blks.get(blks.size() - 1)).getGregorianCalendar().getTimeInMillis()) / 1000L);
                                         }
                                         // Due to a foul up in data in Nov, Dec 2006 it is possible the Q330s got the
                                         // same baler block twice, but the last 7 512's of the block zeroed and the other
@@ -876,6 +878,24 @@ public class EdgeQueryClient {
     }
 
     public static void main(String[] args) {
+
+		// Load a default logging properties file if none already set.
+		String customLogConfigFile = System.getProperty("java.util.logging.config.file");
+		if (customLogConfigFile == null) {
+			// Use default logging
+			try {
+				InputStream configFile = ClassLoader.getSystemResourceAsStream("resources/logging.properties");
+				LogManager.getLogManager().readConfiguration(configFile);
+			}
+			catch (IOException ex) {
+				logger.severe("Failed to open configuration file, logging not configured.");
+			}
+			logger.config("Using default logging confiuration.");
+		}
+		else {
+			logger.config("Using custom logging config file: "+customLogConfigFile);
+		}
+
 
         // TODO - not sure this is doing anything.
         Util.setModeGMT();

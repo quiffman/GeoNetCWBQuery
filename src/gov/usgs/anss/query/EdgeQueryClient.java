@@ -169,7 +169,7 @@ public class EdgeQueryClient {
         // Class that handled this (if there isn't one in the NB.tar
         // already.
         String[] arg = line.split(" ");
-        System.out.println("line=" + line);
+        logger.config("line=" + line);
         for (int i = 0; i < arg.length; i++) {
             arg[i] = "";
         }
@@ -202,7 +202,7 @@ public class EdgeQueryClient {
             end++;
         }
         if (inQuote) {
-            System.out.println("Query argument list has open quotes!");
+            logger.warning("Query argument list has open quotes!");
             return new ArrayList<ArrayList<MiniSeed>>(1);
         }
         arg[narg++] = line.substring(beg, end).trim();
@@ -217,7 +217,7 @@ public class EdgeQueryClient {
         for (int i = 0; i < narg; i++) {
             if (!arg[i].equals("")) {
                 if (line.indexOf("dbg") >= 0) {
-                    System.out.println(n + "=" + arg[i] + "|");
+                    logger.fine(n + "=" + arg[i] + "|");
                 }
                 args[n++] = arg[i];
             }
@@ -361,7 +361,7 @@ public class EdgeQueryClient {
             } else if (args[i].equals("-sacpz")) {
                 sacpz = true;
                 if (i + 1 > args.length) {
-                    System.out.println(" ***** -sacpz units must be either um or nm and is required!");
+                    logger.warning(" ***** -sacpz units must be either um or nm and is required!");
                     System.exit(0);
                 }
 
@@ -370,7 +370,7 @@ public class EdgeQueryClient {
                     stahost = "137.227.230.1";
                 }
                 if (!args[i + 1].equalsIgnoreCase("nm") && !args[i + 1].equalsIgnoreCase("um")) {
-                    System.out.println("   ****** -sacpz units must be either um or nm switch values is " + args[i + 1]);
+                    logger.warning("   ****** -sacpz units must be either um or nm switch values is " + args[i + 1]);
                     System.exit(0);
                 }
                 stasrv = new SacPZ(stahost, pzunit);
@@ -381,9 +381,9 @@ public class EdgeQueryClient {
                 holdingMode = true;
                 gapsonly = true;
                 type = "HOLD";
-                System.out.println("Holdings server=" + holdingIP + "/" + holdingPort + " type=" + holdingType);
+                logger.config("Holdings server=" + holdingIP + "/" + holdingPort + " type=" + holdingType);
             } else {
-                System.out.println("Unknown CWB Query argument=" + args[i]);
+                logger.warning("Unknown CWB Query argument=" + args[i]);
             }
 
         }
@@ -429,14 +429,14 @@ public class EdgeQueryClient {
                 } else {
                     line += "'-ls'\n";
                 }
-                System.out.println("line=" + line + ":");
+                logger.config("line=" + line + ":");
                 outtcp.write(line.getBytes());
                 StringBuffer sb = new StringBuffer(100000);
                 int len = 0;
                 while ((len = in.read(b, 0, 512)) > 0) {
                     sb.append(new String(b, 0, len));
                 }
-                System.out.println(sb.toString());
+                logger.info(sb.toString());
                 return null;
             } catch (IOException e) {
                 logger.severe(e + " Getting a directory");
@@ -550,21 +550,21 @@ public class EdgeQueryClient {
                     }
                 }
                 if (blocksize != 512 && blocksize != 4096) {
-                    System.out.println("-msb must be 512 or 4096 and is only meaningful for msz type");
+                    logger.severe("-msb must be 512 or 4096 and is only meaningful for msz type");
                     return null;
                 }
                 if (begin.equals("")) {
-                    System.out.println("You must enter a beginning time @line " + nline);
+                    logger.severe("You must enter a beginning time @line " + nline);
                     return null;
                 } else {
                     beg = Util.stringToDate2(begin);
                     if (beg.before(Util.stringToDate2("1970/12/31/ 23:59"))) {
-                        System.out.println("the -b field date did not parse correctly. @line" + nline);
+                        logger.severe("the -b field date did not parse correctly. @line" + nline);
                         return null;
                     }
                 }
                 if (seedname.equals("")) {
-                    System.out.println("-s SCNL is not optional.  Specify a seedname @line" + nline);
+                    logger.severe("-s SCNL is not optional.  Specify a seedname @line" + nline);
                     return null;
                 }
                 if (type.equals("ms") || type.equals("msz") || type.equals("sac") ||
@@ -598,7 +598,7 @@ public class EdgeQueryClient {
                     out = null;
                     blksAll = new ArrayList<ArrayList<MiniSeed>>(20);
                 } else {
-                    System.out.println("Output format not supported.  Choose dcc, dcc512, ms, msz, or sac");
+                    logger.severe("Output format not supported.  Choose dcc, dcc512, ms, msz, sac, or text");
                     return null;
                 }
 
@@ -641,13 +641,13 @@ public class EdgeQueryClient {
                     MiniSeed ms = null;
                     if (type.equals("sac")) {
                         if (compareLength < 10) {
-                            System.out.println("\n    ***** Sac files must have names including the channel! *****");
+                            logger.severe("\n    ***** Sac files must have names including the channel! *****");
                             return null;
                         }
 
                     }
                     if (type.equals("msz") && compareLength < 10) {
-                        System.out.println("\n    ***** msz files must have names including the channel! *****");
+                        logger.severe("\n    ***** msz files must have names including the channel! *****");
                         return null;
                     }
                     int npur = 0;
@@ -660,12 +660,12 @@ public class EdgeQueryClient {
                                 if (b[0] == '<' && b[1] == 'E' && b[2] == 'O' && b[3] == 'R' && b[4] == '>') {
                                     eof = true;
                                     ms = null;
-                                    if (dbg) {
-                                        System.out.println("EOR found");
-                                    }
+
+									logger.fine("EOR found");
+
                                 } else {
                                     ms = new MiniSeed(b);
-                                    //SSystem.out.println(""+ms);
+                                    logger.finest(""+ms);
                                     if (!gapsonly && ms.getBlockSize() != 512) {
                                         read(in, b, 512, ms.getBlockSize() - 512);
                                         ms = new MiniSeed(b);
@@ -676,7 +676,7 @@ public class EdgeQueryClient {
                             } else {
                                 eof = true;         // still need to process this last channel THIS SHOULD NEVER  HAPPEN unless socket is lost
                                 ms = null;
-                                System.out.println("   *** Unexpected EOF Found");
+                                logger.warning("   *** Unexpected EOF Found");
                                 if (out != null) {
                                     System.exit(1);      // error out with no file
                                 }
@@ -687,8 +687,9 @@ public class EdgeQueryClient {
                                 perfStart = false;
 
                             }
-                            //System.out.println(iblk+" "+ms.toString());
+                            logger.finest(iblk+" "+ms);
                             if (!quiet && iblk % 1000 == 0 && iblk > 0) {
+								// This is a user-feedback counter.
                                 System.out.print("\r            \r" + iblk + "...");
                             }
 
@@ -700,18 +701,20 @@ public class EdgeQueryClient {
                                     int nsgot = 0;
                                     if (blks.size() > 0) {
                                         Collections.sort(blks);
-                                        //System.out.println(blks.size() +" "+iblk);
+                                        logger.finer(blks.size() +" "+iblk);
                                         for (int i = 0; i < blks.size(); i++) {
                                             nsgot += (blks.get(i)).getNsamp();
                                         }
-                                        //System.out.println(""+(MiniSeed) blks.get(blks.size()-1));
-                                        System.out.println("\r" + Util.asctime() + " Query on " + lastComp.substring(0, compareLength) + " " +
+                                        logger.finest(""+(MiniSeed) blks.get(blks.size()-1));
+                                        System.out.print('\r');
+										logger.info(Util.asctime() + " Query on " + lastComp.substring(0, compareLength) + " " +
                                                 df6.format(blks.size()) + " mini-seed blks " +
                                                 (blks.get(0) == null ? "Null" : ((MiniSeed) blks.get(0)).getTimeString()) + " " +
                                                 (blks.get((blks.size() - 1)) == null ? "Null" : (blks.get(blks.size() - 1)).getEndTimeString()) + " " +
                                                 " ns=" + nsgot);
                                     } else {
-                                        System.out.println("\rQuery on " + seedname + " returned 0 blocks!");
+                                        System.out.print('\r');
+										logger.info("Query on " + seedname + " returned 0 blocks!");
                                     }
 
 
@@ -734,12 +737,12 @@ public class EdgeQueryClient {
 
                                         //filename = lastComp;
                                         filename = filename.replaceAll(" ", "_");
-                                        if (dbg) {
-                                            System.out.println(((MiniSeed) blks.get(0)).getTimeString() + " to " +
-												((MiniSeed) blks.get(blks.size() - 1)).getTimeString() +
-												" " + (((MiniSeed) blks.get(0)).getGregorianCalendar().getTimeInMillis() -
-												((MiniSeed) blks.get(blks.size() - 1)).getGregorianCalendar().getTimeInMillis()) / 1000L);
-                                        }
+
+										logger.finest(((MiniSeed) blks.get(0)).getTimeString() + " to " +
+											((MiniSeed) blks.get(blks.size() - 1)).getTimeString() +
+											" " + (((MiniSeed) blks.get(0)).getGregorianCalendar().getTimeInMillis() -
+											((MiniSeed) blks.get(blks.size() - 1)).getGregorianCalendar().getTimeInMillis()) / 1000L);
+
                                         // Due to a foul up in data in Nov, Dec 2006 it is possible the Q330s got the
                                         // same baler block twice, but the last 7 512's of the block zeroed and the other
                                         // correct.  Find these and purge the bad ones.
@@ -755,9 +758,9 @@ public class EdgeQueryClient {
                                                 }
                                             }
                                         }
-                                        //System.out.println("Found "+npur+" recs with on first block of 4096 valid");
+                                        logger.finer("Found "+npur+" recs with on first block of 4096 valid");
                                         blks.trimToSize();
-                                        //for(int i=0; i<blks.size(); i++) System.out.println(((MiniSeed) blks.get(i)).toString());
+                                        //for(int i=0; i<blks.size(); i++) logger.finest(((MiniSeed) blks.get(i)).toString());
                                         if (sacpz && out.getClass().getSimpleName().indexOf("SacOutputer") < 0) {   // if asked for write out the sac response file
                                             String time = blks.get(0).getTimeString();
                                             time = time.substring(0, 4) + "," + time.substring(5, 8) + "-" + time.substring(9, 17);
@@ -798,7 +801,7 @@ public class EdgeQueryClient {
                                         }
                                     }
                                     if (dbgdup && isDuplicate) {
-                                        System.out.println("Dup:" + ms);
+                                        logger.info("Dup:" + ms);
                                     }
                                     if (!isDuplicate && ms.getIndicator().compareTo("D ") >= 0) {
                                         blks.add(ms);
@@ -818,7 +821,7 @@ public class EdgeQueryClient {
                         }
                     }   // while(!eof)
                     if (!quiet && iblk > 0) {
-                        System.out.println(iblk + " Total blocks transferred in " +
+                        logger.info(iblk + " Total blocks transferred in " +
                                 (System.currentTimeMillis() - startTime) + " ms " +
                                 (iblk * 1000L / Math.max(System.currentTimeMillis() - startTime, 1)) + " b/s " + npur + " #dups=" + ndups);
                     }
@@ -853,7 +856,7 @@ public class EdgeQueryClient {
             }
             if (perfMonitor) {
                 long msEnd = System.currentTimeMillis() - startPhase;
-                System.out.println("Perf setup=" + msSetup + " connect=" + msConnect + " Cmd=" + msCommand + " xfr=" + msTransfer + " out=" + msOutput +
+                logger.info("Perf setup=" + msSetup + " connect=" + msConnect + " Cmd=" + msCommand + " xfr=" + msTransfer + " out=" + msOutput +
                         " last=" + msEnd + " tot=" + (msSetup + msConnect + msTransfer + msOutput + msEnd) + " #blks=" + totblks + " #lines=" + nline);
             }
             return null;

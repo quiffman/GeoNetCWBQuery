@@ -19,8 +19,10 @@ import edu.iris.Fissures.codec.Steim1;
 import edu.iris.Fissures.codec.Steim2;
 import edu.iris.Fissures.codec.SteimException;
 import gov.usgs.anss.edge.*;
-import gov.usgs.anss.util.*;
 import gov.usgs.anss.seed.*;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 
 /** This class generates 4096 byte mini-seed from the returned blocks from a 
  * query.  It uses the following general algorithm :
@@ -92,6 +94,9 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
     int maxnsamp;                 // storage for the most samples that could be in a block before midnight
     long dropDeadEnd;
 	static {logger.fine("$Id$");}
+
+    private DateTimeFormatter hmsFormat = ISODateTimeFormat.time().withZone(DateTimeZone.forID("UTC"));
+    private DateTimeFormatter ymdFormat = ISODateTimeFormat.date().withZone(DateTimeZone.forID("UTC"));
 
     /** Creates a new instance of DCCOutputer */
     public DCCOutputer() {
@@ -313,7 +318,7 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
                         runs.get(ilatest).getMS(Math.max(iblk - 1, 0)).getEndTime().compareTo(r.getEnd()) > 0) {
                     iblk = iblk - 1;
                     if (dbg) {
-                        System.out.println("ms = " + Util.asctime(runs.get(ilatest).getMS(iblk).getGregorianCalendar()) + " r.end=" + Util.asctime(r.getEnd()) +
+                        System.out.println("ms = " + hmsFormat.print(runs.get(ilatest).getMS(iblk).getGregorianCalendar().getTimeInMillis()) + " r.end=" + hmsFormat.print(r.getEnd().getTimeInMillis()) +
                                 " compareTO=" + runs.get(ilatest).getMS(iblk).getGregorianCalendar().compareTo(r.getEnd()) + " ms=" + runs.get(ilatest).getMS(iblk).toString());
                     }
                     if (dbg) {
@@ -321,7 +326,7 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
                     }
                 } else // In this case leave iblk past end so no blocks are processed.
                 if (dbg) {
-                    System.out.println("Last one is still before end ms=" + Util.asctime(runs.get(ilatest).getMS(iblk - 1).getGregorianCalendar()) + " r.end=" + Util.asctime(r.getEnd()) +
+                    System.out.println("Last one is still before end ms=" + hmsFormat.print(runs.get(ilatest).getMS(iblk - 1).getGregorianCalendar().getTimeInMillis()) + " r.end=" + hmsFormat.print(r.getEnd().getTimeInMillis()) +
                             " compareTO=" + runs.get(ilatest).getMS(iblk - 1).getGregorianCalendar().compareTo(r.getEnd()) + " ms=" + runs.get(ilatest).getMS(iblk - 1).toString());
                 }
                 if (iblk < 0) {
@@ -474,7 +479,7 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
                     }
                     int lastRev = bb.getInt();                          // put value in last
                     if (dbg) {
-                        System.out.println("new buffer computed output time=" + Util.asctime2(sss) + " lastvalue=" + lastRev);
+                        System.out.println("new buffer computed output time=" + hmsFormat.print(sss.getTimeInMillis()) + " lastvalue=" + lastRev);
                     }
 
                     rtms.process(data, newnsamp,
@@ -899,8 +904,8 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
         }
         if (newdiff < -max || newdiff > max - 1) {
             if (dbg || dbg2) {
-                System.out.println("     key=" + Util.toHex(keys) + " wk=" + Util.toHex(diffwork) + " diffs=" + Util.toHex(diffs) +
-                        " diff=" + Util.toHex(diff) + " nb=" + nbits + " ty=" + type);
+                System.out.println("     key=" + toHex(keys) + " wk=" + toHex(diffwork) + " diffs=" + toHex(diffs) +
+                        " diff=" + toHex(diff) + " nb=" + nbits + " ty=" + type);
             }
             if (dbg || dbg2) {
                 System.out.println("***** its out of range! " + msg + " not zero=" + dbg2);
@@ -930,9 +935,9 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
         bb2.position(76);
         bb2.putInt(newdiffwork);
         if (dbg || dbg2) {
-            System.out.println("     key=" + Util.toHex(keys) + " wk=" + Util.toHex(diffwork) +
-                    " newwk=" + Util.toHex(newdiffwork) + " diffs=" + Util.toHex(diffs) +
-                    " diff=" + Util.toHex(diff) + " nb=" + nbits + " ty=" + type);
+            System.out.println("     key=" + toHex(keys) + " wk=" + toHex(diffwork) +
+                    " newwk=" + toHex(newdiffwork) + " diffs=" + toHex(diffs) +
+                    " diff=" + toHex(diff) + " nb=" + nbits + " ty=" + type);
         }
         if (dbg) {
             System.out.println("* Its fixed! " + msg);
@@ -1099,13 +1104,15 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
             return (end.getTimeInMillis() - start.getTimeInMillis()) / 1000.;
         }
 
+
         /** string representation
          *@return a String representation of this run */
         @Override
         public String toString() {
-            return "Run from " + Util.ascdate(start) + " " + Util.asctime2(start) + " to " +
-                    Util.ascdate(end) + " " + Util.asctime2(end) + " " + getLength() + " s #blks=" + blks.size();
+            return "Run from " + ymdFormat.print(start.getTimeInMillis()) + " " + hmsFormat.print(start.getTimeInMillis()) + " to " +
+                    ymdFormat.print(end.getTimeInMillis()) + " " + hmsFormat.print(end.getTimeInMillis()) + " " + getLength() + " s #blks=" + blks.size();
         }
+
 
         /** return the ith miniseed block
          *@param Index of desired Mini-seed block

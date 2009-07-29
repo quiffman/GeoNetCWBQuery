@@ -18,13 +18,18 @@ import java.util.Calendar;
 import java.util.Collections;
 
 import gov.usgs.anss.util.SeedUtil;
-import gov.usgs.anss.util.Util;
 import java.text.DecimalFormat;
+import java.util.Date;
 import java.util.ResourceBundle;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 
 /** This class is the main class for CWBQuery which allows the user to make queries
  * against all files on a CWB or Edge computer.  The program has two modes :
@@ -70,9 +75,17 @@ public class EdgeQueryClient {
     static DecimalFormat df4;
     static DecimalFormat df6;
     private static ResourceBundle props;
-	private static final Logger logger = Logger.getLogger(EdgeQueryClient.class.getName());
-	static {logger.fine("$Id$");}
+    private static final Logger logger = Logger.getLogger(EdgeQueryClient.class.getName());
 
+
+    static {
+        logger.fine("$Id$");
+    }
+    private static DateTimeFormatter hmsFormat = ISODateTimeFormat.time().withZone(DateTimeZone.forID("UTC"));
+    private static String beginFormat = "YYYY/MM/dd HH:mm:ss";
+    private static String beginFormatDoy = "YYYY,DDD-HH:mm:ss";
+    private static DateTimeFormatter parseBeginFormat = DateTimeFormat.forPattern(beginFormat).withZone(DateTimeZone.forID("UTC"));
+    private static DateTimeFormatter parseBeginFormatDoy = DateTimeFormat.forPattern(beginFormatDoy).withZone(DateTimeZone.forID("UTC"));
 
     // TODO the two following methods need to go into their own class
     // and be unit tested.  They should also use Joda time.
@@ -225,6 +238,42 @@ public class EdgeQueryClient {
             }
         }
         return query(args);
+    }
+
+    
+    /**
+     * Parses the begin time.  This tries to match
+     * the documentation for CWBClient but does not
+     * match the Util.stringToDate2 method which attempted
+     * to allow for milliseconds.
+     *
+     * @param beginTime
+     * @return java.util.Date parsed from the being time.
+     * @throws java.lang.IllegalArgumentException
+     */
+    protected static java.util.Date parseBegin(String beginTime) throws IllegalArgumentException {
+        DateTime begin = null;
+
+        try {
+            begin = parseBeginFormat.parseDateTime(beginTime);
+        } catch (Exception e) {
+        }
+
+        if (begin == null) {
+            try {
+                begin = parseBeginFormatDoy.parseDateTime(beginTime);
+            } catch (Exception e) {
+            }
+        }
+
+        // TODO Would be ideal if this error contained any range errors from
+        // parseDateTime but this is hard with the two attempts at parsing.
+        if (begin == null) {
+            throw new IllegalArgumentException("Error parsing begin time.  Allowable formats " +
+                    "are: " + beginFormat + " or " + beginFormatDoy);
+        }
+
+        return new Date(begin.getMillis());
     }
 
     /** do a query.  The command line arguments are passed in as they are for the query tool
@@ -565,11 +614,14 @@ public class EdgeQueryClient {
                     logger.severe("You must enter a beginning time @line " + nline);
                     return null;
                 } else {
-                    beg = Util.stringToDate2(begin);
-                    if (beg.before(Util.stringToDate2("1970/12/31/ 23:59"))) {
-                        logger.severe("the -b field date did not parse correctly. @line" + nline);
+
+                    try {
+                        beg = parseBegin(begin);
+                    } catch (IllegalArgumentException illegalArgumentException) {
+                        logger.severe("the -b field date did not parse correctly. @line" + nline + illegalArgumentException);
                         return null;
                     }
+
                 }
                 if (seedname.equals("")) {
                     logger.severe("-s SCNL is not optional.  Specify a seedname @line" + nline);
@@ -577,7 +629,7 @@ public class EdgeQueryClient {
                 }
                 if (type.equals("ms") || type.equals("msz") || type.equals("sac") ||
                         type.equals("dcc") || type.equals("dcc512") ||
-						type.equals("HOLD") || type.equals("text")) {
+                        type.equals("HOLD") || type.equals("text")) {
                     if (seedname.length() < 12) {
                         seedname = (seedname + ".............").substring(0, 12);
                     }
@@ -669,11 +721,11 @@ public class EdgeQueryClient {
                                     eof = true;
                                     ms = null;
 
-									logger.fine("EOR found");
+                                    logger.fine("EOR found");
 
                                 } else {
                                     ms = new MiniSeed(b);
-                                    logger.finest(""+ms);
+                                    logger.finest("" + ms);
                                     if (!gapsonly && ms.getBlockSize() != 512) {
                                         read(in, b, 512, ms.getBlockSize() - 512);
                                         ms = new MiniSeed(b);
@@ -695,9 +747,9 @@ public class EdgeQueryClient {
                                 perfStart = false;
 
                             }
-                            logger.finest(iblk+" "+ms);
+                            logger.finest(iblk + " " + ms);
                             if (!quiet && iblk % 1000 == 0 && iblk > 0) {
-								// This is a user-feedback counter.
+                                // This is a user-feedback counter.
                                 System.out.print("\r            \r" + iblk + "...");
                             }
 
@@ -709,20 +761,23 @@ public class EdgeQueryClient {
                                     int nsgot = 0;
                                     if (blks.size() > 0) {
                                         Collections.sort(blks);
-                                        logger.finer(blks.size() +" "+iblk);
+                                        logger.finer(blks.size() + " " + iblk);
                                         for (int i = 0; i < blks.size(); i++) {
                                             nsgot += (blks.get(i)).getNsamp();
                                         }
-                                        logger.finest(""+(MiniSeed) blks.get(blks.size()-1));
+                                        logger.finest("" + (MiniSeed) blks.get(blks.size() - 1));
                                         System.out.print('\r');
-										logger.info(Util.asctime() + " Query on " + lastComp.substring(0, compareLength) + " " +
+                                        DateTime dt = new DateTime().withZone(DateTimeZone.forID("UTC"));
+
+
+                                        logger.info(hmsFormat.print(dt.getMillis()) + " Query on " + lastComp.substring(0, compareLength) + " " +
                                                 df6.format(blks.size()) + " mini-seed blks " +
                                                 (blks.get(0) == null ? "Null" : ((MiniSeed) blks.get(0)).getTimeString()) + " " +
                                                 (blks.get((blks.size() - 1)) == null ? "Null" : (blks.get(blks.size() - 1)).getEndTimeString()) + " " +
                                                 " ns=" + nsgot);
                                     } else {
                                         System.out.print('\r');
-										logger.info("Query on " + seedname + " returned 0 blocks!");
+                                        logger.info("Query on " + seedname + " returned 0 blocks!");
                                     }
 
 
@@ -746,10 +801,10 @@ public class EdgeQueryClient {
                                         //filename = lastComp;
                                         filename = filename.replaceAll(" ", "_");
 
-										logger.finest(((MiniSeed) blks.get(0)).getTimeString() + " to " +
-											((MiniSeed) blks.get(blks.size() - 1)).getTimeString() +
-											" " + (((MiniSeed) blks.get(0)).getGregorianCalendar().getTimeInMillis() -
-											((MiniSeed) blks.get(blks.size() - 1)).getGregorianCalendar().getTimeInMillis()) / 1000L);
+                                        logger.finest(((MiniSeed) blks.get(0)).getTimeString() + " to " +
+                                                ((MiniSeed) blks.get(blks.size() - 1)).getTimeString() +
+                                                " " + (((MiniSeed) blks.get(0)).getGregorianCalendar().getTimeInMillis() -
+                                                ((MiniSeed) blks.get(blks.size() - 1)).getGregorianCalendar().getTimeInMillis()) / 1000L);
 
                                         // Due to a foul up in data in Nov, Dec 2006 it is possible the Q330s got the
                                         // same baler block twice, but the last 7 512's of the block zeroed and the other
@@ -766,7 +821,7 @@ public class EdgeQueryClient {
                                                 }
                                             }
                                         }
-                                        logger.finer("Found "+npur+" recs with on first block of 4096 valid");
+                                        logger.finer("Found " + npur + " recs with on first block of 4096 valid");
                                         blks.trimToSize();
                                         //for(int i=0; i<blks.size(); i++) logger.finest(((MiniSeed) blks.get(i)).toString());
                                         if (sacpz && out.getClass().getSimpleName().indexOf("SacOutputer") < 0) {   // if asked for write out the sac response file
@@ -889,33 +944,31 @@ public class EdgeQueryClient {
 
     public static void main(String[] args) {
 
-		// Load a default logging properties file if none already set.
-		String customLogConfigFile = System.getProperty("java.util.logging.config.file");
-		if (customLogConfigFile == null) {
-			// Use default logging
-			try {
-				InputStream configFile = ClassLoader.getSystemResourceAsStream("resources/logging.properties");
-				LogManager.getLogManager().readConfiguration(configFile);
-			}
-			catch (IOException ex) {
-				logger.severe("Failed to open configuration file, logging not configured.");
-			}
-			logger.config("Using default logging confiuration.");
-		}
-		else {
-			logger.config("Using custom logging config file: "+customLogConfigFile);
-		}
+        // Load a default logging properties file if none already set.
+        String customLogConfigFile = System.getProperty("java.util.logging.config.file");
+        if (customLogConfigFile == null) {
+            // Use default logging
+            try {
+                InputStream configFile = ClassLoader.getSystemResourceAsStream("resources/logging.properties");
+                LogManager.getLogManager().readConfiguration(configFile);
+            } catch (IOException ex) {
+                logger.severe("Failed to open configuration file, logging not configured.");
+            }
+            logger.config("Using default logging confiuration.");
+        } else {
+            logger.config("Using custom logging config file: " + customLogConfigFile);
+        }
 
         //TOSO this any any others should get explicitly set on calendars.
         TimeZone tz = TimeZone.getTimeZone("GMT+0");
         TimeZone.setDefault(tz);
 
-		logger.finest("Running Edge Query");
+        logger.finest("Running Edge Query");
 
         ArrayList<ArrayList<MiniSeed>> mss = EdgeQueryClient.query(args);
         if (mss == null) {
             // TODO Evil - needs a log message.
-			logger.severe("Query returned null.");
+            logger.severe("Query returned null.");
             System.exit(1);
         }
         System.exit(0);

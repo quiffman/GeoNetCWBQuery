@@ -39,8 +39,8 @@
 
     <dependencies>
 
-        <dependency org="gov.usgs.anss" name="EdgeFile" rev="unknown-1" conf="compile->default"/>
-        <dependency org="gov.usgs.anss" name="Usgs" rev="unknown-1" conf="compile->default"/>
+        <dependency org="gov.usgs.anss" name="EdgeFile" rev="unknown-1" conf="compile->default;foride->sources"/>
+        <dependency org="gov.usgs.anss" name="Usgs" rev="unknown-1" conf="compile->default;foride->sources"/>
 
         <dependency org="joda-time" name="joda-time" rev="1.6" conf="compile->default;foride->sources" />
 

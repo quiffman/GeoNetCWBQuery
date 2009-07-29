@@ -22,6 +22,7 @@ import gov.usgs.anss.util.Util;
 import java.text.DecimalFormat;
 import java.util.ResourceBundle;
 import java.util.TimeZone;
+import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -485,7 +486,13 @@ public class EdgeQueryClient {
                     } else {
                         logger.warning("Got IOError opening socket to server e=" + e);
                     }
-                    Util.sleep(20000);
+					try {
+						Thread.sleep(20000);
+					} catch (InterruptedException ex) {
+						// This isn't necessarily a major issue, and for the purposes
+						// of sleep, we really don't care.
+						logger.log(Level.FINE, "sleep interrupted.", ex);
+					}
                 }
             }
             InputStream in = ds.getInputStream();        // Get input and output streams

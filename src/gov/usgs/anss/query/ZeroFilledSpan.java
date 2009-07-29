@@ -471,20 +471,24 @@ public class ZeroFilledSpan {
         }           // end for each block in list
     }
 
-	  /** Left pad a string s to Width.
-   *@param s The string to pad
-   *@param width The desired width
-   *@return The padded string to width
-  */
-  public static String leftPad(String s, int width) {
-    String tmp="";
-    int npad = width - s.length();
-    if( npad < 0) tmp = s.substring(0 ,width);
-    else if( npad == 0) tmp = s;
-    else {
-      for (int i = 0; i < npad; i++) tmp += " ";
-      tmp += s;
-    }
-    return tmp;
-  }
+	/** Left pad a string s to Width.
+	 *@param s The string to pad
+	 *@param width The desired width
+	 *@return The padded string to width
+	 */
+	protected static String leftPad(String s, int width) {
+		String tmp = "";
+		int npad = width - s.length();
+		if (npad < 0) {
+			tmp = s.substring(0, width);
+		} else if (npad == 0) {
+			tmp = s;
+		} else {
+			for (int i = 0; i < npad; i++) {
+				tmp += " ";
+			}
+			tmp += s;
+		}
+		return tmp;
+	}
 }

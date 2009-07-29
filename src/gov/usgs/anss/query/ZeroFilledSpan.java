@@ -11,7 +11,6 @@ package gov.usgs.anss.query;
 
 import edu.iris.Fissures.codec.*;
 import gov.usgs.anss.seed.MiniSeed;
-import gov.usgs.anss.util.*;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.Calendar;
@@ -257,12 +256,12 @@ public class ZeroFilledSpan {
                     gapSize++;
                 }
                 details.append("*** " + (i + "        ").substring(0, 8) +
-                        Util.leftPad((data[i] == fillValue ? "  nodata  " : "" + data[i]), 8) +
-                        Util.leftPad((z.getData(i) == fillValue ? "  nodata  " : "" + z.getData(i)), 8));
+                        leftPad((data[i] == fillValue ? "  nodata  " : "" + data[i]), 8) +
+                        leftPad((z.getData(i) == fillValue ? "  nodata  " : "" + z.getData(i)), 8));
                 if (data[i] == fillValue || z.getData(i) == fillValue) {
                     details.append("\n");
                 } else {
-                    details.append(Util.leftPad("df=" + (data[i] - z.getData(i)), 14) + "\n");
+                    details.append(leftPad("df=" + (data[i] - z.getData(i)), 14) + "\n");
                 }
             } else {
                 if (gapStart != -1) {
@@ -471,4 +470,21 @@ public class ZeroFilledSpan {
             }
         }           // end for each block in list
     }
+
+	  /** Left pad a string s to Width.
+   *@param s The string to pad
+   *@param width The desired width
+   *@return The padded string to width
+  */
+  public static String leftPad(String s, int width) {
+    String tmp="";
+    int npad = width - s.length();
+    if( npad < 0) tmp = s.substring(0 ,width);
+    else if( npad == 0) tmp = s;
+    else {
+      for (int i = 0; i < npad; i++) tmp += " ";
+      tmp += s;
+    }
+    return tmp;
+  }
 }

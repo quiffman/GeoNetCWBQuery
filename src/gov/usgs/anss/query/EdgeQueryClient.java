@@ -339,9 +339,9 @@ public class EdgeQueryClient {
         boolean nosort = false;
         String durationString = "";
         boolean holdingMode = false;
-        String holdingIP = "";
-        int holdingPort = 0;
-        String holdingType = "";
+        String holdingIP = props.getString("cwbip");
+        int holdingPort = Integer.parseInt(props.getString("queryport"));
+        String holdingType = "CWB";
         boolean showIllegals = false;
         boolean perfMonitor = false;
         boolean chkDups = false;
@@ -418,7 +418,8 @@ public class EdgeQueryClient {
 
                 pzunit = args[i + 1];
                 if (stahost == null || stahost.equals("")) {
-                    stahost = "137.227.230.1";
+                    logger.warning("no metadata server set.  Exiting.");
+                    System.exit(0);
                 }
                 if (!args[i + 1].equalsIgnoreCase("nm") && !args[i + 1].equalsIgnoreCase("um")) {
                     logger.warning("   ****** -sacpz units must be either um or nm switch values is " + args[i + 1]);

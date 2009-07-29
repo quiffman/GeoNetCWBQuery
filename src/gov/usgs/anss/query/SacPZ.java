@@ -10,6 +10,7 @@ package gov.usgs.anss.query;
 import java.io.IOException;
 import java.io.PrintWriter;
 import gov.usgs.anss.util.StaSrv;
+import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 /**
@@ -22,14 +23,16 @@ public class SacPZ {
     private StaSrv stasrv;
 	protected static final Logger logger = Logger.getLogger(SacPZ.class.getName());
 	static {logger.fine("$Id$");}
+    private static ResourceBundle props;
 
     /** Creates a new instance of SacPZ
      * @param stahost The host to use for metadata, if null or "", it uses cwb-pub
      *@param unit The unit of the desired response 'nm' or 'um'
      */
     public SacPZ(String stahost, String unit) {
+        props = ResourceBundle.getBundle("resources.geonetCwbQuery");
         pzunit = unit;
-        stasrv = new StaSrv(stahost, 2052);
+        stasrv = new StaSrv(stahost, Integer.parseInt(props.getString("metadataport")));
     }
 
     /** get a resonse string - if the MDS is not yet up it will wait for it to get up

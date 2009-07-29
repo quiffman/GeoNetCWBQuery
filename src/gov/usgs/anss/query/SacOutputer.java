@@ -55,7 +55,7 @@ public class SacOutputer extends Outputer {
         props = ResourceBundle.getBundle("resources.geonetCwbQuery");
 
         String stahost = props.getString("metadataserver");
-        int staport = 2052;
+        int staport = Integer.parseInt(props.getString("metadataport"));
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("-fill")) {
                 fill = Integer.parseInt(args[i + 1]);
@@ -77,7 +77,8 @@ public class SacOutputer extends Outputer {
                 sacpz = true;
                 pzunit = args[i + 1];
                 if (stahost == null || stahost.equals("")) {
-                    stahost = "137.227.230.1";
+                    logger.warning("No metadata server set.  Exiting.");
+                    System.exit(0);
                 }
             }
         }

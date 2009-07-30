@@ -324,7 +324,6 @@ public class EdgeQueryClient {
         int blocksize = 512;        // only used for msz type
         BufferedReader infile = null;
         String filemask = "%N";
-        boolean reset = false;
         boolean quiet = false;
         boolean gapsonly = false;
         // Make a pass for the command line args for either mode!
@@ -370,8 +369,6 @@ public class EdgeQueryClient {
             } else if (args[i].equals("-lsc")) {
                 lschannels = true;
                 lsoption = true;
-            } else if (args[i].equals("-reset")) {
-                reset = true;
             } else if (args[i].equals("-b")) {
                 begin = args[i + 1];
                 i++;
@@ -432,21 +429,7 @@ public class EdgeQueryClient {
 
         }
 
-        if (reset) {
-            try {
-                Socket ds = new Socket(host, port);
-                InputStream in = ds.getInputStream();        // Get input and output streams
-                OutputStream outtcp = ds.getOutputStream();
-                line = "'-reset'\n";
-
-                outtcp.write(line.getBytes());
-                return null;
-            } catch (IOException e) {
-                logger.severe(e + " Getting a directory");
-            }
-            return null;
-        }
-        // The ls option does not require any args checking
+                // The ls option does not require any args checking
         if (lsoption) {
             try {
                 Socket ds = new Socket(host, port);

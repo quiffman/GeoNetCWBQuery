@@ -350,7 +350,8 @@ public class EdgeQueryClient {
             if (args[i].equals("-f")) {
                 filenamein = args[i + 1];
                 i++;
-            } else if (args[i].equals("-eqdbg")); else if (args[i].equals("-t")) {
+            } 
+            else if (args[i].equals("-t")) {
                 type = args[i + 1];
                 i++;
             } else if (args[i].equals("-msb")) {

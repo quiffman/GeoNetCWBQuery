@@ -32,9 +32,9 @@
     </configurations>
 
     <publications>
-        <artifact name="GeoNetCWBQuery" type="jar" ext="jar" conf="master"/>
-        <artifact name="GeoNetCWBQuery" type="source" ext="jar" conf="sources" m:classifier="sources"/>
-        <artifact name="GeoNetCWBQuery" type="doc" ext="jar" conf="javadoc" m:classifier="javadoc"/>
+        <artifact name="CWBQuery" type="jar" ext="jar" conf="master"/>
+        <artifact name="CWBQuery" type="source" ext="jar" conf="sources" m:classifier="sources"/>
+        <artifact name="CWBQuery" type="doc" ext="jar" conf="javadoc" m:classifier="javadoc"/>
     </publications>
 
     <dependencies>

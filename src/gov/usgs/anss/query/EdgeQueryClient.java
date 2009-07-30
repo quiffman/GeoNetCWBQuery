@@ -238,7 +238,6 @@ public class EdgeQueryClient {
         return query(args);
     }
 
-    
     /**
      * Parses the begin time.  This tries to match
      * the documentation for CWBClient but does not
@@ -328,7 +327,6 @@ public class EdgeQueryClient {
         boolean reset = false;
         boolean quiet = false;
         boolean gapsonly = false;
-        boolean dbgdup = false;
         // Make a pass for the command line args for either mode!
         String exclude = "";
         boolean nosort = false;
@@ -400,8 +398,6 @@ public class EdgeQueryClient {
             else if (args[i].equals("-dccdbg")); // valid only for -t dcc & -t dcc512
             else if (args[i].equals("-perf")) {
                 perfMonitor = true;
-            } else if (args[i].equals("-little")); else if (args[i].equals("-dbgdup")) {
-                dbgdup = true;
             } else if (args[i].equals("-nometa")); else if (args[i].equals("-fill")) {
                 i++;
             } else if (args[i].equals("-sacpz")) {
@@ -531,13 +527,13 @@ public class EdgeQueryClient {
                     } else {
                         logger.warning("Got IOError opening socket to server e=" + e);
                     }
-					try {
-						Thread.sleep(20000);
-					} catch (InterruptedException ex) {
-						// This isn't necessarily a major issue, and for the purposes
-						// of sleep, we really don't care.
-						logger.log(Level.FINE, "sleep interrupted.", ex);
-					}
+                    try {
+                        Thread.sleep(20000);
+                    } catch (InterruptedException ex) {
+                        // This isn't necessarily a major issue, and for the purposes
+                        // of sleep, we really don't care.
+                        logger.log(Level.FINE, "sleep interrupted.", ex);
+                    }
                 }
             }
             InputStream in = ds.getInputStream();        // Get input and output streams
@@ -858,9 +854,6 @@ public class EdgeQueryClient {
                                                 }
                                             }
                                         }
-                                    }
-                                    if (dbgdup && isDuplicate) {
-                                        logger.info("Dup:" + ms);
                                     }
                                     if (!isDuplicate && ms.getIndicator().compareTo("D ") >= 0) {
                                         blks.add(ms);

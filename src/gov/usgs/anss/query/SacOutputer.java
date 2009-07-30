@@ -246,11 +246,6 @@ public class SacOutputer extends Outputer {
             }
         }
         try {
-            // TODO I feel like this should return the SAC class and let something
-            // else do the outputting.  Then if someone wants to filter first
-            // before output they can extend the code.
-            // Probably need to package differently and provide access to a
-            // jar.
             sac.write(filename);
         } catch (FileNotFoundException e) {
             logger.severe(e + " File Not found writing SAC");

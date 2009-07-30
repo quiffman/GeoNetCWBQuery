@@ -85,9 +85,7 @@ public class EdgeQueryClient {
     private static DateTimeFormatter parseBeginFormat = DateTimeFormat.forPattern(beginFormat).withZone(DateTimeZone.forID("UTC"));
     private static DateTimeFormatter parseBeginFormatDoy = DateTimeFormat.forPattern(beginFormatDoy).withZone(DateTimeZone.forID("UTC"));
 
-    // TODO the two following methods need to go into their own class
-    // and be unit tested.  They should also use Joda time.
-    public static String makeFilename(String mask, String seedname, MiniSeed ms) {
+     public static String makeFilename(String mask, String seedname, MiniSeed ms) {
         StringBuffer sb = new StringBuffer(100);
         if (df2 == null) {
             df2 = new DecimalFormat("00");
@@ -176,11 +174,6 @@ public class EdgeQueryClient {
      */
     static public ArrayList<ArrayList<MiniSeed>> query(String line) {
 
-        // TODO This code should go into a class and be tested
-        // I think this is building the string that gets sent to
-        // CWP:port to make the query.  Would be useful to have a
-        // Class that handled this (if there isn't one in the NB.tar
-        // already.
         String[] arg = line.split(" ");
         logger.config("line=" + line);
         for (int i = 0; i < arg.length; i++) {
@@ -342,9 +335,8 @@ public class EdgeQueryClient {
         String pzunit = "nm";
         String stahost = QueryProperties.getNeicMetadataServerIP();
 
-        // TODO probably a more elegant way of handling command line args out there.
-
-        // This loop must validate all arguments on the command line, parsing is really done below
+        
+        // Use JSAP for command line args.
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("-f")) {  // Documented functionality.
                 filenamein = args[i + 1];

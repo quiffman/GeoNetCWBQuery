@@ -14,7 +14,6 @@ import java.util.Collections;
 import java.net.*;
 import java.io.IOException;
 import gov.usgs.anss.edge.*;
-import java.util.ResourceBundle;
 
 /**
  * This outputer just sends the blocks to the TCP/IP based holdings server.  The user
@@ -27,7 +26,6 @@ public class HoldingOutputer extends Outputer {
     boolean dbg;
     HoldingSender hs;
 	static {logger.fine("$Id$");}
-    private static ResourceBundle props;
 
     /** Creates a new instance of HoldingsOutput */
     public HoldingOutputer() {
@@ -36,12 +34,10 @@ public class HoldingOutputer extends Outputer {
     public void makeFile(String comp, String filename, String filemask, ArrayList<MiniSeed> blks,
             java.util.Date beg, double duration, String[] args) throws IOException {
 
-        props = ResourceBundle.getBundle("resources.geonetCwbQuery");
-
         MiniSeed ms2 = null;
-        String holdingIP = props.getString("cwbip");
+        String holdingIP = QueryProperties.getGeoNetCwbIP();
         String holdingType = "CW";
-        int holdingPort = Integer.parseInt(props.getString("queryport"));
+        int holdingPort = QueryProperties.getGeoNetCwbPort();
         for (int i = 0; i < args.length; i++) {
             if (args[i].indexOf("-hold") == 0) {
                 String[] a = args[i].split(":");

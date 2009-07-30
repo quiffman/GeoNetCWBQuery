@@ -20,7 +20,6 @@ import java.util.Collections;
 import gov.usgs.anss.util.SeedUtil;
 import java.text.DecimalFormat;
 import java.util.Date;
-import java.util.ResourceBundle;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -74,7 +73,6 @@ public class EdgeQueryClient {
     static DecimalFormat df2;
     static DecimalFormat df4;
     static DecimalFormat df6;
-    private static ResourceBundle props;
     private static final Logger logger = Logger.getLogger(EdgeQueryClient.class.getName());
 
 
@@ -287,18 +285,15 @@ public class EdgeQueryClient {
 
         String line = "";
 
-        props = ResourceBundle.getBundle("resources.geonetCwbQuery");
 
         if (args.length == 0) {
-            System.out.println(props.getString("usage"));
+            System.out.println(QueryProperties.getUsage());
             return null;
         }
 
 
-        // TODO should check that these are set and exit if not.
-        // TODO if they are set log a message and continue
-        String host = props.getString("cwbip");
-        int port = Integer.parseInt(props.getString("queryport"));
+        String host = QueryProperties.getGeoNetCwbIP();
+        int port = QueryProperties.getGeoNetCwbPort();
 
         long msSetup = 0;
         long msConnect = 0;
@@ -339,8 +334,8 @@ public class EdgeQueryClient {
         boolean nosort = false;
         String durationString = "";
         boolean holdingMode = false;
-        String holdingIP = props.getString("cwbip");
-        int holdingPort = Integer.parseInt(props.getString("queryport"));
+        String holdingIP = QueryProperties.getGeoNetCwbIP();
+        int holdingPort = QueryProperties.getGeoNetCwbPort();
         String holdingType = "CWB";
         boolean showIllegals = false;
         boolean perfMonitor = false;
@@ -348,7 +343,7 @@ public class EdgeQueryClient {
         boolean sacpz = false;
         SacPZ stasrv = null;
         String pzunit = "nm";
-        String stahost = props.getString("metadataserver");
+        String stahost = QueryProperties.getNeicMetadataServerIP();
 
         // TODO probably a more elegant way of handling command line args out there.
 

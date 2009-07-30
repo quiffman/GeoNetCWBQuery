@@ -346,17 +346,17 @@ public class EdgeQueryClient {
 
         // This loop must validate all arguments on the command line, parsing is really done below
         for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("-f")) {
+            if (args[i].equals("-f")) {  // Documented functionality.
                 filenamein = args[i + 1];
                 i++;
             } 
-            else if (args[i].equals("-t")) {
+            else if (args[i].equals("-t")) {  // Documented functionality.
                 type = args[i + 1];
                 i++;
-            } else if (args[i].equals("-msb")) {
+            } else if (args[i].equals("-msb")) {   // Documented functionality.
                 blocksize = Integer.parseInt(args[i + 1]);
                 i++;
-            } else if (args[i].equals("-o")) {
+            } else if (args[i].equals("-o")) { // Documented functionality.
                 filemask = args[i + 1];
                 i++;
             } else if (args[i].equals("-e")) {
@@ -364,24 +364,23 @@ public class EdgeQueryClient {
             } else if (args[i].equals("-el")) {
                 exclude = args[i + 1];
                 i++;
-            } else if (args[i].equals("-ls")) {
+            } else if (args[i].equals("-ls")) { // Documented functionality.
                 lsoption = true;
-            } else if (args[i].equals("-lsc")) {
+            } else if (args[i].equals("-lsc")) { // Documented functionality.
                 lschannels = true;
                 lsoption = true;
-            } else if (args[i].equals("-b")) {
+            } else if (args[i].equals("-b")) { // Documented functionality.
                 begin = args[i + 1];
                 i++;
-            } else if (args[i].equals("-s")) {
+            } else if (args[i].equals("-s")) { // Documented functionality.
                 seedname = args[i + 1];
                 i++;
-            } else if (args[i].equals("-d")) {
+            } else if (args[i].equals("-d")) { // Documented functionality.
                 durationString = args[i + 1];
                 i++;
-            } else if (args[i].equals("-q")) {
+            } else if (args[i].equals("-q")) { // Documented functionality.
                 quiet = true;
-            } else if (args[i].equals("-fap")); // legal for wf and wf1 types
-            else if (args[i].equals("-nosort")) {
+            } else if (args[i].equals("-nosort")) { // Documented functionality.
                 nosort = true;
             } else if (args[i].equals("-nogaps")); // legal for sac and zero MS
             else if (args[i].equals("-nodups")) {

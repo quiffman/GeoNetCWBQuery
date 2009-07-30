@@ -938,11 +938,6 @@ public class EdgeQueryClient {
         logger.finest("Running Edge Query");
 
         ArrayList<ArrayList<MiniSeed>> mss = EdgeQueryClient.query(args);
-        if (mss == null) {
-            // TODO Evil - needs a log message.
-            logger.severe("Query returned null.");
-            System.exit(1);
-        }
-        System.exit(0);
+        
     }
 }

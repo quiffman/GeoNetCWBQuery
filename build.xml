@@ -20,28 +20,6 @@
 	<target name="setup-nb-build-environment" depends="ivy-resolve,ivy-generate-nbproject-classpaths"
 		description="Run once after project check-out, or whenever ivy dependencies have changed in ivy.xml"/>
 
-	<target name="proguard" depends="compile"
-		description="initialises and runs the proguard configuration for this project.">
-		<path id="proguard.classpath">
-			<fileset dir="${ivy.lib.dir}">
-				<include name="**/proguard*.jar"/>
-			</fileset>
-		</path>
-		<taskdef resource="proguard/ant/task.properties" classpathref="proguard.classpath"/>
-
-		<unjar dest="${build.classes.dir}">
-			<fileset dir="${ivy.lib.dir}">
-				<include name="runtime/*.jar" />
-			</fileset>
-		</unjar>
-
-		<proguard configuration="${basedir}/proguard.pro">
-			<injar path="${build.classes.dir}" />
-			<outjar path="${dist.jar}" />
-		</proguard>
-
-	</target>
-
 
 
     <!--

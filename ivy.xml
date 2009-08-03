@@ -42,6 +42,8 @@
 
         <dependency org="joda-time" name="joda-time" rev="1.6" conf="compile->default;foride->sources" />
 
+		<dependency org="com.martiansoftware" name="jsap" rev="2.1" conf="compile->default;runtime->optional;foride->sources" />
+
         <dependency org="junit" name="junit" rev="4.1" conf="test->default"/>
 
         <dependency org="com.cenqua.clover" name="clover" rev="latest." conf="optional->default"/>

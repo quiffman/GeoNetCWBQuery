@@ -8,6 +8,9 @@
  */
 package gov.usgs.anss.query;
 
+import com.martiansoftware.jsap.JSAP;
+import com.martiansoftware.jsap.JSAPException;
+import com.martiansoftware.jsap.JSAPResult;
 import gov.usgs.anss.edge.*;
 import gov.usgs.anss.seed.MiniSeed;
 import java.io.*;
@@ -276,6 +279,38 @@ public class EdgeQueryClient {
 
 
         String line = "";
+		
+		JSAP jsap = null;
+		try {
+			jsap = new JSAP("resources/EdgeQueryClient.jsap.xml");
+		} catch (IOException ex) {
+			logger.log(Level.SEVERE, null, ex);
+		} catch (JSAPException ex) {
+			logger.log(Level.SEVERE, null, ex);
+		}
+		
+		if (jsap == null) {
+			logger.severe("Failed to configure JSAP from XML in resources/EdgeQueryClient.jsap.xml");
+			System.exit(1);
+		}
+		
+		JSAPResult config = jsap.parse(args);
+
+		if (!config.success() || config.getBoolean("help")) {
+			System.err.println();
+
+			// Print out specific error messages describing the problems with
+			// the command line, THEN print usage, THEN print full help.
+			// This is called "beating the user with a clue stick."
+			for (java.util.Iterator errs = config.getErrorMessageIterator(); errs.hasNext();) {
+				System.err.println("Error: " + errs.next());
+			}
+			System.err.println();
+			System.err.println("Usage: java -jar GeoNetCWBQuery.jar " + jsap.getUsage());
+			System.err.println();
+			System.err.println(jsap.getHelp());
+			System.exit(1);
+		}
 
 
         if (args.length == 0) {

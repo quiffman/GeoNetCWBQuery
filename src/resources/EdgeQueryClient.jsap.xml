@@ -15,6 +15,12 @@
 			<shortFlag>q</shortFlag>
             <help>Run in quiet mode (No progress or file status reporting).</help>
         </switch>
+
+        <switch>
+            <id>debug</id>
+			<longFlag>debug</longFlag>
+            <help>Turn on debugging output to stdout.</help>
+        </switch>
 		
 		<switch>
             <id>ls</id>
@@ -39,13 +45,13 @@ Then run CWB Query with  '-f filename' filename with list of SNCL start times an
 		</flaggedOption>
 
 		<flaggedOption>
-            <id>station</id>
+		    <id>seedname</id>
             <stringParser>
                 <classname>StringStringParser</classname>
             </stringParser>
             <required>true</required>
             <shortFlag>s</shortFlag>
-			<longFlag>station</longFlag>
+			<longFlag>seedname</longFlag>
             <help>NSCL or REGEXP  (note: on many shells its best to put this argument in double quotes)
 NNSSSSSCCCLL to specify a seed channel name. If &lt; 12 characters, match any seednames starting
 with those characters.  Example : '-s IUA' would return all IU stations starting with 'A' (ADK,AFI,ANMO,ANTO)
@@ -74,9 +80,9 @@ msz = is data output as continuous mini-seed with filling use -fill to set other
 
 sac = is Seismic Analysis Code format (see -fill for info on nodata code) (ext='.sac')
 
-dcc = best effort reconciliation to 4096 byte mini-seed form.  Overlaps are eliminated. (ext='.msd'
+dcc = best effort reconciliation to 4096 byte mini-seed form.  Overlaps are eliminated. (ext='.msd')
 
-dcc512 = best effort reconciliation to 512 byte mini-seed form.  Overlaps are eliminated. (ext='.msd'
+dcc512 = best effort reconciliation to 512 byte mini-seed form.  Overlaps are eliminated. (ext='.msd')
 
 text = simple text format with space separated values, one row per sample: 'Epoch milliseconds' 'value' This can be extremely verbose.
 
@@ -87,7 +93,10 @@ null = do not create data file, return blocks to caller (for use from a user pro
 			<id>duration</id>
 			<longFlag>duration</longFlag>
 			<shortFlag>d</shortFlag>
-			<help>nnnn[d] seconds of duration(default is 300 seconds) end with 'd' to indicate nnnn is in days.</help>
+		    <defaults>
+		        <string>300</string>
+		    </defaults>
+			<help>nnnn[d] seconds of duration end with 'd' to indicate nnnn is in days.</help>
 		</flaggedOption>
 		
 		<flaggedOption>
@@ -96,7 +105,39 @@ null = do not create data file, return blocks to caller (for use from a user pro
 			<help>nm|um Request sac style response files in either nanometers (nm) or micrometers(um).</help>
 		</flaggedOption>
 
-		
+		<flaggedOption>
+			<id>begin</id>
+            <required>true</required>
+			<longFlag>begin</longFlag>
+			<shortFlag>b</shortFlag>
+			<help>yyyy/mm/dd hh:mm:ss The time to start the query.</help>
+		</flaggedOption>
+
+		<flaggedOption>
+			<id>output</id>
+            <stringParser>
+                <classname>StringStringParser</classname>
+            </stringParser>
+            <required>true</required>
+			<longFlag>output</longFlag>
+			<shortFlag>o</shortFlag>
+            <defaults>
+                <string>%N</string>
+            </defaults>
+			<help>mask Put the output in the given filename described by the mask/tokens
+Tokens: (Any non-tokens will be literally in the file name)
+%N the whole seedname NNSSSSSCCCLL
+%n the two letter SEED network          %s the 5 character SEED station code
+%c the 3 character SEED channel         %l the two character location
+%y Year as 4 digits                     %Y 2 character Year
+%j Day of year (1-366)                  %J Julian day (since 1572)
+%M 2 digit month                        %D 2 digit day of month
+%h 2 digit hour                         %m 2 digit minute
+%S 2 digit second                       %z zap all underscores from name</help>
+		</flaggedOption>
+
+		 
+
 <!--
         <qualifiedSwitch>
             <id>verbose</id>

@@ -339,12 +339,12 @@ public class EdgeQueryClient {
 
         ArrayList<ArrayList<MiniSeed>> blksAll = null;
         double duration = 300.;
-        String seedname = "";
-        String begin = "";
-        String type = "sac";
-        boolean dbg = false;
-        boolean lsoption = false;
-        boolean lschannels = false;
+        String seedname = config.getString("seedname");
+        String begin = config.getString("begin");
+        String type = config.getString("type");
+        boolean dbg = config.getBoolean("debug");
+        boolean lsoption = config.getBoolean("ls");
+        boolean lschannels = config.getBoolean("lsc");
         java.util.Date beg = null;
         int julian = 0;
         String filenamein = " ";
@@ -352,12 +352,12 @@ public class EdgeQueryClient {
         int blocksize = 512;        // only used for msz type
         BufferedReader infile = null;
         String filemask = "%N";
-        boolean quiet = false;
+        boolean quiet = config.getBoolean("quiet");
         boolean gapsonly = false;
         // Make a pass for the command line args for either mode!
         String exclude = "";
         boolean nosort = false;
-        String durationString = "";
+        String durationString = config.getString("duration");
         boolean holdingMode = false;
         String holdingIP = QueryProperties.getGeoNetCwbIP();
         int holdingPort = QueryProperties.getGeoNetCwbPort();
@@ -376,37 +376,37 @@ public class EdgeQueryClient {
             if (args[i].equals("-f")) {  // Documented functionality.
                 filenamein = args[i + 1];
                 i++;
-            } 
-            else if (args[i].equals("-t")) {  // Documented functionality.
-                type = args[i + 1];
-                i++;
+//            }
+//            else if (args[i].equals("-t")) {  // Documented functionality.
+//                type = args[i + 1];
+//                i++;
             } else if (args[i].equals("-msb")) {   // Documented functionality.
                 blocksize = Integer.parseInt(args[i + 1]);
                 i++;
-            } else if (args[i].equals("-o")) { // Documented functionality.
-                filemask = args[i + 1];
-                i++;
+//            } else if (args[i].equals("-o")) { // Documented functionality.
+//                filemask = args[i + 1];
+//                i++;
             } else if (args[i].equals("-e")) {
                 exclude = "exclude.txt";
             } else if (args[i].equals("-el")) {
                 exclude = args[i + 1];
                 i++;
-            } else if (args[i].equals("-ls")) { // Documented functionality.
-                lsoption = true;
-            } else if (args[i].equals("-lsc")) { // Documented functionality.
-                lschannels = true;
-                lsoption = true;
-            } else if (args[i].equals("-b")) { // Documented functionality.
-                begin = args[i + 1];
-                i++;
-            } else if (args[i].equals("-s")) { // Documented functionality.
-                seedname = args[i + 1];
-                i++;
-            } else if (args[i].equals("-d")) { // Documented functionality.
-                durationString = args[i + 1];
-                i++;
-            } else if (args[i].equals("-q")) { // Documented functionality.
-                quiet = true;
+//            } else if (args[i].equals("-ls")) { // Documented functionality.
+//                lsoption = true;
+//            } else if (args[i].equals("-lsc")) { // Documented functionality.
+//                lschannels = true;
+//                lsoption = true;
+//            } else if (args[i].equals("-b")) { // Documented functionality.
+//                begin = args[i + 1];
+//                i++;
+//            } else if (args[i].equals("-s")) { // Documented functionality.
+//                seedname = args[i + 1];
+//                i++;
+//            } else if (args[i].equals("-d")) { // Documented functionality.
+//                durationString = args[i + 1];
+//                i++;
+//            } else if (args[i].equals("-q")) { // Documented functionality.
+//                quiet = true;
             } else if (args[i].equals("-nosort")) { // Documented functionality.
                 nosort = true;
             } else if (args[i].equals("-nogaps")); // legal for sac and zero MS

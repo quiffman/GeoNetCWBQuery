@@ -21,6 +21,16 @@
 			<longFlag>debug</longFlag>
             <help>Turn on debugging output to stdout.</help>
         </switch>
+        
+        <flaggedOption>
+            <id>file</id>
+            <longFlag>file</longFlag>
+            <shortFlag>f</shortFlag>
+            <help>File mode or batch mode:
+                Create a file with one line per query with lines like [QUERY SWITCHES][OUTPUT SWITCHES]:
+                example line :   '-s NSCL -b yyyy/mm/dd hh:mm:ss -d duration -t sac -o %N_%y_%j'
+                Then run CWB Query with  '-f filename' filename with list of SNCL start times and durations.</help>
+        </flaggedOption>
 		
 		<switch>
             <id>ls</id>
@@ -33,16 +43,6 @@
 			<longFlag>lsc</longFlag>
 			<help>List every channel its days of availability from begin time through duration (default last 15 days). Use the -b and -d options to set limits on time interval of the channel list. This option can be cpu intensive if you ask for a long interval, so use only as needed.</help>
 		</switch>
-    
-		<flaggedOption>
-			<id>file</id>
-			<longFlag>file</longFlag>
-			<shortFlag>f</shortFlag>
-			<help>File mode or batch mode:
-Create a file with one line per query with lines like [QUERY SWITCHES][OUTPUT SWITCHES]:
-example line :   '-s NSCL -b yyyy/mm/dd hh:mm:ss -d duration -t sac -o %N_%y_%j'
-Then run CWB Query with  '-f filename' filename with list of SNCL start times and durations.</help>
-		</flaggedOption>
 
 		<flaggedOption>
 		    <id>seedname</id>

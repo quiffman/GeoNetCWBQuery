@@ -386,9 +386,9 @@ public class EdgeQueryClient {
 //            } else if (args[i].equals("-o")) { // Documented functionality.
 //                filemask = args[i + 1];
 //                i++;
-            } else if (args[i].equals("-e")) {
+            } else if (args[i].equals("-e")) { // Exclude the non-public stations from a query (not valid outside of NEIC subnets)
                 exclude = "exclude.txt";
-            } else if (args[i].equals("-el")) {
+            } else if (args[i].equals("-el")) { // Manually specify the exclude list
                 exclude = args[i + 1];
                 i++;
 //            } else if (args[i].equals("-ls")) { // Documented functionality.

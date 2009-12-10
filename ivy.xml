@@ -1,4 +1,4 @@
-
+<?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd" xmlns:m="http://ant.apache.org/ivy/maven">
 
     <info organisation="nz.org.geonet" module="CWBQuery" revision="2.0"/>
@@ -41,6 +41,8 @@
         <dependency org="gov.usgs.anss" name="Usgs" rev="unknown-1" conf="compile->default;foride->sources"/>
 
         <dependency org="joda-time" name="joda-time" rev="1.6" conf="compile->default;foride->sources" />
+
+        <dependency org="com.martiansoftware" name="jsap" rev="2.1" conf="compile->default;runtime->optional;foride->sources" />
 
         <dependency org="junit" name="junit" rev="4.1" conf="test->default"/>
 

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsap>
+    <parameters>
+        
+        <flaggedOption>
+            <id>file</id>
+            <longFlag>file</longFlag>
+            <shortFlag>f</shortFlag>
+            
+            <stringParser>
+                <classname>FileStringParser</classname>
+                <properties>
+                    <property>
+                        <name>mustBeFile</name>
+                        <value>true</value>
+                    </property>
+                    <property>
+                        <name>mustExist</name>
+                        <value>true</value>
+                    </property>
+                </properties>
+            </stringParser>
+            <required>true</required>
+            <help>File mode or batch mode:
+                Create a file with one line per query with lines like [QUERY SWITCHES][OUTPUT SWITCHES]:
+                example line :   '-s NSCL -b yyyy/mm/dd hh:mm:ss -d duration -t sac -o %N_%y_%j'
+                Then run CWB Query with  '-f filename' filename with list of SNCL start times and durations.</help>
+        </flaggedOption>
+        
+    </parameters>
+</jsap>

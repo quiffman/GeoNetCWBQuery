@@ -11,6 +11,8 @@ package gov.usgs.anss.query;
 import com.martiansoftware.jsap.JSAP;
 import com.martiansoftware.jsap.JSAPException;
 import com.martiansoftware.jsap.JSAPResult;
+import com.martiansoftware.jsap.SimpleJSAP;
+import com.martiansoftware.jsap.xml.JSAPConfig;
 import gov.usgs.anss.edge.*;
 import gov.usgs.anss.seed.MiniSeed;
 import java.io.*;
@@ -269,6 +271,52 @@ public class EdgeQueryClient {
         return new Date(begin.getMillis());
     }
 
+	/**
+	 * Creates a JSAP object from the specified xml configuration. Catches any
+	 * thrown exceptions and exits if it fails.
+	 * @param xmlConfig
+	 * @return
+	 */
+	public static JSAP createJsapFromXml(String xmlConfig) throws IOException, JSAPException {
+		return new JSAP(xmlConfig);
+	}
+	
+	public static JSAP createJsapFromXml(JSAP jsap, String xmlConfig) throws IOException, JSAPException {
+		JSAPConfig.configure(jsap, JSAP.class.getClassLoader().getResource(xmlConfig));
+		return jsap;
+	}
+	
+	public static JSAPResult jsapParseGeneralArgs(String[] args) throws IOException, JSAPException {
+		JSAP globalJsap = createJsapFromXml("resources/jsap/global.xml");
+		
+		JSAP batchFileJsap = createJsapFromXml("resources/jsap/batch.file.xml");
+//		createJsapFromXml(batchFileJsap, "resources/jsap/global.xml");
+
+		JSAP queryModeJsap = createJsapFromXml("resources/jsap/query.mode.xml");
+//		createJsapFromXml(queryModeJsap, "resources/jsap/global.xml");
+
+		JSAPResult config = globalJsap.parse(args);
+		if (config.success()) {
+			System.err.println();
+			System.err.println("Usage: java -jar GeoNetCWBQuery.jar " +
+					globalJsap.getUsage() + " (" + batchFileJsap.getUsage() +
+					" | " + queryModeJsap.getUsage() + ")");
+			System.err.println();
+			System.err.println(globalJsap.getHelp());
+			System.err.println("Either:");
+			System.err.println(batchFileJsap.getHelp());
+			System.err.println("Or:");
+			System.err.println(queryModeJsap.getHelp());
+			System.exit(1);			
+		}
+		
+		config = batchFileJsap.parse(args);
+		
+		
+		
+		return null;
+	}
+
     /** do a query.  The command line arguments are passed in as they are for the query tool
      * a files is created unless -t null is specified.  In that case the return is an ArrayList
      * containing ArrayLists<MiniSeed> for each channel returned
@@ -280,23 +328,35 @@ public class EdgeQueryClient {
 
         String line = "";
 		
-		JSAP jsap = null;
+		JSAP globalJsap = null;
+		JSAP batchFileJsap = null;
+		JSAP queryModeJsap = null;
+		
 		try {
-			jsap = new JSAP("resources/EdgeQueryClient.jsap.xml");
+			globalJsap = new JSAP("resources/jsap/global.xml");
+			batchFileJsap = new JSAP();
+			queryModeJsap = new JSAP("resources/jsap/query.mode.xml");
 		} catch (IOException ex) {
 			logger.log(Level.SEVERE, null, ex);
 		} catch (JSAPException ex) {
 			logger.log(Level.SEVERE, null, ex);
 		}
 		
-		if (jsap == null) {
-			logger.severe("Failed to configure JSAP from XML in resources/EdgeQueryClient.jsap.xml");
+		if (globalJsap == null) {
+			logger.severe("Failed to configure JSAP from XML in resources/jsap/global.xml");
 			System.exit(1);
 		}
 		
-		JSAPResult config = jsap.parse(args);
+		JSAPResult config = globalJsap.parse(args);
 
-		if (!config.success() || config.getBoolean("help")) {
+		if (config.getBoolean("help")) {
+			System.err.println();
+			System.err.println("Usage: java -jar GeoNetCWBQuery.jar " + globalJsap.getUsage());
+			System.err.println();
+			System.err.println(globalJsap.getHelp());
+			System.exit(1);
+		}
+		if (!config.success()) {
 			System.err.println();
 
 			// Print out specific error messages describing the problems with
@@ -306,9 +366,7 @@ public class EdgeQueryClient {
 				System.err.println("Error: " + errs.next());
 			}
 			System.err.println();
-			System.err.println("Usage: java -jar GeoNetCWBQuery.jar " + jsap.getUsage());
-			System.err.println();
-			System.err.println(jsap.getHelp());
+			System.err.println("Usage: java -jar GeoNetCWBQuery.jar " + globalJsap.getUsage());
 			System.exit(1);
 		}
 
@@ -373,40 +431,9 @@ public class EdgeQueryClient {
         
         // Use JSAP for command line args.
         for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("-f")) {  // Documented functionality.
-                filenamein = args[i + 1];
-                i++;
-//            }
-//            else if (args[i].equals("-t")) {  // Documented functionality.
-//                type = args[i + 1];
-//                i++;
-            } else if (args[i].equals("-msb")) {   // Documented functionality.
+            if (args[i].equals("-msb")) {   // Documented functionality.
                 blocksize = Integer.parseInt(args[i + 1]);
                 i++;
-//            } else if (args[i].equals("-o")) { // Documented functionality.
-//                filemask = args[i + 1];
-//                i++;
-            } else if (args[i].equals("-e")) { // Exclude the non-public stations from a query (not valid outside of NEIC subnets)
-                exclude = "exclude.txt";
-            } else if (args[i].equals("-el")) { // Manually specify the exclude list
-                exclude = args[i + 1];
-                i++;
-//            } else if (args[i].equals("-ls")) { // Documented functionality.
-//                lsoption = true;
-//            } else if (args[i].equals("-lsc")) { // Documented functionality.
-//                lschannels = true;
-//                lsoption = true;
-//            } else if (args[i].equals("-b")) { // Documented functionality.
-//                begin = args[i + 1];
-//                i++;
-//            } else if (args[i].equals("-s")) { // Documented functionality.
-//                seedname = args[i + 1];
-//                i++;
-//            } else if (args[i].equals("-d")) { // Documented functionality.
-//                durationString = args[i + 1];
-//                i++;
-//            } else if (args[i].equals("-q")) { // Documented functionality.
-//                quiet = true;
             } else if (args[i].equals("-nosort")) { // Documented functionality.
                 nosort = true;
             } else if (args[i].equals("-nogaps")); // legal for sac and zero MS
@@ -964,7 +991,22 @@ public class EdgeQueryClient {
 
         logger.finest("Running Edge Query");
 
-        ArrayList<ArrayList<MiniSeed>> mss = EdgeQueryClient.query(args);
+		JSAPResult config = null;
+		try {
+			config = jsapParseGeneralArgs(args);
+		} catch (IOException ex) {
+			logger.log(Level.SEVERE, null, ex);
+		} catch (JSAPException ex) {
+			logger.log(Level.SEVERE, null, ex);
+		}
+
+		if (config == null) {
+			System.exit(1);
+		}
+
+		System.out.println(config);
+
+//        ArrayList<ArrayList<MiniSeed>> mss = EdgeQueryClient.query(args);
         
     }
 }

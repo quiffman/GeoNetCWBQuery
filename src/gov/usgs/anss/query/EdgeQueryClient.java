@@ -284,8 +284,6 @@ public class EdgeQueryClient {
         }
 
 
-        String host = QueryProperties.getGeoNetCwbIP();
-        int port = QueryProperties.getGeoNetCwbPort();
 
         long msSetup = 0;
         long msConnect = 0;
@@ -303,144 +301,34 @@ public class EdgeQueryClient {
         GregorianCalendar jan_01_2007 = new GregorianCalendar(2007, 0, 1);
 
         ArrayList<ArrayList<MiniSeed>> blksAll = null;
-        double duration = 300.;
-        String seedname = "";
-        String begin = "";
-        String type = "sac";
-        boolean dbg = false;
-        boolean lsoption = false;
-        boolean lschannels = false;
-        java.util.Date beg = null;
-        int julian = 0;
-        String filenamein = " ";
-        String filename = "";
-        int blocksize = 512;        // only used for msz type
-        BufferedReader infile = null;
-        String filemask = "%N";
-        boolean quiet = false;
-        boolean gapsonly = false;
-        // Make a pass for the command line args for either mode!
-        String exclude = "";
-        boolean nosort = false;
-        String durationString = "";
-        boolean holdingMode = false;
-        String holdingIP = QueryProperties.getGeoNetCwbIP();
-        int holdingPort = QueryProperties.getGeoNetCwbPort();
-        String holdingType = "CWB";
-        boolean showIllegals = false;
-        boolean perfMonitor = false;
-        boolean chkDups = false;
-        boolean sacpz = false;
-        SacPZ stasrv = null;
-        String pzunit = "nm";
-        String stahost = QueryProperties.getNeicMetadataServerIP();
+		double duration = 300.;
+		java.util.Date beg = null;
+		String filename = "";
+		BufferedReader infile = null;
 
-        
-        // Use JSAP for command line args.
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("-f")) {  // Documented functionality.
-                filenamein = args[i + 1];
-                i++;
-            } 
-            else if (args[i].equals("-t")) {  // Documented functionality.
-                type = args[i + 1];
-                i++;
-            } else if (args[i].equals("-msb")) {   // Documented functionality.
-                blocksize = Integer.parseInt(args[i + 1]);
-                i++;
-            } else if (args[i].equals("-o")) { // Documented functionality.
-                filemask = args[i + 1];
-                i++;
-            } else if (args[i].equals("-e")) {
-                exclude = "exclude.txt";
-            } else if (args[i].equals("-el")) {
-                exclude = args[i + 1];
-                i++;
-            } else if (args[i].equals("-ls")) { // Documented functionality.
-                lsoption = true;
-            } else if (args[i].equals("-lsc")) { // Documented functionality.
-                lschannels = true;
-                lsoption = true;
-            } else if (args[i].equals("-b")) { // Documented functionality.
-                begin = args[i + 1];
-                i++;
-            } else if (args[i].equals("-s")) { // Documented functionality.
-                seedname = args[i + 1];
-                i++;
-            } else if (args[i].equals("-d")) { // Documented functionality.
-                durationString = args[i + 1];
-                i++;
-            } else if (args[i].equals("-q")) { // Documented functionality.
-                quiet = true;
-            } else if (args[i].equals("-nosort")) { // Documented functionality.
-                nosort = true;
-            } else if (args[i].equals("-nogaps")); // legal for sac and zero MS
-            else if (args[i].equals("-nodups")) {
-                chkDups = true;
-            } else if (args[i].equals("-sactrim")); // legal for sac and zero MS
-            else if (args[i].equals("-gaps")) {
-                gapsonly = true;     // legal for zero MS
-            } else if (args[i].equals("-msgaps")); // legal for zero ms
-            else if (args[i].equals("-udphold")) {
-                gapsonly = true;  // legal for zero MS
-            } else if (args[i].equals("-chk")); // valid only for -t dcc
-            else if (args[i].equals("-dccdbg")); // valid only for -t dcc & -t dcc512
-            else if (args[i].equals("-perf")) {
-                perfMonitor = true;
-            } else if (args[i].equals("-nometa")); else if (args[i].equals("-fill")) {
-                i++;
-            } else if (args[i].equals("-sacpz")) {
-                sacpz = true;
-                if (i + 1 > args.length) {
-                    logger.warning(" ***** -sacpz units must be either um or nm and is required!");
-                    System.exit(0);
-                }
-
-                pzunit = args[i + 1];
-                if (stahost == null || stahost.equals("")) {
-                    logger.warning("no metadata server set.  Exiting.");
-                    System.exit(0);
-                }
-                if (!args[i + 1].equalsIgnoreCase("nm") && !args[i + 1].equalsIgnoreCase("um")) {
-                    logger.warning("   ****** -sacpz units must be either um or nm switch values is " + args[i + 1]);
-                    System.exit(0);
-                }
-                stasrv = new SacPZ(stahost, pzunit);
-                i++;
-            } else if (args[i].equals("-si")) {
-                showIllegals = true;
-            } else if (args[i].indexOf("-hold") == 0) {
-                holdingMode = true;
-                gapsonly = true;
-                type = "HOLD";
-                logger.config("Holdings server=" + holdingIP + "/" + holdingPort + " type=" + holdingType);
-            } else {
-                logger.warning("Unknown CWB Query argument=" + args[i]);
-            }
-
-        }
+		EdgeQueryOptions options = new EdgeQueryOptions(args);
 
                 // The ls option does not require any args checking
-        if (lsoption) {
+        if (options.lsoption) {
             try {
-                Socket ds = new Socket(host, port);
+                Socket ds = new Socket(options.host, options.port);
                 ds.setReceiveBufferSize(512000);
                 //ds.setTcpNoDelay(true);
                 InputStream in = ds.getInputStream();        // Get input and output streams
                 OutputStream outtcp = ds.getOutputStream();
-                if (!exclude.equals("")) {
-                    line = "'-el' '" + exclude + "' ";
+                if (!options.exclude.equals("")) {
+                    line = "'-el' '" + options.exclude + "' ";
                 } else {
                     line = "";
                 }
-                if (!begin.equals("")) {
-                    line += "'-b' '" + begin.trim() + "' ";
+                if (!options.begin.equals("")) {
+                    line += "'-b' '" + options.begin.trim() + "' ";
                 }
-                if (!durationString.equals("")) {
-                    line += "'-d' '" + durationString + "' ";
+                if (!options.durationString.equals("")) {
+                    line += "'-d' '" + options.durationString + "' ";
                 }
-                if (lschannels) {
-                    if (showIllegals) {
+                if (options.lschannels) {
+                    if (options.showIllegals) {
                         line += "'-si' ";
                     }
                     line += "'-lsc'\n";
@@ -464,16 +352,16 @@ public class EdgeQueryClient {
 
 
         // if not -f mode, read in more command line parameters for the run
-        if (filenamein.equals(" ")) {
+        if (options.filenamein.equals(" ")) {
             for (int i = 0; i < args.length; i++) {
                 line += args[i].replaceAll(" ", "@") + " ";
             }
             infile = new BufferedReader(new StringReader(line));
         } else {
             try {
-                infile = new BufferedReader(new FileReader(filenamein));
+                infile = new BufferedReader(new FileReader(options.filenamein));
             } catch (FileNotFoundException e) {
-                logger.severe("did not find the input file=" + filenamein);
+                logger.severe("did not find the input file=" + options.filenamein);
                 return null;
             }
         }
@@ -488,13 +376,13 @@ public class EdgeQueryClient {
             Socket ds = null;
             while (ds == null) {
                 try {
-                    ds = new Socket(host, port);
+                    ds = new Socket(options.host, options.port);
                 } catch (IOException e) {
                     ds = null;
                     if (e != null) {
                         if (e.getMessage() != null) {
                             if (e.getMessage().indexOf("Connection refused") >= 0) {
-                                logger.warning("Got a connection refused. " + host + "/" + port + "  Is the server up?  Wait 20 and try again");
+                                logger.warning("Got a connection refused. " + options.host + "/" + options.port + "  Is the server up?  Wait 20 and try again");
                             }
                         } else {
                             logger.warning("Got IOError opening socket to server e=" + e);
@@ -522,6 +410,8 @@ public class EdgeQueryClient {
                 nline++;
                 boolean on = false;
 
+				// Spaces and quoting...?
+				// TODO: move to EdgeQueryOptions
                 char[] linechar = line.toCharArray();
                 for (int i = 0; i < line.length(); i++) {
                     if (linechar[i] == '"') {
@@ -542,9 +432,9 @@ public class EdgeQueryClient {
                 args = line.split(" ");
                 for (int i = 0; i < args.length; i++) {
                     if (args[i].equals("-b")) {
-                        begin = args[i + 1].replaceAll("@", " ");
+                        options.begin = args[i + 1].replaceAll("@", " ");
                     } else if (args[i].equals("-s")) {
-                        seedname = args[i + 1].replaceAll("@", " ");
+                        options.seedname = args[i + 1].replaceAll("@", " ");
                     } else if (args[i].equals("-d")) {
                         if (args[i + 1].endsWith("d") || args[i + 1].endsWith("D")) {
                             duration = Double.parseDouble(args[i + 1].substring(0, args[i + 1].length() - 1)) * 86400.;
@@ -552,76 +442,76 @@ public class EdgeQueryClient {
                             duration = Double.parseDouble(args[i + 1]);
                         }
                     } else if (args[i].equals("-t")) {
-                        type = args[i + 1];
+                        options.type = args[i + 1];
                         i++;
                     } else if (args[i].equals("-msb")) {
-                        blocksize = Integer.parseInt(args[i + 1]);
+                        options.blocksize = Integer.parseInt(args[i + 1]);
                         i++;
                     } else if (args[i].equals("-o")) {
-                        filemask = args[i + 1].replaceAll("@", " ");
+                        options.filemask = args[i + 1].replaceAll("@", " ");
                         i++;
                     } else if (args[i].equals("-e")) {
-                        exclude = "exclude.txt";
+                        options.exclude = "exclude.txt";
                     } else if (args[i].equals("-el")) {
-                        exclude = args[i + 1].replaceAll("@", " ");
+                        options.exclude = args[i + 1].replaceAll("@", " ");
                         i++;
                     } else if (args[i].equals("-q")) {
-                        quiet = true;
+                        options.quiet = true;
                     } else if (args[i].equals("-nosort")) {
-                        nosort = true;
+                        options.nosort = true;
                     } else if (args[i].indexOf("-hold") == 0) {
                         args[i] = "-gaps";     // change to tel other end gaps mode
                     }
                 }
-                if (blocksize != 512 && blocksize != 4096) {
+                if (options.blocksize != 512 && options.blocksize != 4096) {
                     logger.severe("-msb must be 512 or 4096 and is only meaningful for msz type");
                     return null;
                 }
-                if (begin.equals("")) {
+                if (options.begin.equals("")) {
                     logger.severe("You must enter a beginning time @line " + nline);
                     return null;
                 } else {
 
                     try {
-                        beg = parseBegin(begin);
+                        beg = parseBegin(options.begin);
                     } catch (IllegalArgumentException illegalArgumentException) {
                         logger.severe("the -b field date did not parse correctly. @line" + nline + illegalArgumentException);
                         return null;
                     }
 
                 }
-                if (seedname.equals("")) {
+                if (options.seedname.equals("")) {
                     logger.severe("-s SCNL is not optional.  Specify a seedname @line" + nline);
                     return null;
                 }
-                if (type.equals("ms") || type.equals("msz") || type.equals("sac") ||
-                        type.equals("dcc") || type.equals("dcc512") ||
-                        type.equals("HOLD") || type.equals("text")) {
-                    if (seedname.length() < 12) {
-                        seedname = (seedname + ".............").substring(0, 12);
+                if (options.type.equals("ms") || options.type.equals("msz") || options.type.equals("sac") ||
+                        options.type.equals("dcc") || options.type.equals("dcc512") ||
+                        options.type.equals("HOLD") || options.type.equals("text")) {
+                    if (options.seedname.length() < 12) {
+                        options.seedname = (options.seedname + ".............").substring(0, 12);
                     }
-                    if (type.equals("ms")) {
-                        out = new MSOutputer(nosort);
+                    if (options.type.equals("ms")) {
+                        out = new MSOutputer(options.nosort);
                     }
-                    if (type.equals("sac")) {
+                    if (options.type.equals("sac")) {
                         out = new SacOutputer();
                     }
-                    if (type.equals("msz")) {
-                        out = new MSZOutputer(blocksize);
+                    if (options.type.equals("msz")) {
+                        out = new MSZOutputer(options.blocksize);
                     }
-                    if (type.equals("dcc")) {
+                    if (options.type.equals("dcc")) {
                         out = new DCCOutputer();
                     }
-                    if (type.equals("dcc512")) {
+                    if (options.type.equals("dcc512")) {
                         out = new DCC512Outputer();
                     }
-                    if (type.equals("HOLD")) {
+                    if (options.type.equals("HOLD")) {
                         out = new HoldingOutputer();
                     }
-                    if (type.equals("text")) {
+                    if (options.type.equals("text")) {
                         out = new TextOutputer();
                     }
-                } else if (type.equals("null")) {
+                } else if (options.type.equals("null")) {
                     out = null;
                     blksAll = new ArrayList<ArrayList<MiniSeed>>(20);
                 } else {
@@ -631,19 +521,19 @@ public class EdgeQueryClient {
 
                 // The length at which our compare for changes depends on the output file mask
                 int compareLength = 12;
-                if (filemask.indexOf("%n") >= 0) {
+                if (options.filemask.indexOf("%n") >= 0) {
                     compareLength = 2;
                 }
-                if (filemask.indexOf("%s") >= 0) {
+                if (options.filemask.indexOf("%s") >= 0) {
                     compareLength = 7;
                 }
-                if (filemask.indexOf("%c") >= 0) {
+                if (options.filemask.indexOf("%c") >= 0) {
                     compareLength = 10;
                 }
-                if (filemask.indexOf("%l") >= 0) {
+                if (options.filemask.indexOf("%l") >= 0) {
                     compareLength = 12;
                 }
-                if (filemask.indexOf("%N") >= 0) {
+                if (options.filemask.indexOf("%N") >= 0) {
                     compareLength = 12;
                 }
 
@@ -666,14 +556,14 @@ public class EdgeQueryClient {
                     String lastComp = "            ";
                     boolean eof = false;
                     MiniSeed ms = null;
-                    if (type.equals("sac")) {
+                    if (options.type.equals("sac")) {
                         if (compareLength < 10) {
                             logger.severe("\n    ***** Sac files must have names including the channel! *****");
                             return null;
                         }
 
                     }
-                    if (type.equals("msz") && compareLength < 10) {
+                    if (options.type.equals("msz") && compareLength < 10) {
                         logger.severe("\n    ***** msz files must have names including the channel! *****");
                         return null;
                     }
@@ -683,7 +573,7 @@ public class EdgeQueryClient {
                     while (!eof) {
                         try {
                             // Try to read a mini-seed, if it failes mark eof
-                            if (read(in, b, 0, (gapsonly ? 64 : 512))) {
+                            if (read(in, b, 0, (options.gapsonly ? 64 : 512))) {
                                 if (b[0] == '<' && b[1] == 'E' && b[2] == 'O' && b[3] == 'R' && b[4] == '>') {
                                     eof = true;
                                     ms = null;
@@ -693,7 +583,7 @@ public class EdgeQueryClient {
                                 } else {
                                     ms = new MiniSeed(b);
                                     logger.finest("" + ms);
-                                    if (!gapsonly && ms.getBlockSize() != 512) {
+                                    if (!options.gapsonly && ms.getBlockSize() != 512) {
                                         read(in, b, 512, ms.getBlockSize() - 512);
                                         ms = new MiniSeed(b);
                                     }
@@ -715,7 +605,7 @@ public class EdgeQueryClient {
 
                             }
                             logger.finest(iblk + " " + ms);
-                            if (!quiet && iblk % 1000 == 0 && iblk > 0) {
+                            if (!options.quiet && iblk % 1000 == 0 && iblk > 0) {
                                 // This is a user-feedback counter.
                                 System.out.print("\r            \r" + iblk + "...");
                             }
@@ -724,7 +614,7 @@ public class EdgeQueryClient {
                                     (ms == null ? true : !lastComp.substring(0, compareLength).equals(ms.getSeedName().substring(0, compareLength))))) {
                                 msTransfer += (System.currentTimeMillis() - startPhase);
                                 startPhase = System.currentTimeMillis();
-                                if (!quiet) {
+                                if (!options.quiet) {
                                     int nsgot = 0;
                                     if (blks.size() > 0) {
                                         Collections.sort(blks);
@@ -744,7 +634,7 @@ public class EdgeQueryClient {
                                                 " ns=" + nsgot);
                                     } else {
                                         System.out.print('\r');
-                                        logger.info("Query on " + seedname + " returned 0 blocks!");
+                                        logger.info("Query on " + options.seedname + " returned 0 blocks!");
                                     }
 
 
@@ -758,10 +648,10 @@ public class EdgeQueryClient {
                                         }
                                         blksAll.add(newBlks);
                                     } else {      // create the output file
-                                        if (type.equals("ms") || type.equals("dcc") || type.equals("dcc512") || type.equals("msz")) {
-                                            filename = EdgeQueryClient.makeFilename(filemask, lastComp, ms2);
+                                        if (options.type.equals("ms") || options.type.equals("dcc") || options.type.equals("dcc512") || options.type.equals("msz")) {
+                                            filename = EdgeQueryClient.makeFilename(options.filemask, lastComp, ms2);
                                         } else {
-                                            filename = EdgeQueryClient.makeFilename(filemask, lastComp, beg);
+                                            filename = EdgeQueryClient.makeFilename(options.filemask, lastComp, beg);
                                         }
 
 
@@ -777,7 +667,7 @@ public class EdgeQueryClient {
                                         // same baler block twice, but the last 7 512's of the block zeroed and the other
                                         // correct.  Find these and purge the bad ones.
 
-                                        if (!gapsonly) {
+                                        if (!options.gapsonly) {
                                             for (int i = blks.size() - 1; i >= 0; i--) {
                                                 if (blks.get(i).getBlockSize() == 4096 && // Has to be a big block or it does not happen
                                                         blks.get(i).getGregorianCalendar().compareTo(jan_01_2007) < 0 &&
@@ -791,13 +681,13 @@ public class EdgeQueryClient {
                                         logger.finer("Found " + npur + " recs with on first block of 4096 valid");
                                         blks.trimToSize();
                                         //for(int i=0; i<blks.size(); i++) logger.finest(((MiniSeed) blks.get(i)).toString());
-                                        if (sacpz && out.getClass().getSimpleName().indexOf("SacOutputer") < 0) {   // if asked for write out the sac response file
+                                        if (options.sacpz && out.getClass().getSimpleName().indexOf("SacOutputer") < 0) {   // if asked for write out the sac response file
                                             String time = blks.get(0).getTimeString();
                                             time = time.substring(0, 4) + "," + time.substring(5, 8) + "-" + time.substring(9, 17);
-                                            stasrv.getSACResponse(lastComp, begin, filename);
+                                            options.stasrv.getSACResponse(lastComp, options.begin, filename);
                                         }
 
-                                        out.makeFile(lastComp, filename, filemask, blks, beg, duration, args);
+                                        out.makeFile(lastComp, filename, options.filemask, blks, beg, duration, args);
                                     }
                                 }
                                 maxTime = 0;
@@ -820,7 +710,7 @@ public class EdgeQueryClient {
                             boolean isDuplicate = false;
                             if (ms != null) {
                                 if (ms.getTimeInMillis() <= maxTime) {    // No need to check duplicates if this is newest seen
-                                    if (!gapsonly) {
+                                    if (!options.gapsonly) {
                                         if (blks.size() >= 1) {
                                             for (int i = blks.size() - 1; i >= 0; i--) {
                                                 if (ms.isDuplicate(blks.get(i))) {
@@ -847,7 +737,7 @@ public class EdgeQueryClient {
                             logger.severe("Seedname exception making a seed record e=" + e.getMessage());
                         }
                     }   // while(!eof)
-                    if (!quiet && iblk > 0) {
+                    if (!options.quiet && iblk > 0) {
                         logger.info(iblk + " Total blocks transferred in " +
                                 (System.currentTimeMillis() - startTime) + " ms " +
                                 (iblk * 1000L / Math.max(System.currentTimeMillis() - startTime, 1)) + " b/s " + npur + " #dups=" + ndups);
@@ -857,7 +747,7 @@ public class EdgeQueryClient {
                     }
                     blks.clear();
                 } catch (UnknownHostException e) {
-                    logger.severe("EQC main: Host is unknown=" + host + "/" + port);
+                    logger.severe("EQC main: Host is unknown=" + options.host + "/" + options.port);
                     if (out != null) {
                         System.exit(1);
                     }
@@ -867,7 +757,7 @@ public class EdgeQueryClient {
                         logger.severe("The connection was refused.  Server is likely down or is blocked. This should never happen.");
                         return null;
                     } else {
-                        logger.severe(e + " EQC main: IO error opening/reading socket=" + host + "/" + port);
+                        logger.severe(e + " EQC main: IO error opening/reading socket=" + options.host + "/" + options.port);
                         if (out != null) {
                             System.exit(1);
                         }
@@ -881,7 +771,7 @@ public class EdgeQueryClient {
                 } catch (IOException e) {
                 }
             }
-            if (perfMonitor) {
+            if (options.perfMonitor) {
                 long msEnd = System.currentTimeMillis() - startPhase;
                 logger.info("Perf setup=" + msSetup + " connect=" + msConnect + " Cmd=" + msCommand + " xfr=" + msTransfer + " out=" + msOutput +
                         " last=" + msEnd + " tot=" + (msSetup + msConnect + msTransfer + msOutput + msEnd) + " #blks=" + totblks + " #lines=" + nline);

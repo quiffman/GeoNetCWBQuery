@@ -265,6 +265,49 @@ public class EdgeQueryClient {
 
         return new Date(begin.getMillis());
     }
+	
+	public static ArrayList listQuery(EdgeQueryOptions options) {
+		try {
+			String line = "";
+			byte[] b = new byte[4096];
+			Socket ds = new Socket(options.host, options.port);
+			ds.setReceiveBufferSize(512000);
+			//ds.setTcpNoDelay(true);
+			InputStream in = ds.getInputStream();        // Get input and output streams
+			OutputStream outtcp = ds.getOutputStream();
+			if (!options.exclude.equals("")) {
+				line = "'-el' '" + options.exclude + "' ";
+			} else {
+				line = "";
+			}
+			if (!options.begin.equals("")) {
+				line += "'-b' '" + options.begin.trim() + "' ";
+			}
+			if (!options.durationString.equals("")) {
+				line += "'-d' '" + options.durationString + "' ";
+			}
+			if (options.lschannels) {
+				if (options.showIllegals) {
+					line += "'-si' ";
+				}
+				line += "'-lsc'\n";
+			} else {
+				line += "'-ls'\n";
+			}
+			logger.config("line=" + line + ":");
+			outtcp.write(line.getBytes());
+			StringBuffer sb = new StringBuffer(100000);
+			int len = 0;
+			while ((len = in.read(b, 0, 512)) > 0) {
+				sb.append(new String(b, 0, len));
+			}
+			logger.info(sb.toString());
+		} catch (IOException e) {
+			logger.severe(e + " Getting a directory");
+			return null;
+		}
+		return null;
+	}
 
     /** do a query.  The command line arguments are passed in as they are for the query tool
      * a files is created unless -t null is specified.  In that case the return is an ArrayList
@@ -310,44 +353,7 @@ public class EdgeQueryClient {
 
                 // The ls option does not require any args checking
         if (options.lsoption) {
-            try {
-                Socket ds = new Socket(options.host, options.port);
-                ds.setReceiveBufferSize(512000);
-                //ds.setTcpNoDelay(true);
-                InputStream in = ds.getInputStream();        // Get input and output streams
-                OutputStream outtcp = ds.getOutputStream();
-                if (!options.exclude.equals("")) {
-                    line = "'-el' '" + options.exclude + "' ";
-                } else {
-                    line = "";
-                }
-                if (!options.begin.equals("")) {
-                    line += "'-b' '" + options.begin.trim() + "' ";
-                }
-                if (!options.durationString.equals("")) {
-                    line += "'-d' '" + options.durationString + "' ";
-                }
-                if (options.lschannels) {
-                    if (options.showIllegals) {
-                        line += "'-si' ";
-                    }
-                    line += "'-lsc'\n";
-                } else {
-                    line += "'-ls'\n";
-                }
-                logger.config("line=" + line + ":");
-                outtcp.write(line.getBytes());
-                StringBuffer sb = new StringBuffer(100000);
-                int len = 0;
-                while ((len = in.read(b, 0, 512)) > 0) {
-                    sb.append(new String(b, 0, len));
-                }
-                logger.info(sb.toString());
-                return null;
-            } catch (IOException e) {
-                logger.severe(e + " Getting a directory");
-                return null;
-            }
+			return listQuery(options);
         }
 
 

@@ -1,130 +1,74 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jsap>
     <parameters>
-
-    <switch>
-        <id>ls</id>
-        <longFlag>ls</longFlag>
-        <help>List the data files available for queries (not generally useful to users)</help>
-    </switch>
-    
-    <switch>
-        <id>lsc</id>
-        <longFlag>lsc</longFlag>
-        <help>List every channel its days of availability from begin time through duration (default last 15 days). Use the -b and -d options to set limits on time interval of the channel list. This option can be cpu intensive if you ask for a long interval, so use only as needed.</help>
-    </switch>
-    
-    <flaggedOption>
-        <id>seedname</id>
-        <stringParser>
-            <classname>StringStringParser</classname>
-        </stringParser>
-        <required>true</required>
-        <shortFlag>s</shortFlag>
-        <longFlag>seedname</longFlag>
-        <help>NSCL or REGEXP  (note: on many shells its best to put this argument in double quotes)
-            NNSSSSSCCCLL to specify a seed channel name. If &lt; 12 characters, match any seednames starting
-            with those characters.  Example : '-s IUA' would return all IU stations starting with 'A' (ADK,AFI,ANMO,ANTO)
-            OR
-            REGEXP :'.' matches any character, [ABC] means one character which is A, or B or C The regexp is right padded with '.'
-            Example: '-s IUANMO.LH[ZN]..' returns the vertical and north component for LH channels at station(s) starting with 'ANMO'
-            '.*' matchs zero or more following characters (include in quotes as * has many meanings!
-            'AA|BB' means matches pattern AA or BB e.g.  'US.*|IU.*' matches the US and IU networks</help>
-    </flaggedOption>
-    
-    <flaggedOption>
-        <id>type</id>
-        <stringParser>
-            <classname>StringStringParser</classname>
-        </stringParser> 
-        <required>true</required>
-        <shortFlag>t</shortFlag>
-        <longFlag>type</longFlag>
-        <defaults>
-            <string>sac</string>
-        </defaults>
-        <help>[ms | msz | sac | dcc | dcc512 | text | null] output type.
-            ms is raw blocks with gaps/overlaps (ext='.ms')
-            
-            msz = is data output as continuous mini-seed with filling use -fill to set other fill values (ext='.msz') can also be output as gappy miniseed with -msgaps NOTE: msz rounds times to nearest millsecond
-            
-            sac = is Seismic Analysis Code format (see -fill for info on nodata code) (ext='.sac')
-            
-            dcc = best effort reconciliation to 4096 byte mini-seed form.  Overlaps are eliminated. (ext='.msd')
-            
-            dcc512 = best effort reconciliation to 512 byte mini-seed form.  Overlaps are eliminated. (ext='.msd')
-            
-            text = simple text format with space separated values, one row per sample: 'Epoch milliseconds' 'value' This can be extremely verbose.
-            
-            null = do not create data file, return blocks to caller (for use from a user program)</help>
-    </flaggedOption>
-    
-    <flaggedOption>
-        <id>duration</id>
-        <longFlag>duration</longFlag>
-        <shortFlag>d</shortFlag>
-        <defaults>
-            <string>300</string>
-        </defaults>
-        <help>nnnn[d] seconds of duration end with 'd' to indicate nnnn is in days.</help>
-    </flaggedOption>
-    
-    <flaggedOption>
-        <id>sacpz</id>
-        <longFlag>sacpz</longFlag>
-        <help>nm|um Request sac style response files in either nanometers (nm) or micrometers(um).</help>
-    </flaggedOption>
-    
-    <flaggedOption>
-        <id>begin</id>
-        <required>true</required>
-        <longFlag>begin</longFlag>
-        <shortFlag>b</shortFlag>
-        <help>yyyy/mm/dd hh:mm:ss The time to start the query.</help>
-    </flaggedOption>
-    
-    <flaggedOption>
-        <id>output</id>
-        <stringParser>
-            <classname>StringStringParser</classname>
-        </stringParser>
-        <required>true</required>
-        <longFlag>output</longFlag>
-        <shortFlag>o</shortFlag>
-        <defaults>
-            <string>%N</string>
-        </defaults>
-        <help>mask Put the output in the given filename described by the mask/tokens
-            Tokens: (Any non-tokens will be literally in the file name)
-            %N the whole seedname NNSSSSSCCCLL
-            %n the two letter SEED network          %s the 5 character SEED station code
-            %c the 3 character SEED channel         %l the two character location
-            %y Year as 4 digits                     %Y 2 character Year
-            %j Day of year (1-366)                  %J Julian day (since 1572)
-            %M 2 digit month                        %D 2 digit day of month
-            %h 2 digit hour                         %m 2 digit minute
-            %S 2 digit second                       %z zap all underscores from name</help>
-    </flaggedOption>
-
-<!--
-        <qualifiedSwitch>
-            <id>verbose</id>
-            <shortFlag>v</shortFlag>
-            <longFlag>verbose</longFlag>
-            <list>true</list>
-            <listSeparator>,</listSeparator>
-            <help>Requests verbose output.</help>
-        </qualifiedSwitch>
         
-        <unflaggedOption>
-            <id>name</id>
-            <defaults>
-                <string>World</string>
-            </defaults>
+        <flaggedOption>
+            <id>seedname</id>
+            <stringParser>
+                <classname>StringStringParser</classname>
+            </stringParser>
             <required>true</required>
-            <greedy>true</greedy>
-            <help>One or more names of people you would like to greet.</help>
-        </unflaggedOption>
--->
+            <shortFlag>s</shortFlag>
+            <longFlag>seedname</longFlag>
+            <help>NSCL or REGEXP  (note: on many shells its best to put this argument in double quotes)
+                NNSSSSSCCCLL to specify a seed channel name. If &lt; 12 characters, match any seednames starting
+                with those characters.  Example : '-s IUA' would return all IU stations starting with 'A' (ADK,AFI,ANMO,ANTO)
+                OR
+                REGEXP :'.' matches any character, [ABC] means one character which is A, or B or C The regexp is right padded with '.'
+                Example: '-s IUANMO.LH[ZN]..' returns the vertical and north component for LH channels at station(s) starting with 'ANMO'
+                '.*' matchs zero or more following characters (include in quotes as * has many meanings!
+                'AA|BB' means matches pattern AA or BB e.g.  'US.*|IU.*' matches the US and IU networks</help>
+        </flaggedOption>
+        
+        <flaggedOption>
+            <id>type</id>
+            <stringParser>
+                <classname>StringStringParser</classname>
+            </stringParser> 
+            <required>true</required>
+            <shortFlag>t</shortFlag>
+            <longFlag>type</longFlag>
+            <defaults>
+                <string>sac</string>
+            </defaults>
+            <help>[ms | msz | sac | dcc | dcc512 | text | null] output type.
+                ms is raw blocks with gaps/overlaps (ext='.ms')
+                
+                msz = is data output as continuous mini-seed with filling use -fill to set other fill values (ext='.msz') can also be output as gappy miniseed with -msgaps NOTE: msz rounds times to nearest millsecond
+                
+                sac = is Seismic Analysis Code format (see -fill for info on nodata code) (ext='.sac')
+                
+                dcc = best effort reconciliation to 4096 byte mini-seed form.  Overlaps are eliminated. (ext='.msd')
+                
+                dcc512 = best effort reconciliation to 512 byte mini-seed form.  Overlaps are eliminated. (ext='.msd')
+                
+                text = simple text format with space separated values, one row per sample: 'Epoch milliseconds' 'value' This can be extremely verbose.
+                
+                null = do not create data file, return blocks to caller (for use from a user program)</help>
+        </flaggedOption>
+        
+        <flaggedOption>
+            <id>output</id>
+            <stringParser>
+                <classname>StringStringParser</classname>
+            </stringParser>
+            <required>true</required>
+            <longFlag>output</longFlag>
+            <shortFlag>o</shortFlag>
+            <defaults>
+                <string>%N</string>
+            </defaults>
+            <help>mask Put the output in the given filename described by the mask/tokens
+                Tokens: (Any non-tokens will be literally in the file name)
+                %N the whole seedname NNSSSSSCCCLL
+                %n the two letter SEED network          %s the 5 character SEED station code
+                %c the 3 character SEED channel         %l the two character location
+                %y Year as 4 digits                     %Y 2 character Year
+                %j Day of year (1-366)                  %J Julian day (since 1572)
+                %M 2 digit month                        %D 2 digit day of month
+                %h 2 digit hour                         %m 2 digit minute
+                %S 2 digit second                       %z zap all underscores from name</help>
+        </flaggedOption>
+        
     </parameters>
 </jsap>

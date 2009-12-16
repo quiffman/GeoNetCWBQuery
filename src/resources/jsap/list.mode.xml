@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsap>
+    <parameters>
+        <qualifiedSwitch>
+            <id>ls</id>
+            <longFlag>ls</longFlag>
+            <required>true</required>
+            <defaults>
+                <string>channels</string>
+            </defaults>
+            <help>List every channel its days of availability from begin time through duration (default last 15 days). Use the -b and -d options to set limits on time interval of the channel list. This option can be cpu intensive if you ask for a long interval, so use only as needed. The files qualifier will list the data files available for queries (not generally useful to users).</help>
+        </qualifiedSwitch>    
+    </parameters>
+</jsap>

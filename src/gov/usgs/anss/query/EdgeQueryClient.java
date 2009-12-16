@@ -930,6 +930,6 @@ public class EdgeQueryClient {
         logger.finest("Running Edge Query");
 
         ArrayList<ArrayList<MiniSeed>> mss = EdgeQueryClient.query(args);
-        
+
     }
 }

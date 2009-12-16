@@ -27,10 +27,11 @@ test ! -e "$tmpdir" || exit 1
 mkdir -p $tmpdir
 
 # Test a command line query
-java -jar GeoNetCWBQuery-2.0.0-RC1.jar -b "2009/01/01 00:00:00" -s "NZWLGT.LTZ40" -d 400 -t sac -o $tmpdir/cwb-test-1.out $silence
+java -jar *CWBQuery*.jar -b "2009/01/01 00:00:00" -s "NZWLGT.LTZ40" -d 400 -t sac -o $tmpdir/cwb-test-1.out $silence
 
 # Test running a channel listing
-java -jar GeoNetCWBQuery-2.0.0-RC1.jar -lsc -b "2009/01/01 00:00:00" -d 100 2>$tmpdir/cwb-test-2.out
+java -jar *CWBQuery*.jar -lsc -b "2009/01/01 00:00:00" -d 100 2>$tmpdir/cwb-test-2.tmp
+sed -e 's/today=.*$//' $tmpdir/cwb-test-2.tmp > $tmpdir/cwb-test-2.out
 
 cat > $tmpdir/CWB.batch <<EOF
 -b "2009/01/01 00:00:00" -s "NZWLGT.LTZ40" -t sac -o $tmpdir/cwb-batch-test-1.out
@@ -44,11 +45,11 @@ cat > $tmpdir/CWB.batch <<EOF
 EOF
 
 # Test the rest via a batch file
-java -jar GeoNetCWBQuery-2.*.jar -f $tmpdir/CWB.batch $silence
+java -jar *CWBQuery*.jar -f $tmpdir/CWB.batch $silence
 
 cat > $tmpdir/CWB.md5 <<EOF
 9f7555de4d8f89a6f1c9fc8d05e19c51  $tmpdir/cwb-test-1.out
-f942a5a2d868b9f1fd9394be12ca0d91  $tmpdir/cwb-test-2.out
+b22223f4c94a56defdebdbba5aebf73f  $tmpdir/cwb-test-2.out
 cb20eb719832db4910a4d830f69c7a38  $tmpdir/cwb-batch-test-1.out
 47a7f0f4f157710697c8430f9b1eae29  $tmpdir/NZWLGTLTZ40-NZ-WLGT-LTZ-40-09-2009-001-2454833-01-01-00-00-00-cwb-batch-test-2.out
 72d35048a4ee43e91cf99857342478b1  $tmpdir/NZBFZ__HHZ10-cwb-batch-test-3.out

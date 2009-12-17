@@ -8,7 +8,8 @@ import java.io.BufferedReader;
 import java.util.logging.Logger;
 
 /**
- *
+ * An attempt to encapsulate (read isolate) EdgeQueryClient command line args.
+ * 
  * @author richardg
  */
 public class EdgeQueryOptions {

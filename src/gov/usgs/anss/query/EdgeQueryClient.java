@@ -168,69 +168,6 @@ public class EdgeQueryClient {
     public EdgeQueryClient() {
     }
 
-    /** do a query from a command string, break it into a command args list and call query
-     *@param line The command line string
-     *@return ArrayList<ArrayList<MiniSeed>> with each channels data on each array list
-     */
-    static public ArrayList<ArrayList<MiniSeed>> query(String line) {
-
-        String[] arg = line.split(" ");
-        logger.config("line=" + line);
-        for (int i = 0; i < arg.length; i++) {
-            arg[i] = "";
-        }
-        int narg = 0;
-        boolean inQuote = false;
-        int beg = 0;
-        int end = 0;
-        while (end < line.length()) {
-            if (inQuote) {
-                if (line.charAt(end) == '"' || line.charAt(end) == '\'') {
-                    arg[narg++] = line.substring(beg, end).trim();
-                    if (arg[narg - 1].equals("")) {
-                        narg--;
-                    }
-                    inQuote = false;
-                    beg = end + 1;
-                }
-            } else {
-                if (line.charAt(end) == '"' || line.charAt(end) == '\'') {
-                    inQuote = true;
-                    beg = end + 1;
-                } else if (line.charAt(end) == ' ') {
-                    arg[narg++] = line.substring(beg, end).trim();
-                    if (arg[narg - 1].equals("")) {
-                        narg--;
-                    }
-                    beg = end + 1;
-                }
-            }
-            end++;
-        }
-        if (inQuote) {
-            logger.warning("Query argument list has open quotes!");
-            return new ArrayList<ArrayList<MiniSeed>>(1);
-        }
-        arg[narg++] = line.substring(beg, end).trim();
-        int n = 0;
-        for (int i = 0; i < narg; i++) {
-            if (!arg[i].equals("")) {
-                n++;
-            }
-        }
-        String[] args = new String[n];
-        n = 0;
-        for (int i = 0; i < narg; i++) {
-            if (!arg[i].equals("")) {
-                if (line.indexOf("dbg") >= 0) {
-                    logger.fine(n + "=" + arg[i] + "|");
-                }
-                args[n++] = arg[i];
-            }
-        }
-        return query(args);
-    }
-
     /**
      * Parses the begin time.  This tries to match
      * the documentation for CWBClient but does not
@@ -315,16 +252,10 @@ public class EdgeQueryClient {
      *@param args The String array with args per the documentation
      *@return The ArrayList with ArrayLists of miniseed one for each channel returned.
      */
-    static public ArrayList<ArrayList<MiniSeed>> query(String[] args) {
+    public static ArrayList<ArrayList<MiniSeed>> query(EdgeQueryOptions options) {
 
 
         String line = "";
-
-
-        if (args.length == 0) {
-            System.out.println(QueryProperties.getUsage());
-            return null;
-        }
 
 
 
@@ -348,18 +279,11 @@ public class EdgeQueryClient {
 		String filename = "";
 		BufferedReader infile = null;
 
-		EdgeQueryOptions options = new EdgeQueryOptions(args);
-
-                // The ls option does not require any args checking
-        if (options.lsoption) {
-			return listQuery(options);
-        }
-
 
         // if not -f mode, read in more command line parameters for the run
         if (options.filenamein.equals(" ")) {
-            for (int i = 0; i < args.length; i++) {
-                line += args[i].replaceAll(" ", "@") + " ";
+            for (int i = 0; i < options.args.length; i++) {
+                line += options.args[i].replaceAll(" ", "@") + " ";
             }
             infile = new BufferedReader(new StringReader(line));
         } else {
@@ -751,6 +675,12 @@ public class EdgeQueryClient {
 
     public static void main(String[] args) {
 
+
+        if (args.length == 0) {
+            System.out.println(QueryProperties.getUsage());
+            System.exit(1);
+        }
+
         // Load a default logging properties file if none already set.
         String customLogConfigFile = System.getProperty("java.util.logging.config.file");
         if (customLogConfigFile == null) {
@@ -772,7 +702,15 @@ public class EdgeQueryClient {
 
         logger.finest("Running Edge Query");
 
-        ArrayList<ArrayList<MiniSeed>> mss = EdgeQueryClient.query(args);
+		EdgeQueryOptions options = new EdgeQueryOptions(args);
+
+                // The ls option does not require any args checking
+        if (options.lsoption) {
+			listQuery(options);
+        }
+		else {
+			query(options);
+		}
         
     }
 }

@@ -22,6 +22,9 @@ public class EdgeQueryOptions {
 	String host = QueryProperties.getGeoNetCwbIP();
 	int port = QueryProperties.getGeoNetCwbPort();
 
+	public String[] args;
+	
+	public double duration = 300.;
 	public String seedname = "";
 	public String begin = "";
 	public String type = "sac";
@@ -136,6 +139,70 @@ public class EdgeQueryOptions {
 	}
 
 	public EdgeQueryOptions(String[] args) {
+		this.args = args;
 		this.parseArgs(args);
+	}
+
+	public void parseArgs(String line) {
+		boolean on = false;
+
+		// Spaces and quoting...?
+		// TODO: move to EdgeQueryOptions
+		char[] linechar = line.toCharArray();
+		for (int i = 0; i < line.length(); i++) {
+			if (linechar[i] == '"') {
+				on = !on;
+			} else if (linechar[i] == ' ') {
+				if (on) {
+					linechar[i] = '@';
+				}
+			}
+		}
+
+		line = new String(linechar);
+		line = line.replaceAll("\"", " ");
+		line = line.replaceAll("  ", " ");
+		line = line.replaceAll("  ", " ");
+		line = line.replaceAll("  ", " ");
+
+		this.args = line.split(" ");
+		for (int i = 0; i < args.length; i++) {
+			if (args[i].equals("-b")) {
+				begin = args[i + 1].replaceAll("@", " ");
+			} else if (args[i].equals("-s")) {
+				seedname = args[i + 1].replaceAll("@", " ");
+			} else if (args[i].equals("-d")) {
+				if (args[i + 1].endsWith("d") || args[i + 1].endsWith("D")) {
+					duration = Double.parseDouble(args[i + 1].substring(0, args[i + 1].length() - 1)) * 86400.;
+				} else {
+					duration = Double.parseDouble(args[i + 1]);
+				}
+			} else if (args[i].equals("-t")) {
+				type = args[i + 1];
+				i++;
+			} else if (args[i].equals("-msb")) {
+				blocksize = Integer.parseInt(args[i + 1]);
+				i++;
+			} else if (args[i].equals("-o")) {
+				filemask = args[i + 1].replaceAll("@", " ");
+				i++;
+			} else if (args[i].equals("-e")) {
+				exclude = "exclude.txt";
+			} else if (args[i].equals("-el")) {
+				exclude = args[i + 1].replaceAll("@", " ");
+				i++;
+			} else if (args[i].equals("-q")) {
+				quiet = true;
+			} else if (args[i].equals("-nosort")) {
+				nosort = true;
+			} else if (args[i].indexOf("-hold") == 0) {
+				args[i] = "-gaps";     // change to tel other end gaps mode
+			}
+		}
+
+	}
+
+	public EdgeQueryOptions(String line) {
+		this.parseArgs(line);
 	}
 }

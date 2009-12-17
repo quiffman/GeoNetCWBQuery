@@ -344,7 +344,6 @@ public class EdgeQueryClient {
         GregorianCalendar jan_01_2007 = new GregorianCalendar(2007, 0, 1);
 
         ArrayList<ArrayList<MiniSeed>> blksAll = null;
-		double duration = 300.;
 		java.util.Date beg = null;
 		String filename = "";
 		BufferedReader infile = null;
@@ -414,61 +413,9 @@ public class EdgeQueryClient {
                     continue;
                 }
                 nline++;
-                boolean on = false;
 
-				// Spaces and quoting...?
-				// TODO: move to EdgeQueryOptions
-                char[] linechar = line.toCharArray();
-                for (int i = 0; i < line.length(); i++) {
-                    if (linechar[i] == '"') {
-                        on = !on;
-                    } else if (linechar[i] == ' ') {
-                        if (on) {
-                            linechar[i] = '@';
-                        }
-                    }
-                }
+				options = new EdgeQueryOptions(line);
 
-                line = new String(linechar);
-                line = line.replaceAll("\"", " ");
-                line = line.replaceAll("  ", " ");
-                line = line.replaceAll("  ", " ");
-                line = line.replaceAll("  ", " ");
-
-                args = line.split(" ");
-                for (int i = 0; i < args.length; i++) {
-                    if (args[i].equals("-b")) {
-                        options.begin = args[i + 1].replaceAll("@", " ");
-                    } else if (args[i].equals("-s")) {
-                        options.seedname = args[i + 1].replaceAll("@", " ");
-                    } else if (args[i].equals("-d")) {
-                        if (args[i + 1].endsWith("d") || args[i + 1].endsWith("D")) {
-                            duration = Double.parseDouble(args[i + 1].substring(0, args[i + 1].length() - 1)) * 86400.;
-                        } else {
-                            duration = Double.parseDouble(args[i + 1]);
-                        }
-                    } else if (args[i].equals("-t")) {
-                        options.type = args[i + 1];
-                        i++;
-                    } else if (args[i].equals("-msb")) {
-                        options.blocksize = Integer.parseInt(args[i + 1]);
-                        i++;
-                    } else if (args[i].equals("-o")) {
-                        options.filemask = args[i + 1].replaceAll("@", " ");
-                        i++;
-                    } else if (args[i].equals("-e")) {
-                        options.exclude = "exclude.txt";
-                    } else if (args[i].equals("-el")) {
-                        options.exclude = args[i + 1].replaceAll("@", " ");
-                        i++;
-                    } else if (args[i].equals("-q")) {
-                        options.quiet = true;
-                    } else if (args[i].equals("-nosort")) {
-                        options.nosort = true;
-                    } else if (args[i].indexOf("-hold") == 0) {
-                        args[i] = "-gaps";     // change to tel other end gaps mode
-                    }
-                }
                 if (options.blocksize != 512 && options.blocksize != 4096) {
                     logger.severe("-msb must be 512 or 4096 and is only meaningful for msz type");
                     return null;
@@ -547,9 +494,9 @@ public class EdgeQueryClient {
                 line = "";
                 long maxTime = 0;
                 int ndups = 0;
-                for (int i = 0; i < args.length; i++) {
-                    if (!args[i].equals("")) {
-                        line += "'" + args[i].replaceAll("@", " ") + "' ";
+                for (int i = 0; i < options.args.length; i++) {
+                    if (!options.args[i].equals("")) {
+                        line += "'" + options.args[i].replaceAll("@", " ") + "' ";
                     }
                 }
                 line = line.trim() + "\t";
@@ -693,7 +640,7 @@ public class EdgeQueryClient {
                                             options.stasrv.getSACResponse(lastComp, options.begin, filename);
                                         }
 
-                                        out.makeFile(lastComp, filename, options.filemask, blks, beg, duration, args);
+                                        out.makeFile(lastComp, filename, options.filemask, blks, beg, options.duration, options.args);
                                     }
                                 }
                                 maxTime = 0;

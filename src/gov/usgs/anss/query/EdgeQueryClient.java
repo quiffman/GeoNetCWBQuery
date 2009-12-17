@@ -352,7 +352,8 @@ public class EdgeQueryClient {
                     try {
                         beg = parseBegin(options.begin);
                     } catch (IllegalArgumentException illegalArgumentException) {
-                        logger.severe("the -b field date did not parse correctly. @line" + nline + illegalArgumentException);
+                        logger.severe("the -b field date [" + options.begin +
+								"] did not parse correctly. @line" + nline + illegalArgumentException);
                         return null;
                     }
 
@@ -579,7 +580,7 @@ public class EdgeQueryClient {
                             // If this block is the first in a new component, clear the blks array
                             //if(!lastComp.substring(0,compareLength).equals(
                             //    ms.getSeedName().substring(0,compareLength))) blks.clear();
-              /* in late 2007 there was some files which were massively duplicated by block.
+                            /* in late 2007 there was some files which were massively duplicated by block.
                              * to prevent this from blowing memory when there are so may we eliminate and duplicate
                              * blocks here.  If it is massively out of order , all of these block checks will slow things
                              * down.
@@ -704,7 +705,7 @@ public class EdgeQueryClient {
 
 		EdgeQueryOptions options = new EdgeQueryOptions(args);
 
-                // The ls option does not require any args checking
+        // The ls option does not require any args checking
         if (options.lsoption) {
 			listQuery(options);
         }

@@ -278,22 +278,12 @@ public class EdgeQueryClient {
 		java.util.Date beg = null;
 		String filename = "";
 		BufferedReader infile = null;
-
-
-        // if not -f mode, read in more command line parameters for the run
-        if (options.filenamein.equals(" ")) {
-            for (int i = 0; i < options.args.length; i++) {
-                line += options.args[i].replaceAll(" ", "@") + " ";
-            }
-            infile = new BufferedReader(new StringReader(line));
-        } else {
-            try {
-                infile = new BufferedReader(new FileReader(options.filenamein));
-            } catch (FileNotFoundException e) {
-                logger.severe("did not find the input file=" + options.filenamein);
-                return null;
-            }
-        }
+		
+		try {
+			infile = new BufferedReader(options.getAsReader());
+		} catch (FileNotFoundException ex) {
+			logger.severe("did not find the input file=" + options.filenamein);
+		}
 
         // the "in" BufferedReader will give us the command lines we need for the other end
         try {
@@ -415,16 +405,9 @@ public class EdgeQueryClient {
                     compareLength = 12;
                 }
 
-                // put command line in single quotes.
-                line = "";
                 long maxTime = 0;
                 int ndups = 0;
-                for (int i = 0; i < options.args.length; i++) {
-                    if (!options.args[i].equals("")) {
-                        line += "'" + options.args[i].replaceAll("@", " ") + "' ";
-                    }
-                }
-                line = line.trim() + "\t";
+				line = options.getSingleQuotedCommand();
                 try {
                     msSetup += (System.currentTimeMillis() - startPhase);
                     startPhase = System.currentTimeMillis();

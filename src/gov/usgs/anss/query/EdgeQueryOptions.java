@@ -5,6 +5,10 @@
 package gov.usgs.anss.query;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.logging.Logger;
 
 /**
@@ -33,7 +37,7 @@ public class EdgeQueryOptions {
 	public boolean lsoption = false;
 	public boolean lschannels = false;
 	public int julian = 0;
-	public String filenamein = " ";
+	public String filenamein = null;
 	public int blocksize = 512;        // only used for msz type
 	public String filemask = "%N";
 	public boolean quiet = false;
@@ -175,5 +179,31 @@ public class EdgeQueryOptions {
 			args[i] = args[i].replaceAll("@", " ");
 		}
 		this.parseArgs(this.args);
+	}
+
+	public Reader getAsReader() throws FileNotFoundException {
+
+        // if not -f mode, read in more command line parameters for the run
+        if (this.filenamein != null) {
+			return new FileReader(this.filenamein);
+		}
+
+		String line = "";
+        for (int i = 0; i < this.args.length; i++) {
+			line += this.args[i].replaceAll(" ", "@") + " ";
+		}
+		return new StringReader(line);
+
+	}
+
+	public String getSingleQuotedCommand() {
+		// put command line in single quotes.
+		String line = "";
+		for (int i = 0; i < this.args.length; i++) {
+			if (!this.args[i].equals("")) {
+				line += "'" + this.args[i].replaceAll("@", " ") + "' ";
+			}
+		}
+		return line.trim() + "\t";
 	}
 }

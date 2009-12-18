@@ -19,11 +19,15 @@ import java.util.Collections;
 
 import gov.usgs.anss.util.SeedUtil;
 import java.text.DecimalFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
+import nz.org.geonet.quakeml.v1_0_1.client.QuakemlFactory;
+import nz.org.geonet.quakeml.v1_0_1.client.QuakemlUtils;
+import nz.org.geonet.quakeml.v1_0_1.domain.Quakeml;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -334,7 +338,18 @@ public class EdgeQueryClient {
                     logger.severe("-msb must be 512 or 4096 and is only meaningful for msz type");
                     return null;
                 }
-                if (options.begin.equals("")) {
+				if (options.eventId != null) {
+					// TODO: ARGH! FIX... Fugly!!!
+					Quakeml event = new QuakemlFactory().getQuakemlByEventReference(options.eventId, null, null);
+					DateTime jDate = QuakemlUtils.getOriginTime(QuakemlUtils.getPreferredOrigin(QuakemlUtils.getFirstEvent(event)));
+					jDate.plus(options.offset);
+					beg = jDate.toDate();
+					options.begin = parseBeginFormat.withZone(DateTimeZone.UTC).print(jDate);
+					logger.config("Using begin time " + options.begin + " from event " + options.eventId);
+					options.args = Arrays.copyOf(options.args, options.args.length + 2);
+					options.args[options.args.length - 2] = "-b";
+					options.args[options.args.length - 1] = options.begin;
+				} else if (options.begin.equals("")) {
                     logger.severe("You must enter a beginning time @line " + nline);
                     return null;
                 } else {

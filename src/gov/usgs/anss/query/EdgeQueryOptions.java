@@ -57,6 +57,8 @@ public class EdgeQueryOptions {
 	public SacPZ stasrv = null;
 	public String pzunit = "nm";
 	public String stahost = QueryProperties.getNeicMetadataServerIP();
+	public String eventId;
+	public long offset = 0;
 
 	public void parseArgs(String[] args) {
 
@@ -141,7 +143,14 @@ public class EdgeQueryOptions {
 				gapsonly = true;
 				type = "HOLD";
 				logger.config("Holdings server=" + holdingIP + "/" + holdingPort + " type=" + holdingType);
-			} else {
+			} else if (args[i].equals("-event")) {
+				eventId = args[i + 1];
+				i++;
+			} else if (args[i].equals("-offset")) {
+				offset = Long.parseLong(args[i + 1]);
+				i++;
+			}
+				else {
 				logger.warning("Unknown CWB Query argument=" + args[i]);
 			}
 
@@ -196,6 +205,7 @@ public class EdgeQueryOptions {
 
 	}
 
+	// TODO: This should be constructed from the fields.
 	public String getSingleQuotedCommand() {
 		// put command line in single quotes.
 		String line = "";

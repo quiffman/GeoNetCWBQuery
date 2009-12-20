@@ -282,7 +282,8 @@ public class EdgeQueryClient {
 		java.util.Date beg = null;
 		String filename = "";
 		BufferedReader infile = null;
-		
+
+		// TODO: Push this into EdgeQueryOptions in favour of a command line iterator.
 		try {
 			infile = new BufferedReader(options.getAsReader());
 		} catch (FileNotFoundException ex) {
@@ -333,6 +334,8 @@ public class EdgeQueryClient {
                 nline++;
 
 				options = new EdgeQueryOptions(line);
+
+				//TODO: move the following options validation to EdgeQueryOptions.
 
                 if (options.blocksize != 512 && options.blocksize != 4096) {
                     logger.severe("-msb must be 512 or 4096 and is only meaningful for msz type");
@@ -563,6 +566,7 @@ public class EdgeQueryClient {
                                             options.stasrv.getSACResponse(lastComp, options.begin, filename);
                                         }
 
+										// TODO: Change the signature to pass options only once.
                                         out.makeFile(lastComp, filename, options.filemask, blks, beg, options.duration, options.args);
                                     }
                                 }

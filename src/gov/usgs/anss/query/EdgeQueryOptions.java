@@ -60,6 +60,14 @@ public class EdgeQueryOptions {
 	public String eventId;
 	public long offset = 0;
 
+	/**
+	 * Parses known args into object fields. Does some argument validation and
+	 * potentially System.exit(0).
+	 * TODO: move any/all validation to a validateArgs method.
+	 * TODO: return a String array of unused/unparsed args to be used for
+	 * outputter customisation.
+	 * @param args
+	 */
 	public void parseArgs(String[] args) {
 
 		for (int i = 0; i < args.length; i++) {
@@ -157,11 +165,20 @@ public class EdgeQueryOptions {
 		}
 	}
 
+	/**
+	 * Creates an EdgeQueryOptions object from a set of command line args.
+	 * @param args
+	 */
 	public EdgeQueryOptions(String[] args) {
 		this.args = args;
 		this.parseArgs(this.args);
 	}
 
+	/**
+	 * Creates an EdgeQueryOptions object from a single command line string.
+	 * TODO: Attempt to understand and sanitise this method.
+	 * @param line
+	 */
 	public EdgeQueryOptions(String line) {
 		boolean on = false;
 
@@ -190,6 +207,13 @@ public class EdgeQueryOptions {
 		this.parseArgs(this.args);
 	}
 
+	/**
+	 * Returns a FileReader if filename has been specified, or a StringReader if
+	 * it just contains command line args.
+	 * TODO: replace this with a command line iterator...?
+	 * @return
+	 * @throws FileNotFoundException
+	 */
 	public Reader getAsReader() throws FileNotFoundException {
 
         // if not -f mode, read in more command line parameters for the run
@@ -205,7 +229,11 @@ public class EdgeQueryOptions {
 
 	}
 
-	// TODO: This should be constructed from the fields.
+	/**
+	 * Puts the command line args in single quotes, to be sent to the server.
+	 * TODO: This should be constructed from the fields.
+	 * @return the command line args, single quoted.
+	 */
 	public String getSingleQuotedCommand() {
 		// put command line in single quotes.
 		String line = "";

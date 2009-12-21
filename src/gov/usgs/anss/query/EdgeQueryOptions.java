@@ -182,10 +182,17 @@ public class EdgeQueryOptions {
 	}
 
 	/**
-	 * Validate parsed args.
-	 * @return
+	 * Validate parsed args. This should (initially at least) mimic the dodgy
+	 * args validation of the current client.
+	 * TODO: clean up later for context driven help???
+	 * @return boolean representing whether the args are valid
 	 */
 	public boolean isValid() {
+		if (isFileMode() || isListQuery()) {
+			// No args checking done here.
+			return true;
+		}
+		
 		throw new UnsupportedOperationException("Not yet implemented");
 	}
 

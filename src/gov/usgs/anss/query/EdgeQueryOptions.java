@@ -28,7 +28,7 @@ public class EdgeQueryOptions {
 	int port = QueryProperties.getGeoNetCwbPort();
 
 	public String[] args;
-	
+
 	public double duration = 300.;
 	public String seedname = "";
 	public String begin = "";
@@ -163,6 +163,46 @@ public class EdgeQueryOptions {
 			}
 
 		}
+	}
+
+	/**
+	 * Return true if the arguments specified a batch file.
+	 * @return
+	 */
+	public boolean isFileMode() {
+		throw new UnsupportedOperationException("Not yet implemented");
+	}
+
+	/**
+	 * Return true if a list query -ls or -lsc was defined.
+	 * @return
+	 */
+	public boolean isListQuery() {
+		throw new UnsupportedOperationException("Not yet implemented");
+	}
+
+	/**
+	 * Validate parsed args.
+	 * @return
+	 */
+	public boolean isValid() {
+		throw new UnsupportedOperationException("Not yet implemented");
+	}
+
+	/**
+	 * Generate some (context?) appropriate help text.
+	 * @return the help string.
+	 */
+	public String getHelp() {
+		throw new UnsupportedOperationException("Not yet implemented");
+	}
+
+	/**
+	 * Generate some (context?) appropriate usage text.
+	 * @return the usage string.
+	 */
+	public String getUsage() {
+		throw new UnsupportedOperationException("Not yet implemented");
 	}
 
 	/**

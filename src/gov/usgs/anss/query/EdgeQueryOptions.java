@@ -29,6 +29,7 @@ public class EdgeQueryOptions {
 
 	public String[] args;
 
+	//TODO: change empty string defaults to null
 	public double duration = 300.;
 	public String seedname = "";
 	public String begin = "";

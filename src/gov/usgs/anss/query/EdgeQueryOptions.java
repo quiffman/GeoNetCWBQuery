@@ -171,7 +171,7 @@ public class EdgeQueryOptions {
 	 * @return
 	 */
 	public boolean isFileMode() {
-		throw new UnsupportedOperationException("Not yet implemented");
+		return filenamein != null;
 	}
 
 	/**

@@ -708,7 +708,7 @@ public class EdgeQueryClient {
 		EdgeQueryOptions options = new EdgeQueryOptions(args);
 
         // The ls option does not require any args checking
-        if (options.lsoption) {
+        if (options.isListQuery()) {
 			listQuery(options);
         }
 		else {

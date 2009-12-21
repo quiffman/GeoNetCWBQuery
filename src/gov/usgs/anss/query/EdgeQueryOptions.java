@@ -93,7 +93,6 @@ public class EdgeQueryOptions {
 				lsoption = true;
 			} else if (args[i].equals("-lsc")) { // Documented functionality.
 				lschannels = true;
-				lsoption = true;
 			} else if (args[i].equals("-b")) { // Documented functionality.
 				begin = args[i + 1];
 				i++;
@@ -179,7 +178,7 @@ public class EdgeQueryOptions {
 	 * @return
 	 */
 	public boolean isListQuery() {
-		throw new UnsupportedOperationException("Not yet implemented");
+		return (lsoption || lschannels);
 	}
 
 	/**
@@ -195,7 +194,7 @@ public class EdgeQueryOptions {
 	 * @return the help string.
 	 */
 	public String getHelp() {
-		throw new UnsupportedOperationException("Not yet implemented");
+		return QueryProperties.getUsage();
 	}
 
 	/**

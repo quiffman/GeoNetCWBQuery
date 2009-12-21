@@ -67,27 +67,12 @@ public class EdgeQueryOptionsTest {
 	@Test
 	public void testIsListQuery() {
 		System.out.println("isListQuery");
-		EdgeQueryOptions instance = null;
-		boolean expResult = false;
-		boolean result = instance.isListQuery();
-		assertEquals(expResult, result);
-		// TODO review the generated test code and remove the default call to fail.
-		fail("The test case is a prototype.");
+		EdgeQueryOptions instance = new EdgeQueryOptions(new String[]{"-ls"});
+		assertTrue("File mode should return true", instance.isListQuery());
+		instance = new EdgeQueryOptions(new String[]{"-lsc"});
+		assertTrue("File mode should return true", instance.isListQuery());
 	}
 
-	/**
-	 * Test of isValid method, of class EdgeQueryOptions.
-	 */
-	@Test
-	public void testIsValid() {
-		System.out.println("isValid");
-		EdgeQueryOptions instance = null;
-		boolean expResult = false;
-		boolean result = instance.isValid();
-		assertEquals(expResult, result);
-		// TODO review the generated test code and remove the default call to fail.
-		fail("The test case is a prototype.");
-	}
 
 	/**
 	 * Test of getHelp method, of class EdgeQueryOptions.

@@ -22,12 +22,17 @@ abstract public class Outputer {
 	protected static final Logger logger = Logger.getLogger(Outputer.class.getName());
 	static {logger.fine("$Id$");}
 
-    /** Creates a new instance of Outputer */
+    /**
+	 * Creates a new instance of Outputer
+	 * TODO: Change the constructor to take an EdgeQueryOptions object.
+	 */
     public Outputer() {
     }
 
-    /** the main routine gives an UNSORTED list in blks.  If it needs to be sorted call
+    /**
+	 * the main routine gives an UNSORTED list in blks.  If it needs to be sorted call
      * Collections.sort(blks);
+	 * TODO: Remove the unnecessary options from this method (get them from EdgeQueryOptions)
      */
     abstract public void makeFile(String comp, String filename, String mask, ArrayList<MiniSeed> blks,
             java.util.Date beg, double duration, String[] args) throws IOException;

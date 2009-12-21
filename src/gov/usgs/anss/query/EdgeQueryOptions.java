@@ -68,7 +68,7 @@ public class EdgeQueryOptions {
 	 * outputter customisation.
 	 * @param args
 	 */
-	public void parseArgs(String[] args) {
+	public void parse(String[] args) {
 
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].equals("-f")) {  // Documented functionality.
@@ -171,7 +171,7 @@ public class EdgeQueryOptions {
 	 */
 	public EdgeQueryOptions(String[] args) {
 		this.args = args;
-		this.parseArgs(this.args);
+		this.parse(this.args);
 	}
 
 	/**
@@ -204,7 +204,7 @@ public class EdgeQueryOptions {
 		for (int i = 0; i < args.length; i++) {
 			args[i] = args[i].replaceAll("@", " ");
 		}
-		this.parseArgs(this.args);
+		this.parse(this.args);
 	}
 
 	/**

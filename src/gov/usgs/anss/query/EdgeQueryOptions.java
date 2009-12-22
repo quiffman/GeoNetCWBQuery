@@ -147,20 +147,7 @@ public class EdgeQueryOptions {
 				i++;
 			} else if (args[i].equals("-sacpz")) {
 				sacpz = true;
-				if (i + 1 > args.length) {
-					logger.warning(" ***** -sacpz units must be either um or nm and is required!");
-					System.exit(0);
-				}
-
 				pzunit = args[i + 1];
-				if (stahost == null || stahost.equals("")) {
-					logger.warning("no metadata server set.  Exiting.");
-					System.exit(0);
-				}
-				if (!args[i + 1].equalsIgnoreCase("nm") && !args[i + 1].equalsIgnoreCase("um")) {
-					logger.warning("   ****** -sacpz units must be either um or nm switch values is " + args[i + 1]);
-					System.exit(0);
-				}
 				stasrv = new SacPZ(stahost, pzunit);
 				i++;
 			} else if (args[i].equals("-si")) {
@@ -216,7 +203,18 @@ public class EdgeQueryOptions {
 			// No args checking done here.
 			return true;
 		}
-		
+
+		if (stahost == null || stahost.equals("")) {
+			logger.warning("no metadata server set.");
+			return false;
+		}
+		if (sacpz) {
+			if (!pzunit.equalsIgnoreCase("nm") && !pzunit.equalsIgnoreCase("um")) {
+				logger.warning("   ****** -sacpz units must be either um or nm switch values is " + pzunit);
+				return false;
+			}
+		}
+
 		throw new UnsupportedOperationException("Not yet implemented");
 	}
 

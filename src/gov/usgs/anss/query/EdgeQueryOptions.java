@@ -9,6 +9,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 /**
@@ -28,6 +30,7 @@ public class EdgeQueryOptions {
 	int port = QueryProperties.getGeoNetCwbPort();
 
 	public String[] args;
+	public String[] extraArgs;
 
 	//TODO: change empty string defaults to null
 	public double duration = 300.;
@@ -67,9 +70,25 @@ public class EdgeQueryOptions {
 	 * TODO: move any/all validation to a validateArgs method.
 	 * TODO: return a String array of unused/unparsed args to be used for
 	 * outputter customisation.
-	 * @param args
+	 * @param args the arguments to parse
+	 * @return unused args (unmodified order)
 	 */
-	public void parse(String[] args) {
+	public String[] parse(String[] args) {
+		
+//		List<String> argList = Arrays.asList(args);
+		ArrayList<String> argList = new ArrayList(Arrays.asList(args));
+		int pos = argList.indexOf("-f");
+		if (pos != -1) {
+			argList.remove(pos);
+			filenamein = argList.remove(pos);
+			quiet = argList.remove("-q");
+			dbg = argList.remove("-dbg");
+			if (argList.isEmpty()) {
+				return null;
+			}
+
+			return args = argList.toArray(new String[0]);
+		}
 
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].equals("-f")) {  // Documented functionality.
@@ -163,6 +182,7 @@ public class EdgeQueryOptions {
 			}
 
 		}
+		return args;
 	}
 
 	/**
@@ -188,7 +208,11 @@ public class EdgeQueryOptions {
 	 * @return boolean representing whether the args are valid
 	 */
 	public boolean isValid() {
-		if (isFileMode() || isListQuery()) {
+		if (isFileMode()) {
+			return (extraArgs == null);
+		}
+
+		if (isListQuery()) {
 			// No args checking done here.
 			return true;
 		}
@@ -218,7 +242,7 @@ public class EdgeQueryOptions {
 	 */
 	public EdgeQueryOptions(String[] args) {
 		this.args = args;
-		this.parse(this.args);
+		this.extraArgs = (this.args);
 	}
 
 	/**
@@ -251,7 +275,7 @@ public class EdgeQueryOptions {
 		for (int i = 0; i < args.length; i++) {
 			args[i] = args[i].replaceAll("@", " ");
 		}
-		this.parse(this.args);
+		this.extraArgs = parse(this.args);
 	}
 
 	/**

@@ -26,6 +26,7 @@ public class EdgeQueryOptionsParseAndValidateTest {
         return Arrays.asList(new Object[][]{
 			// args line,	expected valid,		failure message
 			{new EdgeQueryOptions("-f file.txt"), true, "Batch file mode should pass."},
+			{new EdgeQueryOptions("-f \"file with spaces.txt\""), true, "Batch file mode (quoted with spaces) should pass."},
 			{new EdgeQueryOptions("-f file.txt -ls"), false, "Batch file mode should fail with extra args."},
 			{new EdgeQueryOptions("-s \"NZWLGT\" -b \"2009-01-01 00:00:00\""), true, "seedname and begin options should be enough."},
 			{new EdgeQueryOptions("-s \"NZWLGT\""), false, "should fail without begin time."},
@@ -44,7 +45,7 @@ public class EdgeQueryOptionsParseAndValidateTest {
 
     @Test
     public void testParseAndValidate() {
-		assertEquals(message, options.isValid(), valid);
+		assertEquals(message, valid, options.isValid());
     }
 
 }

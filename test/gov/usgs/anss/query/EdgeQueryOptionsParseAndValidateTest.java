@@ -33,6 +33,9 @@ public class EdgeQueryOptionsParseAndValidateTest {
 			{new EdgeQueryOptions("-s \"NZWLGT\" -b \"2009/01/01 00:00:00\" -sacpz um"), true, "sacpz should have nm or um units."},
 			{new EdgeQueryOptions("-s \"NZWLGT\" -b \"2009/01/01 00:00:00\" -sacpz fail"), false, "sacpz should have nm or um units."},
 			{new EdgeQueryOptions("-s \"NZWLGT\""), false, "should fail without begin time."},
+			{new EdgeQueryOptions("-b \"2009/01/01 00:00:00\""), false, "seedname is not optional."},
+
+			{new EdgeQueryOptions("-s \"NZWLGT\" -event 3212109"), true, "seedname and begin options should be enough."},
 		});
     }
 

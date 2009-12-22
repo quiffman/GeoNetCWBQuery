@@ -178,7 +178,7 @@ public class EdgeQueryOptions {
 				logger.config("Holdings server=" + holdingIP + "/" + holdingPort + " type=" + holdingType);
 			} else if (args[i].equals("-event")) {
 				eventId = args[i + 1];
-				// TODO: ARGH! FIX... Fugly!!!
+				// TODO: eventid and begin time should probably be parsed in a getBegineTime method.
 				Quakeml event = new QuakemlFactory().getQuakemlByEventReference(eventId, null, null);
 				DateTime jDate = QuakemlUtils.getOriginTime(QuakemlUtils.getPreferredOrigin(QuakemlUtils.getFirstEvent(event)));
 				jDate.plus(offset);

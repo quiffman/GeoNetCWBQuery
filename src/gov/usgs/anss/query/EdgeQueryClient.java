@@ -19,18 +19,12 @@ import java.util.Collections;
 
 import gov.usgs.anss.util.SeedUtil;
 import java.text.DecimalFormat;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
-import nz.org.geonet.quakeml.v1_0_1.client.QuakemlFactory;
-import nz.org.geonet.quakeml.v1_0_1.client.QuakemlUtils;
-import nz.org.geonet.quakeml.v1_0_1.domain.Quakeml;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
@@ -83,11 +77,7 @@ public class EdgeQueryClient {
     static {
         logger.fine("$Id$");
     }
-    private static DateTimeFormatter hmsFormat = ISODateTimeFormat.time().withZone(DateTimeZone.forID("UTC"));
-    private static String beginFormat = "YYYY/MM/dd HH:mm:ss";
-    private static String beginFormatDoy = "YYYY,DDD-HH:mm:ss";
-    private static DateTimeFormatter parseBeginFormat = DateTimeFormat.forPattern(beginFormat).withZone(DateTimeZone.forID("UTC"));
-    private static DateTimeFormatter parseBeginFormatDoy = DateTimeFormat.forPattern(beginFormatDoy).withZone(DateTimeZone.forID("UTC"));
+	private static DateTimeFormatter hmsFormat = ISODateTimeFormat.time().withZone(DateTimeZone.forID("UTC"));
 
      public static String makeFilename(String mask, String seedname, MiniSeed ms) {
         StringBuffer sb = new StringBuffer(100);
@@ -171,41 +161,6 @@ public class EdgeQueryClient {
     /** Creates a new instance of EdgeQueryClient */
     public EdgeQueryClient() {
     }
-
-    /**
-     * Parses the begin time.  This tries to match
-     * the documentation for CWBClient but does not
-     * match the Util.stringToDate2 method which attempted
-     * to allow for milliseconds.
-     *
-     * @param beginTime
-     * @return java.util.Date parsed from the being time.
-     * @throws java.lang.IllegalArgumentException
-     */
-    protected static java.util.Date parseBegin(String beginTime) throws IllegalArgumentException {
-        DateTime begin = null;
-
-        try {
-            begin = parseBeginFormat.parseDateTime(beginTime);
-        } catch (Exception e) {
-        }
-
-        if (begin == null) {
-            try {
-                begin = parseBeginFormatDoy.parseDateTime(beginTime);
-            } catch (Exception e) {
-            }
-        }
-
-        // TODO Would be ideal if this error contained any range errors from
-        // parseDateTime but this is hard with the two attempts at parsing.
-        if (begin == null) {
-            throw new IllegalArgumentException("Error parsing begin time.  Allowable formats " +
-                    "are: " + beginFormat + " or " + beginFormatDoy);
-        }
-
-        return new Date(begin.getMillis());
-    }
 	
 	public static ArrayList listQuery(EdgeQueryOptions options) {
 		try {
@@ -279,7 +234,6 @@ public class EdgeQueryClient {
         GregorianCalendar jan_01_2007 = new GregorianCalendar(2007, 0, 1);
 
         ArrayList<ArrayList<MiniSeed>> blksAll = null;
-		java.util.Date beg = null;
 		String filename = "";
 		BufferedReader infile = null;
 
@@ -334,42 +288,11 @@ public class EdgeQueryClient {
                 nline++;
 
 				options = new EdgeQueryOptions(line);
+				if (!options.isValid()) {
+					logger.severe("Error @line " + nline);
+					return null;
+				}
 
-				//TODO: move the following options validation to EdgeQueryOptions.
-
-                if (options.blocksize != 512 && options.blocksize != 4096) {
-                    logger.severe("-msb must be 512 or 4096 and is only meaningful for msz type");
-                    return null;
-                }
-				if (options.eventId != null) {
-					// TODO: ARGH! FIX... Fugly!!!
-					Quakeml event = new QuakemlFactory().getQuakemlByEventReference(options.eventId, null, null);
-					DateTime jDate = QuakemlUtils.getOriginTime(QuakemlUtils.getPreferredOrigin(QuakemlUtils.getFirstEvent(event)));
-					jDate.plus(options.offset);
-					beg = jDate.toDate();
-					options.begin = parseBeginFormat.withZone(DateTimeZone.UTC).print(jDate);
-					logger.config("Using begin time " + options.begin + " from event " + options.eventId);
-					options.args = Arrays.copyOf(options.args, options.args.length + 2);
-					options.args[options.args.length - 2] = "-b";
-					options.args[options.args.length - 1] = options.begin;
-				} else if (options.begin == null) {
-                    logger.severe("You must enter a beginning time @line " + nline);
-                    return null;
-                } else {
-
-                    try {
-                        beg = parseBegin(options.begin);
-                    } catch (IllegalArgumentException illegalArgumentException) {
-                        logger.severe("the -b field date [" + options.begin +
-								"] did not parse correctly. @line" + nline + illegalArgumentException);
-                        return null;
-                    }
-
-                }
-                if (options.seedname.equals("")) {
-                    logger.severe("-s SCNL is not optional.  Specify a seedname @line" + nline);
-                    return null;
-                }
                 if (options.type.equals("ms") || options.type.equals("msz") || options.type.equals("sac") ||
                         options.type.equals("dcc") || options.type.equals("dcc512") ||
                         options.type.equals("HOLD") || options.type.equals("text")) {
@@ -530,7 +453,7 @@ public class EdgeQueryClient {
                                         if (options.type.equals("ms") || options.type.equals("dcc") || options.type.equals("dcc512") || options.type.equals("msz")) {
                                             filename = EdgeQueryClient.makeFilename(options.filemask, lastComp, ms2);
                                         } else {
-                                            filename = EdgeQueryClient.makeFilename(options.filemask, lastComp, beg);
+                                            filename = EdgeQueryClient.makeFilename(options.filemask, lastComp, options.beg);
                                         }
 
 
@@ -567,7 +490,7 @@ public class EdgeQueryClient {
                                         }
 
 										// TODO: Change the signature to pass options only once.
-                                        out.makeFile(lastComp, filename, options.filemask, blks, beg, options.duration, options.args);
+                                        out.makeFile(lastComp, filename, options.filemask, blks, options.beg, options.duration, options.args);
                                     }
                                 }
                                 maxTime = 0;

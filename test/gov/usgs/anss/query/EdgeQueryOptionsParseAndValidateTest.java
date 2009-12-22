@@ -29,9 +29,9 @@ public class EdgeQueryOptionsParseAndValidateTest {
 			{new EdgeQueryOptions("-f \"file with spaces.txt\""), true, "Batch file mode (quoted with spaces) should pass."},
 			{new EdgeQueryOptions("-f file.txt -ls"), false, "Batch file mode should fail with extra args."},
 
-			{new EdgeQueryOptions("-s \"NZWLGT\" -b \"2009-01-01 00:00:00\""), true, "seedname and begin options should be enough."},
-			{new EdgeQueryOptions("-s \"NZWLGT\" -b \"2009-01-01 00:00:00\" -sacpz um"), true, "sacpz should have nm or um units."},
-			{new EdgeQueryOptions("-s \"NZWLGT\" -b \"2009-01-01 00:00:00\" -sacpz fail"), false, "sacpz should have nm or um units."},
+			{new EdgeQueryOptions("-s \"NZWLGT\" -b \"2009/01/01 00:00:00\""), true, "seedname and begin options should be enough."},
+			{new EdgeQueryOptions("-s \"NZWLGT\" -b \"2009/01/01 00:00:00\" -sacpz um"), true, "sacpz should have nm or um units."},
+			{new EdgeQueryOptions("-s \"NZWLGT\" -b \"2009/01/01 00:00:00\" -sacpz fail"), false, "sacpz should have nm or um units."},
 			{new EdgeQueryOptions("-s \"NZWLGT\""), false, "should fail without begin time."},
 		});
     }

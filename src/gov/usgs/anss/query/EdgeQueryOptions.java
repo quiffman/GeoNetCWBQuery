@@ -11,7 +11,15 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.logging.Logger;
+import nz.org.geonet.quakeml.v1_0_1.client.QuakemlFactory;
+import nz.org.geonet.quakeml.v1_0_1.client.QuakemlUtils;
+import nz.org.geonet.quakeml.v1_0_1.domain.Quakeml;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 /**
  * An attempt to encapsulate (read isolate) EdgeQueryClient command line args.
@@ -25,6 +33,11 @@ public class EdgeQueryOptions {
 	static {
 		logger.fine("$Id$");
 	}
+
+    private static String beginFormat = "YYYY/MM/dd HH:mm:ss";
+    private static String beginFormatDoy = "YYYY,DDD-HH:mm:ss";
+    private static DateTimeFormatter parseBeginFormat = DateTimeFormat.forPattern(beginFormat).withZone(DateTimeZone.forID("UTC"));
+    private static DateTimeFormatter parseBeginFormatDoy = DateTimeFormat.forPattern(beginFormatDoy).withZone(DateTimeZone.forID("UTC"));
 
 	String host = QueryProperties.getGeoNetCwbIP();
 	int port = QueryProperties.getGeoNetCwbPort();
@@ -62,6 +75,7 @@ public class EdgeQueryOptions {
 	public String stahost = QueryProperties.getNeicMetadataServerIP();
 	public String eventId;
 	public long offset = 0;
+	public Date beg = null;
 
 	/**
 	 * Parses known args into object fields. Does some argument validation and
@@ -113,6 +127,12 @@ public class EdgeQueryOptions {
 				lschannels = true;
 			} else if (args[i].equals("-b")) { // Documented functionality.
 				begin = args[i + 1];
+				try {
+					beg = parseBegin(begin);
+				} catch (IllegalArgumentException illegalArgumentException) {
+					logger.severe("the -b field date [" + begin +
+							"] did not parse correctly." + illegalArgumentException);
+				}
 				i++;
 			} else if (args[i].equals("-s")) { // Documented functionality.
 				seedname = args[i + 1];
@@ -158,6 +178,17 @@ public class EdgeQueryOptions {
 				logger.config("Holdings server=" + holdingIP + "/" + holdingPort + " type=" + holdingType);
 			} else if (args[i].equals("-event")) {
 				eventId = args[i + 1];
+				// TODO: ARGH! FIX... Fugly!!!
+				Quakeml event = new QuakemlFactory().getQuakemlByEventReference(eventId, null, null);
+				DateTime jDate = QuakemlUtils.getOriginTime(QuakemlUtils.getPreferredOrigin(QuakemlUtils.getFirstEvent(event)));
+				jDate.plus(offset);
+				beg = jDate.toDate();
+				begin = parseBeginFormat.withZone(DateTimeZone.UTC).print(jDate);
+				logger.config("Using begin time " + begin + " from event " + eventId);
+				// TODO: Fix this when fixing the command line single quotes.
+				args = Arrays.copyOf(args, args.length + 2);
+				args[args.length - 2] = "-b";
+				args[args.length - 1] = begin;
 				i++;
 			} else if (args[i].equals("-offset")) {
 				offset = Long.parseLong(args[i + 1]);
@@ -203,10 +234,26 @@ public class EdgeQueryOptions {
 			return true;
 		}
 
+		if (blocksize != 512 && blocksize != 4096) {
+			logger.severe("-msb must be 512 or 4096 and is only meaningful for msz type");
+			return false;
+		}
+
+		if (beg == null) {
+			logger.severe("You must enter a beginning time");
+			return false;
+		}
+		
+		if (seedname == null) {
+			logger.severe("-s SCNL is not optional, you must specify a seedname.");
+			return false;
+		}
+
 		if (stahost == null || stahost.equals("")) {
 			logger.warning("no metadata server set.");
 			return false;
 		}
+
 		if (sacpz) {
 			if (!pzunit.equalsIgnoreCase("nm") && !pzunit.equalsIgnoreCase("um")) {
 				logger.warning("   ****** -sacpz units must be either um or nm switch values is " + pzunit);
@@ -214,7 +261,8 @@ public class EdgeQueryOptions {
 			}
 		}
 
-		throw new UnsupportedOperationException("Not yet implemented");
+		// TODO more checking to come.
+		return true;
 	}
 
 	/**
@@ -312,4 +360,39 @@ public class EdgeQueryOptions {
 		}
 		return line.trim() + "\t";
 	}
+
+    /**
+     * Parses the begin time.  This tries to match
+     * the documentation for CWBClient but does not
+     * match the Util.stringToDate2 method which attempted
+     * to allow for milliseconds.
+     *
+     * @param beginTime
+     * @return java.util.Date parsed from the being time.
+     * @throws java.lang.IllegalArgumentException
+     */
+    protected static java.util.Date parseBegin(String beginTime) throws IllegalArgumentException {
+        DateTime begin = null;
+
+        try {
+            begin = parseBeginFormat.parseDateTime(beginTime);
+        } catch (Exception e) {
+        }
+
+        if (begin == null) {
+            try {
+                begin = parseBeginFormatDoy.parseDateTime(beginTime);
+            } catch (Exception e) {
+            }
+        }
+
+        // TODO Would be ideal if this error contained any range errors from
+        // parseDateTime but this is hard with the two attempts at parsing.
+        if (begin == null) {
+            throw new IllegalArgumentException("Error parsing begin time.  Allowable formats " +
+                    "are: " + beginFormat + " or " + beginFormatDoy);
+        }
+
+        return new Date(begin.getMillis());
+    }
 }

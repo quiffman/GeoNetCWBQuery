@@ -19,7 +19,7 @@ import static org.junit.Assert.*;
  * @author geoffc
  */
 @RunWith(Parameterized.class)
-public class EdgeQueryClientParseBeginTest {
+public class EdgeQueryOptionsParseBeginTest {
 
     @Parameters
     public static Collection data() {
@@ -39,7 +39,7 @@ public class EdgeQueryClientParseBeginTest {
     private TimeZone tz = TimeZone.getTimeZone("GMT+0");
     private GregorianCalendar result = new GregorianCalendar(tz);
 
-    public EdgeQueryClientParseBeginTest(String beginTime, GregorianCalendar beg) {
+    public EdgeQueryOptionsParseBeginTest(String beginTime, GregorianCalendar beg) {
         this.beginTime = beginTime;
         this.beg = beg;
     }
@@ -47,13 +47,13 @@ public class EdgeQueryClientParseBeginTest {
     @Test
     public void testParseBegin() {
         beg.setTimeZone(tz);
-        result.setTime(EdgeQueryClient.parseBegin(beginTime));
+        result.setTime(EdgeQueryOptions.parseBegin(beginTime));
         beg.set(GregorianCalendar.MILLISECOND, 0);
         assertEquals(beg, result);
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void testParseBeginError() {
-        result.setTime(EdgeQueryClient.parseBegin(beginTime + "junk"));
+        result.setTime(EdgeQueryOptions.parseBegin(beginTime + "junk"));
     }
 }

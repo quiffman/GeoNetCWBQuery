@@ -32,10 +32,9 @@ public class EdgeQueryOptions {
 	public String[] args;
 	public String[] extraArgs;
 
-	//TODO: change empty string defaults to null
 	public double duration = 300.;
-	public String seedname = "";
-	public String begin = "";
+	public String seedname = null;
+	public String begin = null;
 	public String type = "sac";
 	public boolean dbg = false;
 	public boolean lsoption = false;
@@ -47,9 +46,9 @@ public class EdgeQueryOptions {
 	public boolean quiet = false;
 	public boolean gapsonly = false;
 	// Make a pass for the command line args for either mode!
-	public String exclude = "";
+	public String exclude = null;
 	public boolean nosort = false;
-	public String durationString = "";
+	public String durationString = null;
 	public boolean holdingMode = false;
 	public String holdingIP = QueryProperties.getGeoNetCwbIP();
 	public int holdingPort = QueryProperties.getGeoNetCwbPort();
@@ -240,7 +239,7 @@ public class EdgeQueryOptions {
 	 */
 	public EdgeQueryOptions(String[] args) {
 		this.args = args;
-		this.extraArgs = (this.args);
+		this.extraArgs = parse(this.args);
 	}
 
 	/**

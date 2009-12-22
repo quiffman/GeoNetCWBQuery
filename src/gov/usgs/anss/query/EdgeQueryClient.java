@@ -216,15 +216,15 @@ public class EdgeQueryClient {
 			//ds.setTcpNoDelay(true);
 			InputStream in = ds.getInputStream();        // Get input and output streams
 			OutputStream outtcp = ds.getOutputStream();
-			if (!options.exclude.equals("")) {
+			if (options.exclude != null) {
 				line = "'-el' '" + options.exclude + "' ";
 			} else {
 				line = "";
 			}
-			if (!options.begin.equals("")) {
+			if (options.begin != null) {
 				line += "'-b' '" + options.begin.trim() + "' ";
 			}
-			if (!options.durationString.equals("")) {
+			if (options.durationString != null) {
 				line += "'-d' '" + options.durationString + "' ";
 			}
 			if (options.lschannels) {
@@ -352,7 +352,7 @@ public class EdgeQueryClient {
 					options.args = Arrays.copyOf(options.args, options.args.length + 2);
 					options.args[options.args.length - 2] = "-b";
 					options.args[options.args.length - 1] = options.begin;
-				} else if (options.begin.equals("")) {
+				} else if (options.begin == null) {
                     logger.severe("You must enter a beginning time @line " + nline);
                     return null;
                 } else {

@@ -37,7 +37,7 @@ public class EdgeQueryOptionsParseAndValidateTest {
 
 			{new EdgeQueryOptions("-s \"NZWLGT\" -event 3212109"), true, "seedname and event options should be enough."},
 
-			{new EdgeQueryOptions("-s \"NZWLGT\" -b \"2009/01/01 00:00:00\" -t null"), true, "type null is legal."},
+			{new EdgeQueryOptions("-s \"NZWLGT\" -b \"2009/01/01 00:00:00\" -t NULL"), true, "type null is legal."},
 
 			{new EdgeQueryOptions("-s \"NZWLGT\" -b \"2009/01/01 00:00:00\" -t sac -o \"blah_%s\""), false, "Sac file names must include at least channel."},
 			{new EdgeQueryOptions("-s \"NZWLGT\" -b \"2009/01/01 00:00:00\" -t msz -o \"blah_%s\""), false, "msz file names must include at least channel."},

@@ -59,8 +59,7 @@ public class EdgeQueryOptions {
 	public double duration = 300.;
 	public String seedname = null;
 	public String begin = null;
-	public String type = "sac";
-	public OutputType outputType = null;
+	public OutputType type = OutputType.sac;
 	public boolean dbg = false;
 	public boolean lsoption = false;
 	public boolean lschannels = false;
@@ -122,7 +121,7 @@ public class EdgeQueryOptions {
 				filenamein = args[i + 1];
 				i++;
 			} else if (args[i].equals("-t")) {  // Documented functionality.
-				type = args[i + 1];
+				type = OutputType.valueOf(args[i + 1]);
 				i++;
 			} else if (args[i].equals("-msb")) {   // Documented functionality.
 				blocksize = Integer.parseInt(args[i + 1]);
@@ -177,7 +176,7 @@ public class EdgeQueryOptions {
 			} else if (args[i].indexOf("-hold") == 0) {
 				holdingMode = true;
 				gapsonly = true;
-				type = "HOLD";
+				type = OutputType.HOLD;
 				logger.config("Holdings server=" + holdingIP + "/" + holdingPort + " type=" + holdingType);
 			} else if (args[i].equals("-event")) {
 				eventId = args[i + 1];
@@ -254,11 +253,11 @@ public class EdgeQueryOptions {
 			}
 		}
 
-		if (outputType == OutputType.sac && getCompareLength() < 10) {
+		if (type == OutputType.sac && getCompareLength() < 10) {
 			logger.severe("\n    ***** Sac files must have names including the channel! *****");
 			return false;
 		}
-		if (outputType == OutputType.msz && getCompareLength() < 10) {
+		if (type == OutputType.msz && getCompareLength() < 10) {
 			logger.severe("\n    ***** msz files must have names including the channel! *****");
 			return false;
 		}
@@ -268,7 +267,7 @@ public class EdgeQueryOptions {
 	}
 	
 	public Outputer getOutputter() {
-		switch (outputType) {
+		switch (type) {
 			case ms:
 				return new MSOutputer(nosort);
 			case sac:
@@ -445,14 +444,6 @@ public class EdgeQueryOptions {
 	 * Process the more complex args - time etc.
 	 */
 	private void process() {
-
-		try {
-			outputType = OutputType.valueOf(type);
-		} catch (IllegalArgumentException e) {
-			if ("null".equals(type))
-				outputType = OutputType.NULL;
-		}
-		
 		// Append wildcards to end of seedname
 		if (seedname != null && seedname.length() < 12) {
 			seedname = (seedname + ".............").substring(0, 12);

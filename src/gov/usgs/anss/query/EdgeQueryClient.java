@@ -65,6 +65,7 @@ import org.joda.time.format.ISODateTimeFormat;
  *-dbg Turn on the debug flag
  *
  * @author davidketchum
+ * TODO: consider prepending (e.g.) - if (logger.getLevel().intValue() <= Level.FINEST.intValue()) - to low level logger statements with concatenated toString parameter(s).
  */
 public class EdgeQueryClient {
 
@@ -79,6 +80,7 @@ public class EdgeQueryClient {
     }
 	private static DateTimeFormatter hmsFormat = ISODateTimeFormat.time().withZone(DateTimeZone.forID("UTC"));
 
+	// TODO: push the makeFilename methods into the outputters.
      public static String makeFilename(String mask, String seedname, MiniSeed ms) {
         StringBuffer sb = new StringBuffer(100);
         if (df2 == null) {
@@ -293,58 +295,13 @@ public class EdgeQueryClient {
 					return null;
 				}
 
-                if (options.type.equals("ms") || options.type.equals("msz") || options.type.equals("sac") ||
-                        options.type.equals("dcc") || options.type.equals("dcc512") ||
-                        options.type.equals("HOLD") || options.type.equals("text")) {
-                    if (options.seedname.length() < 12) {
-                        options.seedname = (options.seedname + ".............").substring(0, 12);
-                    }
-                    if (options.type.equals("ms")) {
-                        out = new MSOutputer(options.nosort);
-                    }
-                    if (options.type.equals("sac")) {
-                        out = new SacOutputer();
-                    }
-                    if (options.type.equals("msz")) {
-                        out = new MSZOutputer(options.blocksize);
-                    }
-                    if (options.type.equals("dcc")) {
-                        out = new DCCOutputer();
-                    }
-                    if (options.type.equals("dcc512")) {
-                        out = new DCC512Outputer();
-                    }
-                    if (options.type.equals("HOLD")) {
-                        out = new HoldingOutputer();
-                    }
-                    if (options.type.equals("text")) {
-                        out = new TextOutputer();
-                    }
-                } else if (options.type.equals("null")) {
-                    out = null;
+				out = options.getOutputter();
+                if (out == null) {
                     blksAll = new ArrayList<ArrayList<MiniSeed>>(20);
-                } else {
-                    logger.severe("Output format not supported.  Choose dcc, dcc512, ms, msz, sac, or text");
-                    return null;
-                }
+				}
 
                 // The length at which our compare for changes depends on the output file mask
-                int compareLength = 12;
-                if (options.filemask.indexOf("%n") >= 0) {
-                    compareLength = 2;
-                }
-                if (options.filemask.indexOf("%s") >= 0) {
-                    compareLength = 7;
-                }
-                if (options.filemask.indexOf("%c") >= 0) {
-                    compareLength = 10;
-                }
-                if (options.filemask.indexOf("%l") >= 0) {
-                    compareLength = 12;
-                }
-                if (options.filemask.indexOf("%N") >= 0) {
-                    compareLength = 12;
-                }
+                int compareLength = options.getCompareLength();
 
                 long maxTime = 0;
                 int ndups = 0;
@@ -358,17 +315,6 @@ public class EdgeQueryClient {
                     String lastComp = "            ";
                     boolean eof = false;
                     MiniSeed ms = null;
-                    if (options.type.equals("sac")) {
-                        if (compareLength < 10) {
-                            logger.severe("\n    ***** Sac files must have names including the channel! *****");
-                            return null;
-                        }
-
-                    }
-                    if (options.type.equals("msz") && compareLength < 10) {
-                        logger.severe("\n    ***** msz files must have names including the channel! *****");
-                        return null;
-                    }
                     int npur = 0;
                     ArrayList<MiniSeed> blks = new ArrayList<MiniSeed>(100);
 

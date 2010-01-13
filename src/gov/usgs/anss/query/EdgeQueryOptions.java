@@ -4,7 +4,6 @@
  */
 package gov.usgs.anss.query;
 
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.Reader;
@@ -33,6 +32,18 @@ public class EdgeQueryOptions {
 	static {
 		logger.fine("$Id$");
 	}
+	
+	public enum OutputType {
+		ms,
+		msz,
+		sac,
+		dcc,
+		dcc512,
+		HOLD,
+		text,
+		NULL;
+	}
+
 
     private static String beginFormat = "YYYY/MM/dd HH:mm:ss";
     private static String beginFormatDoy = "YYYY,DDD-HH:mm:ss";
@@ -49,6 +60,7 @@ public class EdgeQueryOptions {
 	public String seedname = null;
 	public String begin = null;
 	public String type = "sac";
+	public OutputType outputType = null;
 	public boolean dbg = false;
 	public boolean lsoption = false;
 	public boolean lschannels = false;
@@ -100,8 +112,10 @@ public class EdgeQueryOptions {
 				return null;
 			}
 
-			return args = argList.toArray(new String[0]);
+			return argList.toArray(new String[0]);
 		}
+		
+		ArrayList<String> extraArgsList = new ArrayList(args.length);
 
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].equals("-f")) {  // Documented functionality.
@@ -127,23 +141,12 @@ public class EdgeQueryOptions {
 				lschannels = true;
 			} else if (args[i].equals("-b")) { // Documented functionality.
 				begin = args[i + 1];
-				try {
-					beg = parseBegin(begin);
-				} catch (IllegalArgumentException illegalArgumentException) {
-					logger.severe("the -b field date [" + begin +
-							"] did not parse correctly." + illegalArgumentException);
-				}
 				i++;
 			} else if (args[i].equals("-s")) { // Documented functionality.
 				seedname = args[i + 1];
 				i++;
 			} else if (args[i].equals("-d")) { // Documented functionality.
 				durationString = args[i + 1];
-				if (args[i + 1].endsWith("d") || args[i + 1].endsWith("D")) {
-					duration = Double.parseDouble(args[i + 1].substring(0, args[i + 1].length() - 1)) * 86400.;
-				} else {
-					duration = Double.parseDouble(args[i + 1]);
-				}
 				i++;
 			} else if (args[i].equals("-q")) { // Documented functionality.
 				quiet = true;
@@ -178,28 +181,18 @@ public class EdgeQueryOptions {
 				logger.config("Holdings server=" + holdingIP + "/" + holdingPort + " type=" + holdingType);
 			} else if (args[i].equals("-event")) {
 				eventId = args[i + 1];
-				// TODO: eventid and begin time should probably be parsed in a getBegineTime method.
-				Quakeml event = new QuakemlFactory().getQuakemlByEventReference(eventId, null, null);
-				DateTime jDate = QuakemlUtils.getOriginTime(QuakemlUtils.getPreferredOrigin(QuakemlUtils.getFirstEvent(event)));
-				jDate.plus(offset);
-				beg = jDate.toDate();
-				begin = parseBeginFormat.withZone(DateTimeZone.UTC).print(jDate);
-				logger.config("Using begin time " + begin + " from event " + eventId);
-				// TODO: Fix this when fixing the command line single quotes.
-				args = Arrays.copyOf(args, args.length + 2);
-				args[args.length - 2] = "-b";
-				args[args.length - 1] = begin;
 				i++;
 			} else if (args[i].equals("-offset")) {
 				offset = Long.parseLong(args[i + 1]);
 				i++;
 			}
-				else {
-				logger.warning("Unknown CWB Query argument=" + args[i]);
+			else {
+				logger.info("Unknown CWB Query argument=" + args[i]);
+				extraArgsList.add(args[i]);
 			}
 
 		}
-		return args;
+		return extraArgsList.toArray(new String[extraArgsList.size()]);
 	}
 
 	/**
@@ -261,8 +254,58 @@ public class EdgeQueryOptions {
 			}
 		}
 
+		if (outputType == OutputType.sac && getCompareLength() < 10) {
+			logger.severe("\n    ***** Sac files must have names including the channel! *****");
+			return false;
+		}
+		if (outputType == OutputType.msz && getCompareLength() < 10) {
+			logger.severe("\n    ***** msz files must have names including the channel! *****");
+			return false;
+		}
+
 		// TODO more checking to come.
 		return true;
+	}
+	
+	public Outputer getOutputter() {
+		switch (outputType) {
+			case ms:
+				return new MSOutputer(nosort);
+			case sac:
+				return new SacOutputer();
+			case msz:
+				return new MSZOutputer(blocksize);
+			case dcc:
+				return new DCCOutputer();
+			case dcc512:
+				return new DCC512Outputer();
+			case HOLD:
+				return new HoldingOutputer();
+			case text:
+				return new TextOutputer();
+		}
+		return null;
+	}
+
+	public int getCompareLength() {
+		// The length at which our compare for changes depends on the output file mask
+		int compareLength = 12;
+		if (filemask.indexOf("%n") >= 0) {
+			compareLength = 2;
+		}
+		if (filemask.indexOf("%s") >= 0) {
+			compareLength = 7;
+		}
+		if (filemask.indexOf("%c") >= 0) {
+			compareLength = 10;
+		}
+		if (filemask.indexOf("%l") >= 0) {
+			compareLength = 12;
+		}
+		if (filemask.indexOf("%N") >= 0) {
+			compareLength = 12;
+		}
+		return compareLength;
 	}
 
 	/**
@@ -288,6 +331,7 @@ public class EdgeQueryOptions {
 	public EdgeQueryOptions(String[] args) {
 		this.args = args;
 		this.extraArgs = parse(this.args);
+		this.process();
 	}
 
 	/**
@@ -321,6 +365,7 @@ public class EdgeQueryOptions {
 			args[i] = args[i].replaceAll("@", " ");
 		}
 		this.extraArgs = parse(this.args);
+		this.process();
 	}
 
 	/**
@@ -371,7 +416,7 @@ public class EdgeQueryOptions {
      * @return java.util.Date parsed from the being time.
      * @throws java.lang.IllegalArgumentException
      */
-    protected static java.util.Date parseBegin(String beginTime) throws IllegalArgumentException {
+    protected static java.util.Date parseBegin(String beginTime, long offset) throws IllegalArgumentException {
         DateTime begin = null;
 
         try {
@@ -393,6 +438,59 @@ public class EdgeQueryOptions {
                     "are: " + beginFormat + " or " + beginFormatDoy);
         }
 
-        return new Date(begin.getMillis());
+        return new Date(begin.plus(offset).getMillis());
     }
+
+	/**
+	 * Process the more complex args - time etc.
+	 */
+	private void process() {
+
+		try {
+			outputType = OutputType.valueOf(type);
+		} catch (IllegalArgumentException e) {
+			if ("null".equals(type))
+				outputType = OutputType.NULL;
+		}
+		
+		// Append wildcards to end of seedname
+		if (seedname != null && seedname.length() < 12) {
+			seedname = (seedname + ".............").substring(0, 12);
+		}
+
+		// This logic allows a user to set an eventId for phases, picks etc. but
+		// still manually define the begin time for a query.
+		if (begin != null) {
+			try {
+				beg = parseBegin(begin, offset);
+			} catch (IllegalArgumentException illegalArgumentException) {
+				logger.severe("the -b field date [" + begin +
+						"] did not parse correctly." + illegalArgumentException);
+			}
+		}
+		else if (eventId != null) {
+			Quakeml event = new QuakemlFactory().getQuakemlByEventReference(eventId, null, null);
+			if (event != null) {
+				DateTime jDate = QuakemlUtils.getOriginTime(QuakemlUtils.getPreferredOrigin(QuakemlUtils.getFirstEvent(event)));
+				jDate.plus(offset);
+				beg = jDate.toDate();
+				begin = parseBeginFormat.withZone(DateTimeZone.UTC).print(jDate);
+				logger.config("Using begin time " + begin + " from event " + eventId);
+				// TODO: Fix this when fixing the command line single quotes.
+				args = Arrays.copyOf(args, args.length + 2);
+				args[args.length - 2] = "-b";
+				args[args.length - 1] = begin;
+			} else {
+				logger.severe("failed to retrieve details for event id " + eventId);
+			}
+		}
+
+		if (durationString != null) {
+			if (durationString.endsWith("d") || durationString.endsWith("D")) {
+				duration = Double.parseDouble(durationString.substring(0, durationString.length() - 1)) * 86400.;
+			} else {
+				duration = Double.parseDouble(durationString);
+			}
+		}
+	}
 }

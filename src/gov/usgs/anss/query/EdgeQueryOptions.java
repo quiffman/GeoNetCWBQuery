@@ -55,11 +55,10 @@ public class EdgeQueryOptions {
 
 	public String[] args;
 	public String[] extraArgs;
-
-	public double duration = 300.;
-	public String seedname = null;
+	private double duration = 300.;
+	private String seedname = null;
 	public String begin = null;
-	public OutputType type = OutputType.sac;
+	private OutputType type = OutputType.sac;
 	public boolean dbg = false;
 	public boolean lsoption = false;
 	public boolean lschannels = false;
@@ -86,7 +85,7 @@ public class EdgeQueryOptions {
 	public String stahost = QueryProperties.getNeicMetadataServerIP();
 	public String eventId;
 	public long offset = 0;
-	public Date beg = null;
+	private Date beg = null;
 
 	/**
 	 * Parses known args into object fields. Does some argument validation and
@@ -121,7 +120,7 @@ public class EdgeQueryOptions {
 				filenamein = args[i + 1];
 				i++;
 			} else if (args[i].equals("-t")) {  // Documented functionality.
-				type = OutputType.valueOf(args[i + 1]);
+				setType(args[i + 1]);
 				i++;
 			} else if (args[i].equals("-msb")) {   // Documented functionality.
 				blocksize = Integer.parseInt(args[i + 1]);
@@ -142,7 +141,7 @@ public class EdgeQueryOptions {
 				begin = args[i + 1];
 				i++;
 			} else if (args[i].equals("-s")) { // Documented functionality.
-				seedname = args[i + 1];
+				setSeedname(args[i + 1]);
 				i++;
 			} else if (args[i].equals("-d")) { // Documented functionality.
 				durationString = args[i + 1];
@@ -176,7 +175,7 @@ public class EdgeQueryOptions {
 			} else if (args[i].indexOf("-hold") == 0) {
 				holdingMode = true;
 				gapsonly = true;
-				type = OutputType.HOLD;
+				setType(OutputType.HOLD);
 				logger.config("Holdings server=" + holdingIP + "/" + holdingPort + " type=" + holdingType);
 			} else if (args[i].equals("-event")) {
 				eventId = args[i + 1];
@@ -231,12 +230,12 @@ public class EdgeQueryOptions {
 			return false;
 		}
 
-		if (beg == null) {
+		if (getBeg() == null) {
 			logger.severe("You must enter a beginning time");
 			return false;
 		}
 		
-		if (seedname == null) {
+		if (getSeedname() == null) {
 			logger.severe("-s SCNL is not optional, you must specify a seedname.");
 			return false;
 		}
@@ -253,11 +252,11 @@ public class EdgeQueryOptions {
 			}
 		}
 
-		if (type == OutputType.sac && getCompareLength() < 10) {
+		if (getType() == OutputType.sac && getCompareLength() < 10) {
 			logger.severe("\n    ***** Sac files must have names including the channel! *****");
 			return false;
 		}
-		if (type == OutputType.msz && getCompareLength() < 10) {
+		if (getType() == OutputType.msz && getCompareLength() < 10) {
 			logger.severe("\n    ***** msz files must have names including the channel! *****");
 			return false;
 		}
@@ -267,7 +266,7 @@ public class EdgeQueryOptions {
 	}
 	
 	public Outputer getOutputter() {
-		switch (type) {
+		switch (getType()) {
 			case ms:
 				return new MSOutputer(nosort);
 			case sac:
@@ -444,16 +443,12 @@ public class EdgeQueryOptions {
 	 * Process the more complex args - time etc.
 	 */
 	private void process() {
-		// Append wildcards to end of seedname
-		if (seedname != null && seedname.length() < 12) {
-			seedname = (seedname + ".............").substring(0, 12);
-		}
 
 		// This logic allows a user to set an eventId for phases, picks etc. but
 		// still manually define the begin time for a query.
 		if (begin != null) {
 			try {
-				beg = parseBegin(begin, offset);
+				setBeg(parseBegin(begin, offset));
 			} catch (IllegalArgumentException illegalArgumentException) {
 				logger.severe("the -b field date [" + begin +
 						"] did not parse correctly." + illegalArgumentException);
@@ -464,7 +459,7 @@ public class EdgeQueryOptions {
 			if (event != null) {
 				DateTime jDate = QuakemlUtils.getOriginTime(QuakemlUtils.getPreferredOrigin(QuakemlUtils.getFirstEvent(event)));
 				jDate.plus(offset);
-				beg = jDate.toDate();
+				setBeg(jDate.toDate());
 				begin = parseBeginFormat.withZone(DateTimeZone.UTC).print(jDate);
 				logger.config("Using begin time " + begin + " from event " + eventId);
 				// TODO: Fix this when fixing the command line single quotes.
@@ -478,10 +473,79 @@ public class EdgeQueryOptions {
 
 		if (durationString != null) {
 			if (durationString.endsWith("d") || durationString.endsWith("D")) {
-				duration = Double.parseDouble(durationString.substring(0, durationString.length() - 1)) * 86400.;
+				setDuration(Double.parseDouble(durationString.substring(0, durationString.length() - 1)) * 86400.);
 			} else {
-				duration = Double.parseDouble(durationString);
+				setDuration(Double.parseDouble(durationString));
 			}
 		}
+	}
+
+	/**
+	 * @return the duration
+	 */
+	public double getDuration() {
+		return duration;
+	}
+
+	/**
+	 * @param duration the duration to set
+	 */
+	public void setDuration(double duration) {
+		this.duration = duration;
+	}
+
+	/**
+	 * @return the seedname
+	 */
+	public String getSeedname() {
+		return seedname;
+	}
+
+	/**
+	 * @param seedname the seedname to set
+	 */
+	public void setSeedname(String seedname) {
+		// Append wildcards to end of seedname
+		if (seedname != null && seedname.length() < 12) {
+			this.seedname = (seedname + ".............").substring(0, 12);
+		}
+		else {
+			this.seedname = seedname;
+		}
+	}
+
+	/**
+	 * @return the type
+	 */
+	public OutputType getType() {
+		return type;
+	}
+
+	/**
+	 * @param type the type to set
+	 */
+	public void setType(OutputType type) {
+		this.type = type;
+	}
+
+	/**
+	 * @param type the type to set
+	 */
+	public void setType(String type) {
+		this.type = OutputType.valueOf(type);
+	}
+
+	/**
+	 * @return the beg
+	 */
+	public Date getBeg() {
+		return beg;
+	}
+
+	/**
+	 * @param beg the beg to set
+	 */
+	public void setBeg(Date beg) {
+		this.beg = beg;
 	}
 }

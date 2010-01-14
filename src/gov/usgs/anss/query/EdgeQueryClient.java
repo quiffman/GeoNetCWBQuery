@@ -382,7 +382,7 @@ public class EdgeQueryClient {
                                                 " ns=" + nsgot);
                                     } else {
                                         System.out.print('\r');
-                                        logger.info("Query on " + options.seedname + " returned 0 blocks!");
+                                        logger.info("Query on " + options.getSeedname() + " returned 0 blocks!");
                                     }
 
 
@@ -396,10 +396,10 @@ public class EdgeQueryClient {
                                         }
                                         blksAll.add(newBlks);
                                     } else {      // create the output file
-                                        if (options.type.equals("ms") || options.type.equals("dcc") || options.type.equals("dcc512") || options.type.equals("msz")) {
+                                        if (options.getType().equals("ms") || options.getType().equals("dcc") || options.getType().equals("dcc512") || options.getType().equals("msz")) {
                                             filename = EdgeQueryClient.makeFilename(options.filemask, lastComp, ms2);
                                         } else {
-                                            filename = EdgeQueryClient.makeFilename(options.filemask, lastComp, options.beg);
+                                            filename = EdgeQueryClient.makeFilename(options.filemask, lastComp,options.getBeg());
                                         }
 
 
@@ -436,7 +436,7 @@ public class EdgeQueryClient {
                                         }
 
 										// TODO: Change the signature to pass options only once.
-                                        out.makeFile(lastComp, filename, options.filemask, blks, options.beg, options.duration, options.args);
+                                        out.makeFile(lastComp, filename, options.filemask, blks, options.getBeg(), options.getDuration(), options.args);
                                     }
                                 }
                                 maxTime = 0;

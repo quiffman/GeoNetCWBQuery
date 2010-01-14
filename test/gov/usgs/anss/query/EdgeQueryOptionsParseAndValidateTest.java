@@ -36,7 +36,7 @@ public class EdgeQueryOptionsParseAndValidateTest {
 			{new EdgeQueryOptions("-b \"2009/01/01 00:00:00\""), false, "seedname is not optional."},
 
 			// Ultimately this will probably have to go...
-			{new EdgeQueryOptions("-s \"NZWLGT\" -event 3134964"), true, "seedname and event options should be enough."},
+			{new EdgeQueryOptions("-s \"NZWLGT\" -event 3134964"), true, "seedname and event options should be valid."},
 
 			{new EdgeQueryOptions("-s \"NZWLGT\" -b \"2009/01/01 00:00:00\" -t NULL"), true, "type null is legal."},
 

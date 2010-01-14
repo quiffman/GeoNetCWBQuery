@@ -107,9 +107,6 @@ public class EdgeQueryOptions {
 			filenamein = argList.remove(pos);
 			quiet = argList.remove("-q");
 			dbg = argList.remove("-dbg");
-			if (argList.isEmpty()) {
-				return null;
-			}
 
 			return argList;
 		}
@@ -218,7 +215,7 @@ public class EdgeQueryOptions {
 	 */
 	public boolean isValid() {
 		if (isFileMode()) {
-			return (extraArgs == null);
+			return (extraArgs.isEmpty());
 		}
 
 		if (isListQuery()) {
@@ -534,7 +531,7 @@ public class EdgeQueryOptions {
 			return begin;
 		}
 		else if (getEvent() != null) {
-			begin = QuakemlUtils.getOriginTime(QuakemlUtils.getPreferredOrigin(QuakemlUtils.getFirstEvent(event)));
+			return QuakemlUtils.getOriginTime(QuakemlUtils.getPreferredOrigin(QuakemlUtils.getFirstEvent(event)));
 
 			// TODO: Fix this when fixing the command line single quotes.
 //				args = Arrays.copyOf(args, args.length + 2);

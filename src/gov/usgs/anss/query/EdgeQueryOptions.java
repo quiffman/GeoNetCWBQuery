@@ -11,6 +11,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Logger;
 import nz.org.geonet.quakeml.v1_0_1.client.QuakemlFactory;
 import nz.org.geonet.quakeml.v1_0_1.client.QuakemlUtils;
@@ -21,8 +22,9 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 
-	/**
+/**
  * An attempt to encapsulate (read isolate) EdgeQueryClient command line args.
+ * TODO: move line space handling, double quoting and splitting of arguments to a separate method.
  * 
  * @author richardg
  */
@@ -34,7 +36,7 @@ public class EdgeQueryOptions {
 		logger.fine("$Id$");
 	}
 	
-	public enum OutputType {
+	protected enum OutputType {
 		ms,
 		msz,
 		sac,
@@ -51,11 +53,11 @@ public class EdgeQueryOptions {
     private static DateTimeFormatter parseBeginFormat = DateTimeFormat.forPattern(beginFormat).withZone(DateTimeZone.forID("UTC"));
     private static DateTimeFormatter parseBeginFormatDoy = DateTimeFormat.forPattern(beginFormatDoy).withZone(DateTimeZone.forID("UTC"));
 
-	String host = QueryProperties.getGeoNetCwbIP();
-	int port = QueryProperties.getGeoNetCwbPort();
+	public String host = QueryProperties.getGeoNetCwbIP();
+	public int port = QueryProperties.getGeoNetCwbPort();
 
 	public String[] args;
-	public String[] extraArgs;
+	private List extraArgs;
 	private Double duration = 300.0;
 	private String seedname = null;
 	private DateTime begin = null;
@@ -95,7 +97,7 @@ public class EdgeQueryOptions {
 	 * @param args the arguments to parse
 	 * @return unused args (unmodified order)
 	 */
-	public String[] parse(String[] args) {
+	public List parse(String[] args) {
 		
 //		List<String> argList = Arrays.asList(args);
 		ArrayList<String> argList = new ArrayList(Arrays.asList(args));
@@ -109,7 +111,7 @@ public class EdgeQueryOptions {
 				return null;
 			}
 
-			return argList.toArray(new String[0]);
+			return argList;
 		}
 		
 		ArrayList<String> extraArgsList = new ArrayList(args.length);
@@ -189,7 +191,7 @@ public class EdgeQueryOptions {
 			}
 
 		}
-		return extraArgsList.toArray(new String[extraArgsList.size()]);
+		return extraArgsList;
 	}
 
 	/**

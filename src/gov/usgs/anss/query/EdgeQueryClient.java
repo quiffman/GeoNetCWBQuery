@@ -9,6 +9,7 @@
 package gov.usgs.anss.query;
 
 import gov.usgs.anss.edge.*;
+import gov.usgs.anss.query.EdgeQueryOptions.OutputType;
 import gov.usgs.anss.seed.MiniSeed;
 import java.io.*;
 import java.net.*;
@@ -178,11 +179,11 @@ public class EdgeQueryClient {
 			} else {
 				line = "";
 			}
-			if (options.begin != null) {
-				line += "'-b' '" + options.begin.trim() + "' ";
+			if (options.getBegin() != null) {
+				line += "'-b' '" + options.getBeginAsString() + "' ";
 			}
-			if (options.durationString != null) {
-				line += "'-d' '" + options.durationString + "' ";
+			if (options.getDuration() != null) {
+				line += "'-d' '" + options.getDuration() + "' ";
 			}
 			if (options.lschannels) {
 				if (options.showIllegals) {
@@ -396,10 +397,13 @@ public class EdgeQueryClient {
                                         }
                                         blksAll.add(newBlks);
                                     } else {      // create the output file
-                                        if (options.getType().equals("ms") || options.getType().equals("dcc") || options.getType().equals("dcc512") || options.getType().equals("msz")) {
+                                        if (options.getType() == OutputType.ms ||
+											options.getType() == OutputType.dcc ||
+											options.getType() == OutputType.dcc512 ||
+											options.getType() == OutputType.msz) {
                                             filename = EdgeQueryClient.makeFilename(options.filemask, lastComp, ms2);
                                         } else {
-                                            filename = EdgeQueryClient.makeFilename(options.filemask, lastComp,options.getBeg());
+                                            filename = EdgeQueryClient.makeFilename(options.filemask, lastComp,options.getBeginAsDate());
                                         }
 
 
@@ -432,11 +436,11 @@ public class EdgeQueryClient {
                                         if (options.sacpz && out.getClass().getSimpleName().indexOf("SacOutputer") < 0) {   // if asked for write out the sac response file
                                             String time = blks.get(0).getTimeString();
                                             time = time.substring(0, 4) + "," + time.substring(5, 8) + "-" + time.substring(9, 17);
-                                            options.stasrv.getSACResponse(lastComp, options.begin, filename);
+                                            options.stasrv.getSACResponse(lastComp, options.getBeginAsString(), filename);
                                         }
 
 										// TODO: Change the signature to pass options only once.
-                                        out.makeFile(lastComp, filename, options.filemask, blks, options.getBeg(), options.getDuration(), options.args);
+                                        out.makeFile(lastComp, filename, options.filemask, blks, options.getBeginWithOffsetAsDate(), options.getDuration(), options.args);
                                     }
                                 }
                                 maxTime = 0;

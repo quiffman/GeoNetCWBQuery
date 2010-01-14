@@ -20,7 +20,8 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-/**
+
+	/**
  * An attempt to encapsulate (read isolate) EdgeQueryClient command line args.
  * 
  * @author richardg
@@ -55,9 +56,9 @@ public class EdgeQueryOptions {
 
 	public String[] args;
 	public String[] extraArgs;
-	private double duration = 300.;
+	private Double duration = 300.0;
 	private String seedname = null;
-	public String begin = null;
+	private DateTime begin = null;
 	private OutputType type = OutputType.sac;
 	public boolean dbg = false;
 	public boolean lsoption = false;
@@ -71,7 +72,6 @@ public class EdgeQueryOptions {
 	// Make a pass for the command line args for either mode!
 	public String exclude = null;
 	public boolean nosort = false;
-	public String durationString = null;
 	public boolean holdingMode = false;
 	public String holdingIP = QueryProperties.getGeoNetCwbIP();
 	public int holdingPort = QueryProperties.getGeoNetCwbPort();
@@ -83,9 +83,8 @@ public class EdgeQueryOptions {
 	public SacPZ stasrv = null;
 	public String pzunit = "nm";
 	public String stahost = QueryProperties.getNeicMetadataServerIP();
-	public String eventId;
-	public long offset = 0;
-	private Date beg = null;
+	private Quakeml event = null;
+	private long offset = 0;
 
 	/**
 	 * Parses known args into object fields. Does some argument validation and
@@ -138,13 +137,13 @@ public class EdgeQueryOptions {
 			} else if (args[i].equals("-lsc")) { // Documented functionality.
 				lschannels = true;
 			} else if (args[i].equals("-b")) { // Documented functionality.
-				begin = args[i + 1];
+				setBegin(args[i + 1]);
 				i++;
 			} else if (args[i].equals("-s")) { // Documented functionality.
 				setSeedname(args[i + 1]);
 				i++;
 			} else if (args[i].equals("-d")) { // Documented functionality.
-				durationString = args[i + 1];
+				setDuration(args[i + 1]);
 				i++;
 			} else if (args[i].equals("-q")) { // Documented functionality.
 				quiet = true;
@@ -178,10 +177,10 @@ public class EdgeQueryOptions {
 				setType(OutputType.HOLD);
 				logger.config("Holdings server=" + holdingIP + "/" + holdingPort + " type=" + holdingType);
 			} else if (args[i].equals("-event")) {
-				eventId = args[i + 1];
+				setEvent(args[i + 1]);
 				i++;
 			} else if (args[i].equals("-offset")) {
-				offset = Long.parseLong(args[i + 1]);
+				setOffset(Long.parseLong(args[i + 1]));
 				i++;
 			}
 			else {
@@ -230,7 +229,7 @@ public class EdgeQueryOptions {
 			return false;
 		}
 
-		if (getBeg() == null) {
+		if (getBegin() == null) {
 			logger.severe("You must enter a beginning time");
 			return false;
 		}
@@ -323,13 +322,18 @@ public class EdgeQueryOptions {
 	}
 
 	/**
+	 * A default constructor.
+	 */
+	public EdgeQueryOptions() {
+	}
+
+	/**
 	 * Creates an EdgeQueryOptions object from a set of command line args.
 	 * @param args
 	 */
 	public EdgeQueryOptions(String[] args) {
 		this.args = args;
 		this.extraArgs = parse(this.args);
-		this.process();
 	}
 
 	/**
@@ -363,7 +367,6 @@ public class EdgeQueryOptions {
 			args[i] = args[i].replaceAll("@", " ");
 		}
 		this.extraArgs = parse(this.args);
-		this.process();
 	}
 
 	/**
@@ -414,8 +417,8 @@ public class EdgeQueryOptions {
      * @return java.util.Date parsed from the being time.
      * @throws java.lang.IllegalArgumentException
      */
-    protected static java.util.Date parseBegin(String beginTime, long offset) throws IllegalArgumentException {
-        DateTime begin = null;
+	public void setBegin(String beginTime) throws IllegalArgumentException {
+        begin = null;
 
         try {
             begin = parseBeginFormat.parseDateTime(beginTime);
@@ -435,42 +438,21 @@ public class EdgeQueryOptions {
             throw new IllegalArgumentException("Error parsing begin time.  Allowable formats " +
                     "are: " + beginFormat + " or " + beginFormatDoy);
         }
-
-        return new Date(begin.plus(offset).getMillis());
     }
 
 	/**
-	 * Process the more complex args - time etc.
+	 * @return the duration
 	 */
-	private void process() {
+	public Double getDuration() {
+		return duration;
+	}
 
-		// This logic allows a user to set an eventId for phases, picks etc. but
-		// still manually define the begin time for a query.
-		if (begin != null) {
-			try {
-				setBeg(parseBegin(begin, offset));
-			} catch (IllegalArgumentException illegalArgumentException) {
-				logger.severe("the -b field date [" + begin +
-						"] did not parse correctly." + illegalArgumentException);
-			}
-		}
-		else if (eventId != null) {
-			Quakeml event = new QuakemlFactory().getQuakemlByEventReference(eventId, null, null);
-			if (event != null) {
-				DateTime jDate = QuakemlUtils.getOriginTime(QuakemlUtils.getPreferredOrigin(QuakemlUtils.getFirstEvent(event)));
-				jDate.plus(offset);
-				setBeg(jDate.toDate());
-				begin = parseBeginFormat.withZone(DateTimeZone.UTC).print(jDate);
-				logger.config("Using begin time " + begin + " from event " + eventId);
-				// TODO: Fix this when fixing the command line single quotes.
-				args = Arrays.copyOf(args, args.length + 2);
-				args[args.length - 2] = "-b";
-				args[args.length - 1] = begin;
-			} else {
-				logger.severe("failed to retrieve details for event id " + eventId);
-			}
-		}
-
+	/**
+	 * Sets the duration from a String. By default this is interpreted as seconds
+	 * but the user can append 'd' or 'D' to the number to represent days.
+	 * @param duration the duration string to set
+	 */
+	private void setDuration(String durationString) {
 		if (durationString != null) {
 			if (durationString.endsWith("d") || durationString.endsWith("D")) {
 				setDuration(Double.parseDouble(durationString.substring(0, durationString.length() - 1)) * 86400.);
@@ -481,16 +463,9 @@ public class EdgeQueryOptions {
 	}
 
 	/**
-	 * @return the duration
-	 */
-	public double getDuration() {
-		return duration;
-	}
-
-	/**
 	 * @param duration the duration to set
 	 */
-	public void setDuration(double duration) {
+	public void setDuration(Double duration) {
 		this.duration = duration;
 	}
 
@@ -536,16 +511,102 @@ public class EdgeQueryOptions {
 	}
 
 	/**
-	 * @return the beg
+	 * @return the offset
 	 */
-	public Date getBeg() {
-		return beg;
+	public long getOffset() {
+		return offset;
 	}
 
 	/**
-	 * @param beg the beg to set
+	 * @param offset the offset to set
 	 */
-	public void setBeg(Date beg) {
-		this.beg = beg;
+	public void setOffset(long offset) {
+		this.offset = offset;
+	}
+
+	/**
+	 * @return the begin
+	 */
+	public DateTime getBegin() {
+		if (begin != null) {
+			return begin;
+		}
+		else if (getEvent() != null) {
+			begin = QuakemlUtils.getOriginTime(QuakemlUtils.getPreferredOrigin(QuakemlUtils.getFirstEvent(event)));
+
+			// TODO: Fix this when fixing the command line single quotes.
+//				args = Arrays.copyOf(args, args.length + 2);
+//				args[args.length - 2] = "-b";
+//				args[args.length - 1] = begin;
+		}
+
+		return null;
+	}
+
+	/**
+	 * @return the begin
+	 */
+	public Date getBeginAsDate() {
+		return getBegin().toDate();
+	}
+
+	/**
+	 * @return the begin
+	 */
+	public String getBeginAsString() {
+		return parseBeginFormat.withZone(DateTimeZone.UTC).print(getBegin());
+	}
+
+	/**
+	 * @return the begin
+	 */
+	public DateTime getBeginWithOffset() {
+		return getBegin().plus(getOffset());
+	}
+
+	/**
+	 * @return the begin
+	 */
+	public Date getBeginWithOffsetAsDate() {
+		return getBeginWithOffset().toDate();
+	}
+
+	/**
+	 * @return the begin
+	 */
+	public String getBeginWithOffsetAsString() {
+		return parseBeginFormat.withZone(DateTimeZone.UTC).print(getBeginWithOffset());
+	}
+
+	/**
+	 * @param begin the begin to set
+	 */
+	public void setBegin(DateTime begin) {
+		this.begin = begin;
+	}
+
+	/**
+	 * @return the event
+	 */
+	public Quakeml getEvent() {
+		return event;
+	}
+
+	/**
+	 * @param event the event to set
+	 */
+	public void setEvent(Quakeml event) {
+		this.event = event;
+	}
+
+	/**
+	 * TODO: throw an exception if the event can't be found...?
+	 * @param event the public ID of an event to set
+	 */
+	public void setEvent(String publicId) {
+		this.event = new QuakemlFactory().getQuakemlByEventReference(publicId, null, null);
+		if (event == null) {
+			logger.severe("failed to retrieve details for event ID " + publicId);
+		}
 	}
 }

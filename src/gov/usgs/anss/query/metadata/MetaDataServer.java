@@ -1,11 +1,21 @@
 package gov.usgs.anss.query.metadata;
 
+import gov.usgs.anss.query.EdgeQueryOptions;
 import gov.usgs.anss.util.StaSrv;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringReader;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 /**
  *
@@ -14,9 +24,12 @@ import java.util.logging.Logger;
 public class MetaDataServer {
 
     private StaSrv stasrv;
+    private static Socket ds;
     private static final String pzunit = "nm";
     protected static final Logger logger = Logger.getLogger(MetaDataServer.class.getName());
 
+    private static String beginFormat = "YYYY/MM/dd-HH:mm:ss";
+    private static DateTimeFormatter parseBeginFormat = DateTimeFormat.forPattern(beginFormat).withZone(DateTimeZone.forID("UTC"));
 
     static {
         logger.fine("$Id$");
@@ -29,6 +42,13 @@ public class MetaDataServer {
      */
     public MetaDataServer(String metaDataServerHost, int metaDataServerPort) {
         stasrv = new StaSrv(metaDataServerHost, metaDataServerPort);
+        try {
+            ds = new Socket(metaDataServerHost, metaDataServerPort);
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(MetaDataServer.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(MetaDataServer.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -37,7 +57,7 @@ public class MetaDataServer {
      * @param code 
      * @param component
      * @param location
-     * @param time - the time to retrieve the response at yyyy,ddd-hh:mm:ss or yyyy/mm/dd-hh:mm:ss
+     * @param date
      * @return
      */
     public StationMetaData getStationMetaData(
@@ -45,8 +65,9 @@ public class MetaDataServer {
             String code,
             String component,
             String location,
-            String time) {
-        String s = getResponseData(network, code, component, location, time, pzunit);
+            DateTime date) {
+        System.out.println(parseBeginFormat.withZone(DateTimeZone.UTC).print(date));
+        String s = getResponseData(network, code, component, location, date, pzunit);
 
         StationMetaData md = new StationMetaData(network, code, component, location);
 
@@ -91,10 +112,12 @@ public class MetaDataServer {
             String code,
             String component,
             String location,
-            String time,
+            DateTime date,
             String units) {
         // TODO pad the station code to 5 char left justified
-        String s = stasrv.getSACResponse(network.toUpperCase() + code.toUpperCase() + component.toUpperCase() + location, time, units);
+        String s = stasrv.getSACResponse(network.toUpperCase() + code.toUpperCase() + component.toUpperCase() + location, 
+                parseBeginFormat.withZone(DateTimeZone.UTC).print(date),
+                units);
 
         // Its not at all clear how this will get triggered
         // there has to be message come back from the server for
@@ -109,11 +132,60 @@ public class MetaDataServer {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
             }
-            s = stasrv.getSACResponse(network.toUpperCase() + code.toUpperCase() + component.toUpperCase() + location, time, pzunit);
+            s = stasrv.getSACResponse(network.toUpperCase() + code.toUpperCase() + component.toUpperCase() + location, parseBeginFormat.withZone(DateTimeZone.UTC).print(date), pzunit);
         }
         return s;
     }
 
+//    public static String listChannels(DateTime begin, Double duration) {
+//        EdgeQueryOptions options = new EdgeQueryOptions();
+//        options.lschannels = true;
+//        options.setBegin(begin);
+//        options.setDuration(duration);
+//        return listQuery(options);
+//    }
+//
+//    public static String listQuery(EdgeQueryOptions options) {
+//        try {
+//            String line = "";
+//            byte[] b = new byte[4096];
+//
+//            ds.setReceiveBufferSize(512000);
+//            //ds.setTcpNoDelay(true);
+//            InputStream in = ds.getInputStream();        // Get input and output streams
+//            OutputStream outtcp = ds.getOutputStream();
+//            if (options.exclude != null) {
+//                line = "'-el' '" + options.exclude + "' ";
+//            } else {
+//                line = "";
+//            }
+//            if (options.getBegin() != null) {
+//                line += "'-b' '" + options.getBeginAsString() + "' ";
+//            }
+//            if (options.getDuration() != null) {
+//                line += "'-d' '" + options.getDuration() + "' ";
+//            }
+//            if (options.lschannels) {
+//                if (options.showIllegals) {
+//                    line += "'-si' ";
+//                }
+//                line += "'-lsc'\n";
+//            } else {
+//                line += "'-ls'\n";
+//            }
+//            logger.config("line=" + line + ":");
+//            outtcp.write(line.getBytes());
+//            StringBuffer sb = new StringBuffer(100000);
+//            int len = 0;
+//            while ((len = in.read(b, 0, 512)) > 0) {
+//                sb.append(new String(b, 0, len));
+//            }
+//            return sb.toString();
+//        } catch (IOException e) {
+//            logger.severe(e + " Getting a directory");
+//            return null;
+//        }
+//    }
 
     /**
      *
@@ -121,7 +193,7 @@ public class MetaDataServer {
      * @param code
      * @param component
      * @param location
-     * @param time
+     * @param date 
      * @param units
      * @param filename
      */
@@ -130,11 +202,11 @@ public class MetaDataServer {
             String code,
             String component,
             String location,
-            String time,
+            DateTime date,
             String units,
             String filename) {
-        String s = getResponseData(network, code, component, location, time, pzunit);
-       
+        String s = getResponseData(network, code, component, location, date, pzunit);
+
         try {
             PrintWriter fout = new PrintWriter(filename);
             fout.write(s);

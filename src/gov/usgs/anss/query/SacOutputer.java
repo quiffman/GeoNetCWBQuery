@@ -103,7 +103,7 @@ public class SacOutputer extends Outputer {
         sac.npts = span.getNsamp();
         PNZ pnz = null;
 
-        // Get station meta data and possible repsonse info
+        // Get station meta data and repsonse info (if requested)
         // Give a default if there is noMeta
         StationMetaData md = new StationMetaData(network, code, component, location);
         if (!noMeta) {
@@ -116,10 +116,10 @@ public class SacOutputer extends Outputer {
             time = time.substring(0, 4) + "," + time.substring(5, 8) + "-" + time.substring(9, 17);
 
             if (options.sacpz) {
-                metaDataServer.getSACResponse(network, code, component, location, time, options.pzunit, filename + ".pz");
+                metaDataServer.getSACResponse(network, code, component, location, options.getBegin(), options.pzunit, filename + ".pz");
             }
 
-            md = metaDataServer.getStationMetaData(network, code, component, location, time);
+            md = metaDataServer.getStationMetaData(network, code, component, location, options.getBegin());
         }
 
         // Set the byteOrder based on native architecture and sac statics

@@ -5,6 +5,8 @@
 package gov.usgs.anss.query.metadata;
 
 import gov.usgs.anss.query.*;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -19,6 +21,7 @@ import static org.junit.Assert.*;
 public class StationMetaDataTest {
 
     private static MetaDataServer metaDataServer;
+    private static DateTimeZone tz = DateTimeZone.forID("UTC");
 
     public StationMetaDataTest() {
     }
@@ -48,7 +51,8 @@ public class StationMetaDataTest {
     // Can we stub the server?
     @Test
     public void testGetStationMetaData() {
-        StationMetaData md = metaDataServer.getStationMetaData("NZ", "WEL  ", "HHZ", "10", "2009,010-11:11:11");
+        StationMetaData md = metaDataServer.getStationMetaData("NZ", "WEL  ", "HHZ", "10", 
+                new DateTime(2009, 1, 1, 11, 11, 11, 0, tz));
         assertTrue("Network ", md.getNetwork().equals("NZ"));
         assertTrue("Code ", md.getCode().equals("WEL  "));
         assertTrue("component", md.getComponent().equals("HHZ"));
@@ -64,7 +68,8 @@ public class StationMetaDataTest {
     // Can we stub the server?
     @Test
     public void testGetStationMetaDataNull() {
-        StationMetaData md = metaDataServer.getStationMetaData("NZ", "ZZZZZ", "HHZ", "10", "2009,010-11:11:11");
+        StationMetaData md = metaDataServer.getStationMetaData("NZ", "ZZZZZ", "HHZ", "10", 
+                new DateTime(2009, 1, 1, 11, 11, 11, 0, tz));
         assertTrue("Network ", md.getNetwork().equals("NZ"));
         assertTrue("Code ", md.getCode().equals("ZZZZZ"));
         assertTrue("component", md.getComponent().equals("HHZ"));

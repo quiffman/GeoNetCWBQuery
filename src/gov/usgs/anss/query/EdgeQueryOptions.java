@@ -59,7 +59,7 @@ public class EdgeQueryOptions {
 	public int port = QueryProperties.getGeoNetCwbPort();
 
 	public String[] args;
-	private List extraArgs;
+	public List<String> extraArgs;
 	private Double duration = 300.0;
 	private String seedname = null;
 	private DateTime begin = null;
@@ -269,19 +269,19 @@ public class EdgeQueryOptions {
 	public Outputer getOutputter() {
 		switch (getType()) {
 			case ms:
-				return new MSOutputer(nosort);
+				return new MSOutputer(this);
 			case sac:
-				return new SacOutputer();
+				return new SacOutputer(this);
 			case msz:
-				return new MSZOutputer(blocksize);
+				return new MSZOutputer(this);
 			case dcc:
-				return new DCCOutputer();
+				return new DCCOutputer(this);
 			case dcc512:
-				return new DCC512Outputer();
+				return new DCC512Outputer(this);
 			case HOLD:
-				return new HoldingOutputer();
+				return new HoldingOutputer(this);
 			case text:
-				return new TextOutputer();
+				return new TextOutputer(this);
 		}
 		return null;
 	}

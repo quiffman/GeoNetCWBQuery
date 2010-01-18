@@ -32,11 +32,13 @@ public class SacOutputer extends Outputer {
 	static {logger.fine("$Id$");}
 
     /** Creates a new instance of SacOutputer */
-    public SacOutputer() {
+    public SacOutputer(EdgeQueryOptions options) {
+		this.options = options;
     }
+	
 
-    public void makeFile(String lastComp, String filename, String filemask, ArrayList<MiniSeed> blks,
-            java.util.Date beg, double duration, String[] args) throws IOException {
+    public void makeFile(String lastComp, String filename,
+			ArrayList<MiniSeed> blks) throws IOException {
 
         // Process the args for things that affect us
         if (blks.size() == 0) {
@@ -53,30 +55,19 @@ public class SacOutputer extends Outputer {
 
         String stahost = QueryProperties.getNeicMetadataServerIP();
         int staport = QueryProperties.getNeicMetadataServerPort();
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("-fill")) {
-                fill = Integer.parseInt(args[i + 1]);
+        for (int i = 0; i < options.extraArgs.size(); i++) {
+            if (options.extraArgs.get(i).equals("-fill")) {
+                fill = Integer.parseInt(options.extraArgs.get(i + 1));
             }
-            if (args[i].equals("-nogaps")) {
+            if (options.extraArgs.get(i).equals("-nogaps")) {
                 fill = 2147000000;
                 nogaps = true;
             }
-            if (args[i].equals("-nometa")) {
+            if (options.extraArgs.get(i).equals("-nometa")) {
                 noStaSrv = true;
             }
-            if (args[i].equals("-sactrim")) {
+            if (options.extraArgs.get(i).equals("-sactrim")) {
                 sactrim = true;
-            }
-            if (args[i].equals("-q")) {
-                quiet = true;
-            }
-            if (args[i].equals("-sacpz")) {
-                sacpz = true;
-                pzunit = args[i + 1];
-                if (stahost == null || stahost.equals("")) {
-                    logger.warning("No metadata server set.  Exiting.");
-                    System.exit(0);
-                }
             }
         }
         if (stahost.equals("")) {
@@ -89,10 +80,10 @@ public class SacOutputer extends Outputer {
         }
         // Use the span to populate a sac file
         GregorianCalendar start = new GregorianCalendar();
-        start.setTimeInMillis(beg.getTime());
+        start.setTimeInMillis(options.getBeginWithOffset().getMillis());
 
         // build the zero filled area (either with exact limits or with all blocks)
-        ZeroFilledSpan span = new ZeroFilledSpan(blks, start, duration, fill);
+        ZeroFilledSpan span = new ZeroFilledSpan(blks, start, options.getDuration(), fill);
         if (span.getRate() <= 0.00) {
             return;         // There is no real data to put in SAC
         }
@@ -105,7 +96,7 @@ public class SacOutputer extends Outputer {
             logger.warning("  ** " + lastComp + " has gaps - discarded # missing =" + noval);
             return;
         }
-        if (filemask.equals("%N")) {
+        if (options.filemask.equals("%N")) {
             filename += ".sac";
         }
         filename = filename.replaceAll("[__]", "_");

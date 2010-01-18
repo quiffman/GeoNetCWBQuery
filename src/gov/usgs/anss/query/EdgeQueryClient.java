@@ -440,7 +440,7 @@ public class EdgeQueryClient {
                                         }
 
 										// TODO: Change the signature to pass options only once.
-                                        out.makeFile(lastComp, filename, options.filemask, blks, options.getBeginWithOffsetAsDate(), options.getDuration(), options.args);
+                                        out.makeFile(lastComp, filename, blks);
                                     }
                                 }
                                 maxTime = 0;

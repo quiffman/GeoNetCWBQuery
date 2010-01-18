@@ -29,19 +29,19 @@ import gov.usgs.anss.util.SeedUtil;
 public class MSZOutputer extends Outputer {
 
     boolean dbg;
-    int blocksize;
     DecimalFormat df3;
 	static {logger.fine("$Id$");}
 
     private static DateTimeFormatter dtFormat = ISODateTimeFormat.dateTime().withZone(DateTimeZone.forID("UTC"));
 
     /** Creates a new instance of SacOutputer */
-    public MSZOutputer(int blkSize) {
-        blocksize = blkSize;
+    public MSZOutputer(EdgeQueryOptions options) {
+		this.options = options;
     }
 
-    public void makeFile(String lastComp, String filename, String filemask, ArrayList<MiniSeed> blks,
-            java.util.Date beg, double duration, String[] args) throws IOException {
+
+    public void makeFile(String lastComp, String filename,
+			ArrayList<MiniSeed> blks) throws IOException {
 
         // Process the args for things that affect us
         boolean gaps = false;       // if true, generate a list of any gaps in the data
@@ -49,27 +49,27 @@ public class MSZOutputer extends Outputer {
         boolean msgaps = false;
         boolean dbg = false;
         int fill = -12345;
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("-fill")) {
-                fill = Integer.parseInt(args[i + 1]);
+        for (int i = 0; i < options.extraArgs.size(); i++) {
+            if (options.extraArgs.get(i).equals("-fill")) {
+                fill = Integer.parseInt(options.extraArgs.get(i + 1));
             }
-            if (args[i].equals("-gaps")) {
+            if (options.extraArgs.get(i).equals("-gaps")) {
                 fill = 2147000000;
                 gaps = true;
             }
-            if (args[i].equals("-updhold")) {
+            if (options.extraArgs.get(i).equals("-updhold")) {
                 doHoldings = true;
             }
-            if (args[i].equals("-dbgz")) {
+            if (options.extraArgs.get(i).equals("-dbgz")) {
                 dbg = true;
             }
-            if (args[i].equals("-msgaps")) {
+            if (options.extraArgs.get(i).equals("-msgaps")) {
                 msgaps = true;
             }
         }
 
         GregorianCalendar start = new GregorianCalendar();
-        start.setTimeInMillis(beg.getTime());
+        start.setTimeInMillis(options.getBeginWithOffset().getMillis());
 
 
         //ZeroFilledSpan span = new ZeroFilledSpan(blks);
@@ -183,11 +183,11 @@ public class MSZOutputer extends Outputer {
         }
 
         // build the zero filled area (either with exact limits or with all blocks)
-        ZeroFilledSpan span = new ZeroFilledSpan(blks, start, duration, fill);
+        ZeroFilledSpan span = new ZeroFilledSpan(blks, start, options.getDuration(), fill);
 
 		logger.fine("ZeroSpan=" + span.toString());
 
-        if (filemask.equals("%N")) {
+        if (options.filemask.equals("%N")) {
             filename += ".ms";
         }
         filename = filename.replaceAll("[__]", "_");
@@ -196,7 +196,7 @@ public class MSZOutputer extends Outputer {
         MiniSeed ms = (MiniSeed) blks.get(0);
         GregorianCalendar st = span.getStart();
         RawToMiniSeed rwms = new RawToMiniSeed(lastComp, ms.getRate(),
-                blocksize / 64 - 1,
+                options.blocksize / 64 - 1,
                 ms.getYear(), ms.getDay(),
                 (int) ((st.getTimeInMillis() % 86400000L) / 1000L),
                 (int) ((st.getTimeInMillis() % 1000L) * 1000L),

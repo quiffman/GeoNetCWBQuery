@@ -164,8 +164,16 @@ public class EdgeQueryClient {
     /** Creates a new instance of EdgeQueryClient */
     public EdgeQueryClient() {
     }
+
+	public static String listChannels(DateTime begin, Double duration) {
+		EdgeQueryOptions options = new EdgeQueryOptions();
+		options.lschannels = true;
+		options.setBegin(begin);
+		options.setDuration(duration);
+		return listQuery(options);
+	}
 	
-	public static ArrayList listQuery(EdgeQueryOptions options) {
+	public static String listQuery(EdgeQueryOptions options) {
 		try {
 			String line = "";
 			byte[] b = new byte[4096];
@@ -200,12 +208,11 @@ public class EdgeQueryClient {
 			while ((len = in.read(b, 0, 512)) > 0) {
 				sb.append(new String(b, 0, len));
 			}
-			logger.info(sb.toString());
+			return sb.toString();
 		} catch (IOException e) {
 			logger.severe(e + " Getting a directory");
 			return null;
 		}
-		return null;
 	}
 
     /** do a query.  The command line arguments are passed in as they are for the query tool
@@ -576,7 +583,7 @@ public class EdgeQueryClient {
 
         // The ls option does not require any args checking
         if (options.isListQuery()) {
-			listQuery(options);
+			logger.info(listQuery(options));
         }
 		else {
 			query(options);

@@ -24,10 +24,13 @@ import org.joda.time.format.DateTimeFormatter;
 public class MetaDataServer {
 
     private StaSrv stasrv;
-    private static Socket ds;
     private static final String pzunit = "nm";
     protected static final Logger logger = Logger.getLogger(MetaDataServer.class.getName());
 
+    // This is used to format the query to the meta data server,
+    // not the CWB server.  It looks like the format is different
+    // so we will format it ourselves here instead of creating
+    //  a new instance of options.
     private static String beginFormat = "YYYY/MM/dd-HH:mm:ss";
     private static DateTimeFormatter parseBeginFormat = DateTimeFormat.forPattern(beginFormat).withZone(DateTimeZone.forID("UTC"));
 
@@ -42,13 +45,6 @@ public class MetaDataServer {
      */
     public MetaDataServer(String metaDataServerHost, int metaDataServerPort) {
         stasrv = new StaSrv(metaDataServerHost, metaDataServerPort);
-        try {
-            ds = new Socket(metaDataServerHost, metaDataServerPort);
-        } catch (UnknownHostException ex) {
-            Logger.getLogger(MetaDataServer.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(MetaDataServer.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 
     /**
@@ -136,56 +132,6 @@ public class MetaDataServer {
         }
         return s;
     }
-
-//    public static String listChannels(DateTime begin, Double duration) {
-//        EdgeQueryOptions options = new EdgeQueryOptions();
-//        options.lschannels = true;
-//        options.setBegin(begin);
-//        options.setDuration(duration);
-//        return listQuery(options);
-//    }
-//
-//    public static String listQuery(EdgeQueryOptions options) {
-//        try {
-//            String line = "";
-//            byte[] b = new byte[4096];
-//
-//            ds.setReceiveBufferSize(512000);
-//            //ds.setTcpNoDelay(true);
-//            InputStream in = ds.getInputStream();        // Get input and output streams
-//            OutputStream outtcp = ds.getOutputStream();
-//            if (options.exclude != null) {
-//                line = "'-el' '" + options.exclude + "' ";
-//            } else {
-//                line = "";
-//            }
-//            if (options.getBegin() != null) {
-//                line += "'-b' '" + options.getBeginAsString() + "' ";
-//            }
-//            if (options.getDuration() != null) {
-//                line += "'-d' '" + options.getDuration() + "' ";
-//            }
-//            if (options.lschannels) {
-//                if (options.showIllegals) {
-//                    line += "'-si' ";
-//                }
-//                line += "'-lsc'\n";
-//            } else {
-//                line += "'-ls'\n";
-//            }
-//            logger.config("line=" + line + ":");
-//            outtcp.write(line.getBytes());
-//            StringBuffer sb = new StringBuffer(100000);
-//            int len = 0;
-//            while ((len = in.read(b, 0, 512)) > 0) {
-//                sb.append(new String(b, 0, len));
-//            }
-//            return sb.toString();
-//        } catch (IOException e) {
-//            logger.severe(e + " Getting a directory");
-//            return null;
-//        }
-//    }
 
     /**
      *

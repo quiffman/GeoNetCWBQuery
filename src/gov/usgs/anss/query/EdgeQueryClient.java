@@ -79,10 +79,10 @@ public class EdgeQueryClient {
     static {
         logger.fine("$Id$");
     }
-	private static DateTimeFormatter hmsFormat = ISODateTimeFormat.time().withZone(DateTimeZone.forID("UTC"));
+    private static DateTimeFormatter hmsFormat = ISODateTimeFormat.time().withZone(DateTimeZone.forID("UTC"));
 
-	// TODO: push the makeFilename methods into the outputters.
-     public static String makeFilename(String mask, String seedname, MiniSeed ms) {
+    // TODO: push the makeFilename methods into the outputters.
+    public static String makeFilename(String mask, String seedname, MiniSeed ms) {
         StringBuffer sb = new StringBuffer(100);
         if (df2 == null) {
             df2 = new DecimalFormat("00");
@@ -165,47 +165,55 @@ public class EdgeQueryClient {
     public EdgeQueryClient() {
     }
 
-	public static String listQuery(EdgeQueryOptions options) {
-		try {
-			String line = "";
-			byte[] b = new byte[4096];
-			Socket ds = new Socket(options.host, options.port);
-			ds.setReceiveBufferSize(512000);
-			//ds.setTcpNoDelay(true);
-			InputStream in = ds.getInputStream();        // Get input and output streams
-			OutputStream outtcp = ds.getOutputStream();
-			if (options.exclude != null) {
-				line = "'-el' '" + options.exclude + "' ";
-			} else {
-				line = "";
-			}
-			if (options.getBegin() != null) {
-				line += "'-b' '" + options.getBeginAsString() + "' ";
-			}
-			if (options.getDuration() != null) {
-				line += "'-d' '" + options.getDuration() + "' ";
-			}
-			if (options.lschannels) {
-				if (options.showIllegals) {
-					line += "'-si' ";
-				}
-				line += "'-lsc'\n";
-			} else {
-				line += "'-ls'\n";
-			}
-			logger.config("line=" + line + ":");
-			outtcp.write(line.getBytes());
-			StringBuffer sb = new StringBuffer(100000);
-			int len = 0;
-			while ((len = in.read(b, 0, 512)) > 0) {
-				sb.append(new String(b, 0, len));
-			}
-			return sb.toString();
-		} catch (IOException e) {
-			logger.severe(e + " Getting a directory");
-			return null;
-		}
-	}
+    public static String listChannels(DateTime begin, Double duration) {
+        EdgeQueryOptions options = new EdgeQueryOptions();
+        options.lschannels = true;
+        options.setBegin(begin);
+        options.setDuration(duration);
+        return listQuery(options);
+    }
+
+    public static String listQuery(EdgeQueryOptions options) {
+        try {
+            String line = "";
+            byte[] b = new byte[4096];
+            Socket ds = new Socket(options.host, options.port);
+            ds.setReceiveBufferSize(512000);
+            //ds.setTcpNoDelay(true);
+            InputStream in = ds.getInputStream();        // Get input and output streams
+            OutputStream outtcp = ds.getOutputStream();
+            if (options.exclude != null) {
+                line = "'-el' '" + options.exclude + "' ";
+            } else {
+                line = "";
+            }
+            if (options.getBegin() != null) {
+                line += "'-b' '" + options.getBeginAsString() + "' ";
+            }
+            if (options.getDuration() != null) {
+                line += "'-d' '" + options.getDuration() + "' ";
+            }
+            if (options.lschannels) {
+                if (options.showIllegals) {
+                    line += "'-si' ";
+                }
+                line += "'-lsc'\n";
+            } else {
+                line += "'-ls'\n";
+            }
+            logger.config("line=" + line + ":");
+            outtcp.write(line.getBytes());
+            StringBuffer sb = new StringBuffer(100000);
+            int len = 0;
+            while ((len = in.read(b, 0, 512)) > 0) {
+                sb.append(new String(b, 0, len));
+            }
+            return sb.toString();
+        } catch (IOException e) {
+            logger.severe(e + " Getting a directory");
+            return null;
+        }
+    }
 
     /** do a query.  The command line arguments are passed in as they are for the query tool
      * a files is created unless -t null is specified.  In that case the return is an ArrayList
@@ -236,15 +244,15 @@ public class EdgeQueryClient {
         GregorianCalendar jan_01_2007 = new GregorianCalendar(2007, 0, 1);
 
         ArrayList<ArrayList<MiniSeed>> blksAll = null;
-		String filename = "";
-		BufferedReader infile = null;
+        String filename = "";
+        BufferedReader infile = null;
 
-		// TODO: Push this into EdgeQueryOptions in favour of a command line iterator.
-		try {
-			infile = new BufferedReader(options.getAsReader());
-		} catch (FileNotFoundException ex) {
-			logger.severe("did not find the input file=" + options.filenamein);
-		}
+        // TODO: Push this into EdgeQueryOptions in favour of a command line iterator.
+        try {
+            infile = new BufferedReader(options.getAsReader());
+        } catch (FileNotFoundException ex) {
+            logger.severe("did not find the input file=" + options.filenamein);
+        }
 
         // the "in" BufferedReader will give us the command lines we need for the other end
         try {
@@ -289,23 +297,23 @@ public class EdgeQueryClient {
                 }
                 nline++;
 
-				options = new EdgeQueryOptions(line);
-				if (!options.isValid()) {
-					logger.severe("Error @line " + nline);
-					return null;
-				}
+                options = new EdgeQueryOptions(line);
+                if (!options.isValid()) {
+                    logger.severe("Error @line " + nline);
+                    return null;
+                }
 
-				out = options.getOutputter();
+                out = options.getOutputter();
                 if (out == null) {
                     blksAll = new ArrayList<ArrayList<MiniSeed>>(20);
-				}
+                }
 
                 // The length at which our compare for changes depends on the output file mask
                 int compareLength = options.getCompareLength();
 
                 long maxTime = 0;
                 int ndups = 0;
-				line = options.getSingleQuotedCommand();
+                line = options.getSingleQuotedCommand();
                 try {
                     msSetup += (System.currentTimeMillis() - startPhase);
                     startPhase = System.currentTimeMillis();
@@ -397,12 +405,12 @@ public class EdgeQueryClient {
                                         blksAll.add(newBlks);
                                     } else {      // create the output file
                                         if (options.getType() == OutputType.ms ||
-											options.getType() == OutputType.dcc ||
-											options.getType() == OutputType.dcc512 ||
-											options.getType() == OutputType.msz) {
+                                                options.getType() == OutputType.dcc ||
+                                                options.getType() == OutputType.dcc512 ||
+                                                options.getType() == OutputType.msz) {
                                             filename = EdgeQueryClient.makeFilename(options.filemask, lastComp, ms2);
                                         } else {
-                                            filename = EdgeQueryClient.makeFilename(options.filemask, lastComp,options.getBeginAsDate());
+                                            filename = EdgeQueryClient.makeFilename(options.filemask, lastComp, options.getBeginAsDate());
                                         }
 
 
@@ -432,7 +440,7 @@ public class EdgeQueryClient {
                                         logger.finer("Found " + npur + " recs with on first block of 4096 valid");
                                         blks.trimToSize();
                                         //for(int i=0; i<blks.size(); i++) logger.finest(((MiniSeed) blks.get(i)).toString());
-										// TODO: Change the signature to pass options only once.
+                                        // TODO: Change the signature to pass options only once.
                                         out.makeFile(lastComp, filename, blks);
                                     }
                                 }
@@ -571,15 +579,14 @@ public class EdgeQueryClient {
 
         logger.finest("Running Edge Query");
 
-		EdgeQueryOptions options = new EdgeQueryOptions(args);
+        EdgeQueryOptions options = new EdgeQueryOptions(args);
 
         // The ls option does not require any args checking
         if (options.isListQuery()) {
-			logger.info(listQuery(options));
+            logger.info(listQuery(options));
+        } else {
+            query(options);
         }
-		else {
-			query(options);
-		}
-        
+
     }
 }

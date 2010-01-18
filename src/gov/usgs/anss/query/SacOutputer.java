@@ -29,16 +29,31 @@ public class SacOutputer extends Outputer {
     private static SacPZ stasrv;
     private static String stasrvHost;
     private static int stasrvPort;
-	static {logger.fine("$Id$");}
+
+    // TODO - do we roll the sacpz functions from stasrc into
+    // MetaDataServer?
+    // We will hang onto the stasrv above for now,
+    // it is still used to get the sacpz files.
+    private static MetaDataServer metaDataServer;
+
+
+    static {
+        logger.fine("$Id$");
+    }
 
     /** Creates a new instance of SacOutputer */
     public SacOutputer(EdgeQueryOptions options) {
-		this.options = options;
+        this.options = options;
     }
-	
 
     public void makeFile(String lastComp, String filename,
-			ArrayList<MiniSeed> blks) throws IOException {
+            ArrayList<MiniSeed> blks) throws IOException {
+
+        // TODO - these could be in an argument object?
+        String network = lastComp.substring(0, 2);
+        String code = lastComp.substring(2, 7);
+        String component = lastComp.substring(7, 10);
+        String location = lastComp.substring(10, 12);
 
         // Process the args for things that affect us
         if (blks.size() == 0) {
@@ -77,6 +92,9 @@ public class SacOutputer extends Outputer {
             stasrv = new SacPZ(stahost, pzunit);
             stasrvHost = stahost;
             stasrvPort = staport;
+            metaDataServer = new MetaDataServer(
+                    QueryProperties.getNeicMetadataServerIP(),
+                    QueryProperties.getNeicMetadataServerPort());
         }
         // Use the span to populate a sac file
         GregorianCalendar start = new GregorianCalendar();
@@ -88,7 +106,7 @@ public class SacOutputer extends Outputer {
             return;         // There is no real data to put in SAC
         }
 
-		logger.fine("ZeroSpan=" + span.toString());
+        logger.fine("ZeroSpan=" + span.toString());
 
         int noval = span.getNMissingData();
 
@@ -105,65 +123,20 @@ public class SacOutputer extends Outputer {
 
         SacTimeSeries sac = new SacTimeSeries();
         sac.npts = span.getNsamp();
-        double[] coord = new double[3];
-        double[] orient = new double[3];
-        for (int i = 0; i < 3; i++) {
-            orient[i] = SacTimeSeries.DOUBLE_UNDEF;
-            coord[i] = SacTimeSeries.DOUBLE_UNDEF;
-        }
         PNZ pnz = null;
+
+        // Give a default if there is noStaSrv
+        StationMetaData md = new StationMetaData(network, code, component, location);
         if (!noStaSrv) {
-            //coord = stasrv.getCoord(lastComp.substring(0,2),
-            //    lastComp.substring(2,7),lastComp.substring(10,12));
-            // orientation [0] = azimuth clwse from N, [1]=dip down from horizontl, [2]=burial depth
-            //orient = stasrv.getOrientation(lastComp.substring(0,2),
-            //    lastComp.substring(2,7),lastComp.substring(10,12),lastComp.substring(7,10));
             String time = blks.get(0).getTimeString();
             time = time.substring(0, 4) + "," + time.substring(5, 8) + "-" + time.substring(9, 17);
 
-            String s = null;
             if (sacpz) {
-                s = stasrv.getSACResponse(lastComp, time, filename);  // write out the file too
-            } else {
-                s = stasrv.getSACResponse(lastComp, time);
+                String s = stasrv.getSACResponse(lastComp, time, filename);  // write out the file too
             }
-            // This commented out code is repeated from getSacResponse()
-            // TODO delete?
-//            int loop = 0;
-//            while (s.indexOf("MetaDataServer not up") >= 0) {
-//                if (loop++ % 15 == 1) {
-//                    logger.info("MetaDataServer is not up - waiting for connection");
-//                }
-//                try {
-//                    Thread.sleep(2000);
-//                } catch (InterruptedException e) {
-//                }
-//                s = stasrv.getSACResponse(lastComp, time, filename);
-//            }
-            try {
-                BufferedReader in = new BufferedReader(new StringReader(s));
-                String line = "";
-                while ((line = in.readLine()) != null) {
-                    if (line.indexOf("LAT-SEED") > 0) {
-                        coord[0] = Double.parseDouble(line.substring(15));
-                    } else if (line.indexOf("LONG-SEED") > 0) {
-                        coord[1] = Double.parseDouble(line.substring(15));
-                    } else if (line.indexOf("ELEV-SEED") > 0) {
-                        coord[2] = Double.parseDouble(line.substring(15));
-                    } else if (line.indexOf("AZIMUTH") > 0) {
-                        orient[0] = Double.parseDouble(line.substring(15));
-                    } else if (line.indexOf("DIP") > 0) {
-                        orient[1] = Double.parseDouble(line.substring(15));
-                    } else if (line.indexOf("DEPTH") > 0) {
-                        orient[2] = Double.parseDouble(line.substring(15));
-                    }
-                }
-	            logger.finer("coord="+coord[0]+" "+coord[1]+" "+coord[2]+" orient="+orient[0]+" "+orient[1]+" "+orient[2]);
-            } catch (IOException e) {
-                logger.severe("OUtput error writing sac response file " + lastComp + ".resp e=" + e.getMessage());
-            }
-        }
 
+            md = metaDataServer.getStationMetaData(network, code, component, location, time);
+        } 
 
         // Set the byteOrder based on native architecture and sac statics
         sac.nvhdr = 6;                // Only format supported
@@ -181,45 +154,34 @@ public class SacOutputer extends Outputer {
         sac.nzsec = span.getStart().get(Calendar.SECOND);
         sac.nzmsec = span.getStart().get(Calendar.MILLISECOND);
         sac.iztype = SacTimeSeries.IB;
-        sac.knetwk = lastComp.substring(0, 2);
-        sac.kstnm = lastComp.substring(2, 7);
-        sac.kcmpnm = lastComp.substring(7, 10);
-        sac.khole = "  ";
-        if (!lastComp.substring(10, 12).equals("  ")) {
-            sac.khole = lastComp.substring(10, 12);
+        
+        sac.knetwk = network;
+        sac.kstnm = code;
+        sac.kcmpnm = component;
+        sac.khole = location;
+
+        // TODO - could be pushed into a method that takes the sac and md
+        // classes and builds the SAC header?
+        if (md.getLatitude() != Double.MIN_VALUE) {
+            sac.stla = md.getLatitude();
         }
-        if (coord[0] != SacTimeSeries.DOUBLE_UNDEF) {
-            sac.stla = coord[0];
+        if (md.getLongitude() != Double.MIN_VALUE) {
+            sac.stlo = md.getLongitude();
         }
-        if (coord[1] != SacTimeSeries.DOUBLE_UNDEF) {
-            sac.stlo = coord[1];
+        if (md.getElevation() != Double.MIN_VALUE) {
+            sac.stel = md.getElevation();
         }
-        if (coord[2] != SacTimeSeries.DOUBLE_UNDEF) {
-            sac.stel = coord[2];
+        if (md.getDepth() != Double.MIN_VALUE) {
+            sac.stdp = md.getDepth();
         }
-        if (coord[0] == SacTimeSeries.DOUBLE_UNDEF && coord[1] == SacTimeSeries.DOUBLE_UNDEF && coord[2] == SacTimeSeries.DOUBLE_UNDEF) {
-            if (!noStaSrv) {
-                logger.warning("   **** " + lastComp + " did not get lat/long.  Is server down?");
-            }
+        if (md.getAzimuth() != Double.MIN_VALUE) {
+            sac.cmpaz = md.getAzimuth();
         }
-        if (orient != null) {
-            if (orient[2] != SacTimeSeries.DOUBLE_UNDEF) {
-                sac.stdp = orient[2];
-            }
-            if (orient[0] != SacTimeSeries.DOUBLE_UNDEF) {
-                sac.cmpaz = orient[0];
-            }
-            if (orient[1] != SacTimeSeries.DOUBLE_UNDEF) {
-                sac.cmpinc = (orient[1] + 90.);   // seed is down from horiz, sac is down from vertical
-            }
-        } else {
-            if (orient[0] == SacTimeSeries.DOUBLE_UNDEF && orient[1] == SacTimeSeries.DOUBLE_UNDEF) {
-                if (!noStaSrv) {
-                    logger.warning("      ***** " + lastComp + " Did not get orientation.  Is server down?");
-                }
-            }
+        if (md.getDip() != Double.MIN_VALUE) {
+            sac.cmpinc = (md.getDip() + 90.);   // seed is down from horiz, sac is down from vertical
         }
-        logger.finer("Sac stla="+sac.stla+" stlo="+sac.stlo+" stel="+sac.stel+" cmpaz="+sac.cmpaz+" cmpinc="+sac.cmpinc+" stdp="+sac.stdp);
+
+        logger.finer("Sac stla=" + sac.stla + " stlo=" + sac.stlo + " stel=" + sac.stel + " cmpaz=" + sac.cmpaz + " cmpinc=" + sac.cmpinc + " stdp=" + sac.stdp);
         sac.y = new double[span.getNsamp()];   // allocate space for data
         int nodata = 0;
         for (int i = 0; i < span.getNsamp(); i++) {

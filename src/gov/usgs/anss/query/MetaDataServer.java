@@ -48,8 +48,13 @@ public class MetaDataServer {
             String time) {
         // TODO pad the station code to 5 char left justified
         String s = stasrv.getSACResponse(network.toUpperCase() + code.toUpperCase() + component.toUpperCase() + location, time, pzunit);
+
+        // Its not at all clear how this will get triggered
+        // there has to be message come back from the server for
+        // this to work...
         int loop = 0;
         while (s.indexOf("MetaDataServer not up") >= 0) {
+            logger.warning("MetaDataServer is not up - waiting for connection");
             if (loop++ % 15 == 1) {
                 logger.warning("MetaDataServer is not up - waiting for connection");
             }
@@ -83,6 +88,16 @@ public class MetaDataServer {
 
         } catch (IOException e) {
             logger.severe("Error parsing metadata " + e.getMessage());
+        }
+
+        if (md.getLatitude() == Double.MIN_VALUE && md.getLongitude() == Double.MIN_VALUE) {
+            logger.warning("      ***** " + network + code + component + location +
+                    " Did not get station location.  Server is down or missing meta data?");
+        }
+
+        if (md.getAzimuth() == Double.MIN_VALUE && md.getDip() == Double.MIN_VALUE) {
+            logger.warning("      ***** " + network + code + component + location +
+                    " Did not get component orientation.  Server is down or missing meta data?");
         }
 
         return md;

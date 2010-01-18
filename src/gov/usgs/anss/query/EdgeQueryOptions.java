@@ -174,6 +174,12 @@ public class EdgeQueryOptions {
 				holdingMode = true;
 				gapsonly = true;
 				setType(OutputType.HOLD);
+				String[] a = args[i].split(":");
+				if (a.length == 4) {
+					holdingIP = a[1];
+					holdingPort = Integer.parseInt(a[2]);
+					holdingType = a[3];
+				}
 				logger.config("Holdings server=" + holdingIP + "/" + holdingPort + " type=" + holdingType);
 			} else if (args[i].equals("-event")) {
 				setEvent(args[i + 1]);

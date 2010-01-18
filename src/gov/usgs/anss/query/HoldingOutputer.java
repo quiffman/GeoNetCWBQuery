@@ -36,20 +36,10 @@ public class HoldingOutputer extends Outputer {
 			ArrayList<MiniSeed> blks) throws IOException {
 
         MiniSeed ms2 = null;
-        String holdingType = "CW";
-        for (int i = 0; i < options.extraArgs.size(); i++) {
-            if (options.extraArgs.get(i).indexOf("-hold") == 0) {
-                String[] a = options.extraArgs.get(i).split(":");
-                if (a.length == 4) {
-                    options.holdingIP = a[1];
-                    options.holdingPort = Integer.parseInt(a[2]);
-                    options.holdingType = a[3];
-                }
-            }
-        }
+        
         if (hs == null) {
             try {
-                hs = new HoldingSender("-h " + options.holdingIP + " -p " + options.holdingPort + " -t " + holdingType + " -q 10000 -tcp", "");
+                hs = new HoldingSender("-h " + options.holdingIP + " -p " + options.holdingPort + " -t " + options.holdingType + " -q 10000 -tcp", "");
             } catch (UnknownHostException e) {
                 logger.severe("Unknown host exception host=" + options.holdingIP);
                 System.exit(1);

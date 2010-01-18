@@ -136,17 +136,19 @@ public class SacOutputer extends Outputer {
             } else {
                 s = stasrv.getSACResponse(lastComp, time);
             }
-            int loop = 0;
-            while (s.indexOf("MetaDataServer not up") >= 0) {
-                if (loop++ % 15 == 1) {
-                    logger.info("MetaDataServer is not up - waiting for connection");
-                }
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                }
-                s = stasrv.getSACResponse(lastComp, time, filename);
-            }
+            // This commented out code is repeated from getSacResponse()
+            // TODO delete?
+//            int loop = 0;
+//            while (s.indexOf("MetaDataServer not up") >= 0) {
+//                if (loop++ % 15 == 1) {
+//                    logger.info("MetaDataServer is not up - waiting for connection");
+//                }
+//                try {
+//                    Thread.sleep(2000);
+//                } catch (InterruptedException e) {
+//                }
+//                s = stasrv.getSACResponse(lastComp, time, filename);
+//            }
             try {
                 BufferedReader in = new BufferedReader(new StringReader(s));
                 String line = "";

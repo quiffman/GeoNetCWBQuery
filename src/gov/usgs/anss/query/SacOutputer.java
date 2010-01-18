@@ -8,6 +8,8 @@
  */
 package gov.usgs.anss.query;
 
+import gov.usgs.anss.query.metadata.StationMetaData;
+import gov.usgs.anss.query.metadata.MetaDataServer;
 import java.util.GregorianCalendar;
 import java.util.Calendar;
 import java.io.IOException;

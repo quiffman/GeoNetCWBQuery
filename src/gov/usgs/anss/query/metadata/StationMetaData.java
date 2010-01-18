@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package gov.usgs.anss.query;
+package gov.usgs.anss.query.metadata;
 
 /**
  *

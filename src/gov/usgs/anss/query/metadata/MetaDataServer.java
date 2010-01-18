@@ -1,4 +1,4 @@
-package gov.usgs.anss.query;
+package gov.usgs.anss.query.metadata;
 
 import gov.usgs.anss.util.StaSrv;
 import java.io.BufferedReader;

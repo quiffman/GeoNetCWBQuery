@@ -84,6 +84,7 @@ public class EdgeQueryOptions {
 	public boolean perfMonitor = false;
 	public boolean chkDups = false;
 	public boolean sacpz = false;
+    // TODO - delete SacPZ
 	public SacPZ stasrv = null;
 	public String pzunit = "nm";
 	public String stahost = QueryProperties.getNeicMetadataServerIP();

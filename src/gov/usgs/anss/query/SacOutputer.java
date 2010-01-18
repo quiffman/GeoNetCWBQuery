@@ -12,8 +12,6 @@ import java.util.GregorianCalendar;
 import java.util.Calendar;
 import java.io.IOException;
 import java.io.FileNotFoundException;
-import java.io.BufferedReader;
-import java.io.StringReader;
 import java.util.ArrayList;
 import gov.usgs.anss.util.PNZ;
 import gov.usgs.anss.seed.*;
@@ -26,14 +24,6 @@ import edu.sc.seis.TauP.SacTimeSeries;
 public class SacOutputer extends Outputer {
 
     boolean dbg;
-    private static SacPZ stasrv;
-    private static String stasrvHost;
-    private static int stasrvPort;
-
-    // TODO - do we roll the sacpz functions from stasrc into
-    // MetaDataServer?
-    // We will hang onto the stasrv above for now,
-    // it is still used to get the sacpz files.
     private static MetaDataServer metaDataServer;
 
 
@@ -61,15 +51,11 @@ public class SacOutputer extends Outputer {
         }
         boolean nogaps = false;       // if true, do not generate a file if it has any gaps!
         int fill = -12345;
-        boolean sacpz = false;
-        boolean noStaSrv = false;
+        boolean noMeta = false;
         boolean quiet = false;
         boolean sactrim = false;      // return full length padded with no data value
         String pzunit = "nm";
 
-
-        String stahost = QueryProperties.getNeicMetadataServerIP();
-        int staport = QueryProperties.getNeicMetadataServerPort();
         for (int i = 0; i < options.extraArgs.size(); i++) {
             if (options.extraArgs.get(i).equals("-fill")) {
                 fill = Integer.parseInt(options.extraArgs.get(i + 1));
@@ -79,23 +65,13 @@ public class SacOutputer extends Outputer {
                 nogaps = true;
             }
             if (options.extraArgs.get(i).equals("-nometa")) {
-                noStaSrv = true;
+                noMeta = true;
             }
             if (options.extraArgs.get(i).equals("-sactrim")) {
                 sactrim = true;
             }
         }
-        if (stahost.equals("")) {
-            noStaSrv = true;
-        }
-        if (!noStaSrv && (stasrv == null || !stahost.equals(stasrvHost) || stasrvPort != staport)) {
-            stasrv = new SacPZ(stahost, pzunit);
-            stasrvHost = stahost;
-            stasrvPort = staport;
-            metaDataServer = new MetaDataServer(
-                    QueryProperties.getNeicMetadataServerIP(),
-                    QueryProperties.getNeicMetadataServerPort());
-        }
+
         // Use the span to populate a sac file
         GregorianCalendar start = new GregorianCalendar();
         start.setTimeInMillis(options.getBeginWithOffset().getMillis());
@@ -125,18 +101,24 @@ public class SacOutputer extends Outputer {
         sac.npts = span.getNsamp();
         PNZ pnz = null;
 
-        // Give a default if there is noStaSrv
+        // Get station meta data and possible repsonse info
+        // Give a default if there is noMeta
         StationMetaData md = new StationMetaData(network, code, component, location);
-        if (!noStaSrv) {
+        if (!noMeta) {
+
+            metaDataServer = new MetaDataServer(
+                    QueryProperties.getNeicMetadataServerIP(),
+                    QueryProperties.getNeicMetadataServerPort());
+
             String time = blks.get(0).getTimeString();
             time = time.substring(0, 4) + "," + time.substring(5, 8) + "-" + time.substring(9, 17);
 
-            if (sacpz) {
-                String s = stasrv.getSACResponse(lastComp, time, filename);  // write out the file too
+            if (options.sacpz) {
+                metaDataServer.getSACResponse(network, code, component, location, time, options.pzunit, filename + ".pz");
             }
 
             md = metaDataServer.getStationMetaData(network, code, component, location, time);
-        } 
+        }
 
         // Set the byteOrder based on native architecture and sac statics
         sac.nvhdr = 6;                // Only format supported
@@ -154,14 +136,12 @@ public class SacOutputer extends Outputer {
         sac.nzsec = span.getStart().get(Calendar.SECOND);
         sac.nzmsec = span.getStart().get(Calendar.MILLISECOND);
         sac.iztype = SacTimeSeries.IB;
-        
+
         sac.knetwk = network;
         sac.kstnm = code;
         sac.kcmpnm = component;
         sac.khole = location;
 
-        // TODO - could be pushed into a method that takes the sac and md
-        // classes and builds the SAC header?
         if (md.getLatitude() != Double.MIN_VALUE) {
             sac.stla = md.getLatitude();
         }

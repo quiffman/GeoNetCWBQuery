@@ -1,12 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package gov.usgs.anss.query;
 
 import gov.usgs.anss.util.StaSrv;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.StringReader;
 import java.util.logging.Logger;
 
@@ -17,26 +14,29 @@ import java.util.logging.Logger;
 public class MetaDataServer {
 
     private StaSrv stasrv;
-    // Hard coded - this is the units that the
-    // response is returned in.  We aren't going to
-    // work with the response and Rich said this was ok...
-    private String pzunit = "nm";
-    protected static final Logger logger = Logger.getLogger(SacPZ.class.getName());
+    private static final String pzunit = "nm";
+    protected static final Logger logger = Logger.getLogger(MetaDataServer.class.getName());
 
 
     static {
         logger.fine("$Id$");
     }
 
+    /**
+     *
+     * @param metaDataServerHost
+     * @param metaDataServerPort
+     */
     public MetaDataServer(String metaDataServerHost, int metaDataServerPort) {
         stasrv = new StaSrv(metaDataServerHost, metaDataServerPort);
     }
 
     /**
      *
-     * @param stationCode - the station code.  Must be padded to 5 char e.g., 'WEL  '.
      * @param network
+     * @param code 
      * @param component
+     * @param location
      * @param time - the time to retrieve the response at yyyy,ddd-hh:mm:ss or yyyy/mm/dd-hh:mm:ss
      * @return
      */
@@ -46,24 +46,7 @@ public class MetaDataServer {
             String component,
             String location,
             String time) {
-        // TODO pad the station code to 5 char left justified
-        String s = stasrv.getSACResponse(network.toUpperCase() + code.toUpperCase() + component.toUpperCase() + location, time, pzunit);
-
-        // Its not at all clear how this will get triggered
-        // there has to be message come back from the server for
-        // this to work...
-        int loop = 0;
-        while (s.indexOf("MetaDataServer not up") >= 0) {
-            logger.warning("MetaDataServer is not up - waiting for connection");
-            if (loop++ % 15 == 1) {
-                logger.warning("MetaDataServer is not up - waiting for connection");
-            }
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-            }
-            s = stasrv.getSACResponse(network.toUpperCase() + code.toUpperCase() + component.toUpperCase() + location, time, pzunit);
-        }
+        String s = getResponseData(network, code, component, location, time, pzunit);
 
         StationMetaData md = new StationMetaData(network, code, component, location);
 
@@ -101,5 +84,63 @@ public class MetaDataServer {
         }
 
         return md;
+    }
+
+    private String getResponseData(
+            String network,
+            String code,
+            String component,
+            String location,
+            String time,
+            String units) {
+        // TODO pad the station code to 5 char left justified
+        String s = stasrv.getSACResponse(network.toUpperCase() + code.toUpperCase() + component.toUpperCase() + location, time, units);
+
+        // Its not at all clear how this will get triggered
+        // there has to be message come back from the server for
+        // this to work...
+        int loop = 0;
+        while (s.indexOf("MetaDataServer not up") >= 0) {
+            logger.warning("MetaDataServer is not up - waiting for connection");
+            if (loop++ % 15 == 1) {
+                logger.warning("MetaDataServer is not up - waiting for connection");
+            }
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+            }
+            s = stasrv.getSACResponse(network.toUpperCase() + code.toUpperCase() + component.toUpperCase() + location, time, pzunit);
+        }
+        return s;
+    }
+
+
+    /**
+     *
+     * @param network
+     * @param code
+     * @param component
+     * @param location
+     * @param time
+     * @param units
+     * @param filename
+     */
+    public void getSACResponse(
+            String network,
+            String code,
+            String component,
+            String location,
+            String time,
+            String units,
+            String filename) {
+        String s = getResponseData(network, code, component, location, time, pzunit);
+       
+        try {
+            PrintWriter fout = new PrintWriter(filename);
+            fout.write(s);
+            fout.close();
+        } catch (IOException e) {
+            logger.severe("OUtput error writing sac response file " + filename + ".resp e=" + e.getMessage());
+        }
     }
 }

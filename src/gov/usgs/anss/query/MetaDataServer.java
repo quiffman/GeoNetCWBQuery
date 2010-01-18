@@ -5,6 +5,9 @@
 package gov.usgs.anss.query;
 
 import gov.usgs.anss.util.StaSrv;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.logging.Logger;
 
 /**
@@ -13,7 +16,7 @@ import java.util.logging.Logger;
  */
 public class MetaDataServer {
 
-    private StaSrv metaDataServer;
+    private StaSrv stasrv;
     // Hard coded - this is the units that the
     // response is returned in.  We aren't going to
     // work with the response and Rich said this was ok...
@@ -26,9 +29,8 @@ public class MetaDataServer {
     }
 
     public MetaDataServer(String metaDataServerHost, int metaDataServerPort) {
-        metaDataServer = new StaSrv(metaDataServerHost, metaDataServerPort);
+        stasrv = new StaSrv(metaDataServerHost, metaDataServerPort);
     }
-
 
     /**
      *
@@ -38,15 +40,14 @@ public class MetaDataServer {
      * @param time - the time to retrieve the response at yyyy,ddd-hh:mm:ss or yyyy/mm/dd-hh:mm:ss
      * @return
      */
-    protected String getSACResponse(
+    public StationMetaData getStationMetaData(
             String network,
-            String stationCode,
+            String code,
             String component,
             String location,
-            String time
-            ) {
-        // TODO don't know if this is case sensitive for code network etc.
-        String s = metaDataServer.getSACResponse(network.toUpperCase() + stationCode.toUpperCase() + component.toUpperCase() + location, time, pzunit);
+            String time) {
+        // TODO pad the station code to 5 char left justified
+        String s = stasrv.getSACResponse(network.toUpperCase() + code.toUpperCase() + component.toUpperCase() + location, time, pzunit);
         int loop = 0;
         while (s.indexOf("MetaDataServer not up") >= 0) {
             if (loop++ % 15 == 1) {
@@ -56,8 +57,34 @@ public class MetaDataServer {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
             }
-            s = metaDataServer.getSACResponse(network.toUpperCase() + stationCode.toUpperCase() + component.toUpperCase() + location, time, pzunit);
+            s = stasrv.getSACResponse(network.toUpperCase() + code.toUpperCase() + component.toUpperCase() + location, time, pzunit);
         }
-        return s;
+
+        StationMetaData md = new StationMetaData(network, code, component, location);
+
+        try {
+            BufferedReader in = new BufferedReader(new StringReader(s));
+            String line = "";
+            while ((line = in.readLine()) != null) {
+                if (line.indexOf("LAT-SEED") > 0) {
+                    md.setLatitude(Double.parseDouble(line.substring(15)));
+                } else if (line.indexOf("LONG-SEED") > 0) {
+                    md.setLongitude(Double.parseDouble(line.substring(15)));
+                } else if (line.indexOf("ELEV-SEED") > 0) {
+                    md.setElevation(Double.parseDouble(line.substring(15)));
+                } else if (line.indexOf("AZIMUTH") > 0) {
+                    md.setAzimuth(Double.parseDouble(line.substring(15)));
+                } else if (line.indexOf("DIP") > 0) {
+                    md.setDip(Double.parseDouble(line.substring(15)));
+                } else if (line.indexOf("DEPTH") > 0) {
+                    md.setDepth(Double.parseDouble(line.substring(15)));
+                }
+            }
+
+        } catch (IOException e) {
+            logger.severe("Error parsing metadata " + e.getMessage());
+        }
+
+        return md;
     }
 }

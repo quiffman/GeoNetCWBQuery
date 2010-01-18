@@ -36,7 +36,7 @@ sed -e 's/today=.*$//' $tmpdir/cwb-test-2.tmp > $tmpdir/cwb-test-2.out
 cat > $tmpdir/CWB.batch <<EOF
 -b "2009/01/01 00:00:00" -s "NZWLGT.LTZ40" -t sac -o $tmpdir/cwb-batch-test-1.out
 -b "2009/01/01 00:00:00" -s "NZWLGT.LTZ40" -d 600 -t sac -o "$tmpdir/%N-%n-%s-%c-%l-%Y-%y-%j-%J-%M-%D-%h-%m-%S%z-cwb-batch-test-2.out"
--b "2009/01/01 00:00:00" -s "NZWEL..HH[ENZ]..|NZBFZ..HHZ..|.*WAZ.*20" -d 300 -t sac -o "$tmpdir/%N-cwb-batch-test-3.out"
+-b "2009/01/01 00:00:00" -s "NZWEL..HH[ENZ]..|NZBFZ..HHZ..|.*WAZ.*20" -d 300 -t sac -sacpz nm -o "$tmpdir/%N-cwb-batch-test-3.out"
 -b "2009/01/01 00:00:00" -s "NZWLGT.BTZ40" -d 600 -t ms -o $tmpdir/cwb-batch-test-4.out
 -b "2009/01/01 00:00:00" -s "NZWLGT.BTZ40" -d 600 -t msz -o $tmpdir/cwb-batch-test-5.out
 -b "2009/01/01 00:00:00" -s "NZWLGT.BTZ40" -d 600 -t dcc -o $tmpdir/cwb-batch-test-6.out
@@ -53,11 +53,17 @@ b22223f4c94a56defdebdbba5aebf73f  $tmpdir/cwb-test-2.out
 cb20eb719832db4910a4d830f69c7a38  $tmpdir/cwb-batch-test-1.out
 47a7f0f4f157710697c8430f9b1eae29  $tmpdir/NZWLGTLTZ40-NZ-WLGT-LTZ-40-09-2009-001-2454833-01-01-00-00-00-cwb-batch-test-2.out
 72d35048a4ee43e91cf99857342478b1  $tmpdir/NZBFZ__HHZ10-cwb-batch-test-3.out
+9b5162f7b37d1aca09a2ee6f76d20bef  $tmpdir/NZBFZ__HHZ10-cwb-batch-test-3.out.pz
 9408af0c4071ad8cda3366df2245b6b2  $tmpdir/NZWAZ__LNE20-cwb-batch-test-3.out
+0445d9c358cc6bc9dc40a2a01a991c13  $tmpdir/NZWAZ__LNE20-cwb-batch-test-3.out.pz
 2557642ab3ab099c2c94de239f608025  $tmpdir/NZWAZ__LNZ20-cwb-batch-test-3.out
+f458036c9e64f4e65d3463eb22f5496b  $tmpdir/NZWAZ__LNZ20-cwb-batch-test-3.out.pz
 20ed04531f27198dc6c99401c1dea2f6  $tmpdir/NZWEL__HHE10-cwb-batch-test-3.out
+349d26ae2e633ecef530c7c6a3fe6793  $tmpdir/NZWEL__HHE10-cwb-batch-test-3.out.pz
 a074d2af7a574f226e87789ab39eadaf  $tmpdir/NZWEL__HHN10-cwb-batch-test-3.out
+edd387b552b4f9fae331cc1a036a5286  $tmpdir/NZWEL__HHN10-cwb-batch-test-3.out.pz
 20e616630aca460a026d5d3ad7722a44  $tmpdir/NZWEL__HHZ10-cwb-batch-test-3.out
+48c8362a4d2f843cb20eca5fc1e3cfbf  $tmpdir/NZWEL__HHZ10-cwb-batch-test-3.out.pz
 3b103d7bcbb9ac99d6de26026fc93cf9  $tmpdir/cwb-batch-test-4.out
 2c5ae4cc1bf1de7208ff62e65fa5b468  $tmpdir/cwb-batch-test-5.out
 757476816a0da1ec5922385a4b18987e  $tmpdir/cwb-batch-test-6.out

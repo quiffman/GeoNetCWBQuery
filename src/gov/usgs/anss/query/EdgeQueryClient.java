@@ -433,12 +433,6 @@ public class EdgeQueryClient {
                                         logger.finer("Found " + npur + " recs with on first block of 4096 valid");
                                         blks.trimToSize();
                                         //for(int i=0; i<blks.size(); i++) logger.finest(((MiniSeed) blks.get(i)).toString());
-                                        if (options.sacpz && out.getClass().getSimpleName().indexOf("SacOutputer") < 0) {   // if asked for write out the sac response file
-                                            String time = blks.get(0).getTimeString();
-                                            time = time.substring(0, 4) + "," + time.substring(5, 8) + "-" + time.substring(9, 17);
-                                            options.stasrv.getSACResponse(lastComp, options.getBeginAsString(), filename);
-                                        }
-
 										// TODO: Change the signature to pass options only once.
                                         out.makeFile(lastComp, filename, blks);
                                     }

@@ -84,10 +84,7 @@ public class EdgeQueryOptions {
 	public boolean perfMonitor = false;
 	public boolean chkDups = false;
 	public boolean sacpz = false;
-    // TODO - delete SacPZ
-	public SacPZ stasrv = null;
 	public String pzunit = "nm";
-	public String stahost = QueryProperties.getNeicMetadataServerIP();
 	private Quakeml event = null;
 	private long offset = 0;
 	private static Matcher quakeMlUriMatcher = Pattern.compile("%ref%").matcher(QueryProperties.getGeoNetQuakeMlUri());
@@ -170,7 +167,6 @@ public class EdgeQueryOptions {
 			} else if (args[i].equals("-sacpz")) {
 				sacpz = true;
 				pzunit = args[i + 1];
-				stasrv = new SacPZ(stahost, pzunit);
 				i++;
 			} else if (args[i].equals("-si")) {
 				showIllegals = true;
@@ -239,11 +235,6 @@ public class EdgeQueryOptions {
 		
 		if (getSeedname() == null) {
 			logger.severe("-s SCNL is not optional, you must specify a seedname.");
-			return false;
-		}
-
-		if (stahost == null || stahost.equals("")) {
-			logger.warning("no metadata server set.");
 			return false;
 		}
 

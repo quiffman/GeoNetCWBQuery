@@ -6,8 +6,7 @@ package gov.usgs.anss.query;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -35,7 +34,7 @@ public class EdgeQueryOptionsParseAndValidateTest {
 			{new EdgeQueryOptions("-s \"NZWLGT\""), false, "should fail without begin time."},
 			{new EdgeQueryOptions("-b \"2009/01/01 00:00:00\""), false, "seedname is not optional."},
 
-			// Ultimately this will probably have to go...
+			// Ultimately this will probably have to go... Unless we do the TODOs
 			{new EdgeQueryOptions("-s \"NZWLGT\" -event 3134964"), true, "seedname and event options should be valid."},
 
 			{new EdgeQueryOptions("-s \"NZWLGT\" -b \"2009/01/01 00:00:00\" -t NULL"), true, "type null is legal."},
@@ -45,6 +44,11 @@ public class EdgeQueryOptionsParseAndValidateTest {
 		});
     }
 
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		// TODO: Start some embedded http server for static quakeml files.
+	}
+
 	private EdgeQueryOptions options;
 	private boolean valid;
 	private String message;
@@ -53,6 +57,7 @@ public class EdgeQueryOptionsParseAndValidateTest {
         this.options = options;
         this.valid = valid;
 		this.message = message;
+		// TODO: set the quakeml uri to the local server.
     }
 
     @Test

@@ -48,7 +48,7 @@ public class EdgeQueryOptionsTest {
 	@Test
 	public void testParse() {
 		System.out.println("parse");
-		String[] args = new String[0];;
+		String[] args = new String[0];
 		EdgeQueryOptions instance = new EdgeQueryOptions();
 		instance.parse(args);
 		// TODO review the generated test code and remove the default call to fail.

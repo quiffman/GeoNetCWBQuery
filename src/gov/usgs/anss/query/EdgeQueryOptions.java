@@ -13,6 +13,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import nz.org.geonet.quakeml.v1_0_1.client.QuakemlFactory;
 import nz.org.geonet.quakeml.v1_0_1.client.QuakemlUtils;
 import nz.org.geonet.quakeml.v1_0_1.domain.Quakeml;
@@ -87,6 +89,7 @@ public class EdgeQueryOptions {
 	public String stahost = QueryProperties.getNeicMetadataServerIP();
 	private Quakeml event = null;
 	private long offset = 0;
+	private static Matcher quakeMlUriMatcher = Pattern.compile("%ref%").matcher(QueryProperties.getGeoNetQuakeMlUri());
 
 	/**
 	 * Parses known args into object fields. Does some argument validation and
@@ -603,7 +606,9 @@ public class EdgeQueryOptions {
 	 * @param event the public ID of an event to set
 	 */
 	public void setEvent(String publicId) {
-		this.event = new QuakemlFactory().getQuakemlByEventReference(publicId, null, null);
+		this.event = new QuakemlFactory().getQuakeml(
+				quakeMlUriMatcher.replaceAll(publicId),
+				null, null);
 		if (event == null) {
 			logger.severe("failed to retrieve details for event ID " + publicId);
 		}

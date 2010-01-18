@@ -41,4 +41,8 @@ public class QueryProperties {
     public static String getUsage() {
         return props.getString("usage");
     }
+
+    public static String getGeoNetQuakeMlUri() {
+        return props.getString("geonet-quakeml-uri");
+    }
 }

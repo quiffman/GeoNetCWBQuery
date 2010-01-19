@@ -56,6 +56,14 @@ public class EdgeQueryOptions {
     private static DateTimeFormatter parseBeginFormatDoy = DateTimeFormat.forPattern(beginFormatDoy).withZone(DateTimeZone.forID("UTC"));
 
 	public String host = QueryProperties.getGeoNetCwbIP();
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
 	public int port = QueryProperties.getGeoNetCwbPort();
 
 	public String[] args;

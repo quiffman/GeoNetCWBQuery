@@ -21,98 +21,57 @@ import org.joda.time.DateTime;
  */
 public class CwbHoldings {
 
-    private Socket ds;
-    private InputStream in;
-    private OutputStream out;
+//    private Socket ds;
+//    private InputStream in;
+//    private OutputStream out;
+
+    private String cwbHost;
+    private int cwbPort;
+
     protected static final Logger logger = Logger.getLogger(CwbHoldings.class.getName());
 
-    public CwbHoldings(String CwbHost, int CwbPort) {
-        try {
-            ds = new Socket(CwbHost, CwbPort);
-            ds.setReceiveBufferSize(512000);
-            in = ds.getInputStream();        // Get input and output streams
-            out = ds.getOutputStream();
-
-        } catch (UnknownHostException ex) {
-            Logger.getLogger(CwbHoldings.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(CwbHoldings.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    public CwbHoldings(String cwbHost, int cwbPort) {
+        this.cwbHost = cwbHost;
+        this.cwbPort = cwbPort;
     }
 
     public String listChannels(DateTime begin, Double duration) {
         EdgeQueryOptions options = new EdgeQueryOptions();
         options.lschannels = true;
         options.setBegin(begin);
+        options.setHost(cwbHost);
+        options.setPort(cwbPort);
         options.setDuration(duration);
-        String s = listQuery(options);
+        String s = EdgeQueryClient.listQuery(options);
 
         BufferedReader sr = new BufferedReader(new StringReader(s));
 
         String nextLine = null;
         try {
             while ((nextLine = sr.readLine()) != null) {
-                
-                if (nextLine.startsWith("There are") || nextLine.isEmpty()) {
-                    continue;
+
+                if (lscToNscl(nextLine) != null) {
+                    System.out.println("bob: " + lscToNscl(nextLine));
                 }
-                System.out.println("bob: " + lscToNscl(nextLine));
             }
         } catch (IOException ex) {
             Logger.getLogger(CwbHoldings.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        return listQuery(options);
+        return EdgeQueryClient.listQuery(options);
     }
 
-public static String lscToNscl (String lsc) {
-    return lsc.substring(0, 12);
-}
+    public static String lscToNscl(String lsc) {
+        String r;
 
-
-    // Basically cut and paste out of EdgeQueryClient
-    private String listQuery(EdgeQueryOptions options) {
-
-        byte[] b = new byte[4096];
-        String line = "";
-        //ds.setTcpNoDelay(true);
-
-        if (options.exclude != null) {
-            line = "'-el' '" + options.exclude + "' ";
+        if (lsc.startsWith("There are") || lsc.isEmpty()) {
+            r = null;
         } else {
-            line = "";
-        }
-        if (options.getBegin() != null) {
-            line += "'-b' '" + options.getBeginAsString() + "' ";
-        }
-        if (options.getDuration() != null) {
-            line += "'-d' '" + options.getDuration() + "' ";
-        }
-        if (options.lschannels) {
-            if (options.showIllegals) {
-                line += "'-si' ";
-            }
-            line += "'-lsc'\n";
-        } else {
-            line += "'-ls'\n";
+            r = lsc.substring(0, 12);
         }
 
-        logger.config("line=" + line + ":");
-        try {
-            out.write(line.getBytes());
-        } catch (IOException ex) {
-            Logger.getLogger(CwbHoldings.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        StringBuffer sb = new StringBuffer(100000);
-        int len = 0;
-        try {
-            while ((len = in.read(b, 0, 512)) > 0) {
-                sb.append(new String(b, 0, len));
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(CwbHoldings.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return sb.toString();
+        return r;
     }
+
+
 }

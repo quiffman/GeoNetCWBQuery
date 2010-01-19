@@ -41,6 +41,8 @@ public class MetaDataServer {
         stasrv = new StaSrv(metaDataServerHost, metaDataServerPort);
     }
 
+    // TODO - this is really the component meta data - should probably
+    // rename it.
     /**
      *
      * @param network
@@ -104,7 +106,7 @@ public class MetaDataServer {
             String location,
             DateTime date,
             String units) {
-        // TODO pad the station code to 5 char left justified
+        // TODO - should be able to use NSCL object here eventually.
         String s = stasrv.getSACResponse(network.toUpperCase() + code.toUpperCase() + component.toUpperCase() + location, 
                 parseBeginFormat.withZone(DateTimeZone.UTC).print(date),
                 units);

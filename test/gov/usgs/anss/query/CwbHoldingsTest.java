@@ -39,6 +39,8 @@ public class CwbHoldingsTest {
         assertTrue("lsc 2", CwbHoldings.lscToNscl("NZTSZ  ACE01 #days=1    09_001").equals("NZTSZ  ACE01"));
         assertTrue("lsc 3", CwbHoldings.lscToNscl("NZTSZ  HHE10 #days=1    09_001").equals("NZTSZ  HHE10"));
         assertTrue("lsc 4", CwbHoldings.lscToNscl("NZTSZ  HHN10 #days=1    09_001").equals("NZTSZ  HHN10"));
+        assertNull("Empty string", CwbHoldings.lscToNscl(""));
+        assertNull("There are...", CwbHoldings.lscToNscl("There are 248 stations"));
     }
 
     @Test

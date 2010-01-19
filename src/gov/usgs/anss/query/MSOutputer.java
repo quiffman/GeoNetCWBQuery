@@ -29,7 +29,7 @@ public class MSOutputer extends Outputer {
     }
 
 
-    public void makeFile(String lastComp, String filename,
+    public void makeFile(SeedName nscl, String filename,
 			ArrayList<MiniSeed> blks) throws IOException {
         MiniSeed ms2 = null;
         if (options.filemask.equals("%N")) {

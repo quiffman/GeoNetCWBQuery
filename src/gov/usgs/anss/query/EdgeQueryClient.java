@@ -433,7 +433,7 @@ public class EdgeQueryClient {
                                         blks.trimToSize();
                                         //for(int i=0; i<blks.size(); i++) logger.finest(((MiniSeed) blks.get(i)).toString());
                                         // TODO: Change the signature to pass options only once.
-                                        out.makeFile(lastComp, filename, blks);
+                                        out.makeFile(SeedName.nsclStringToSeedName(lastComp), filename, blks);
                                     }
                                 }
                                 maxTime = 0;

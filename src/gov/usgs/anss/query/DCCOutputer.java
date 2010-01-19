@@ -103,7 +103,7 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
 		this.options = options;
     }
 
-    public void makeFile(String comp, String filename,
+    public void makeFile(SeedName nscl, String filename,
 			ArrayList<MiniSeed> blks) throws IOException {
         MiniSeed ms2 = null;
         frames = new byte[4096 - 64];   // scratch space for decompression
@@ -177,7 +177,7 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
         // Some of the early Q330 data did not put Husec in Mini-seed but truncated MS.  Reverse this process
         boolean q330 = false;
         for (int i = 0; i < Q330S.length; i++) {
-            if (comp.substring(2, 7).trim().equals(Q330S[i])) {
+            if (nscl.getStation().trim().equals(Q330S[i])) {
                 q330 = true;
                 break;
             }

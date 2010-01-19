@@ -28,7 +28,7 @@ abstract public class Outputer {
 	 * the main routine gives an UNSORTED list in blks.  If it needs to be sorted call
      * Collections.sort(blks);
      */
-    abstract public void makeFile(String comp, String filename,
+    abstract public void makeFile(SeedName nscl, String filename,
 			ArrayList<MiniSeed> blks) throws IOException;
 
       /** convert to hex string

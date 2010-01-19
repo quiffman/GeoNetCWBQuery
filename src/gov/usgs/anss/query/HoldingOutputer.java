@@ -32,7 +32,7 @@ public class HoldingOutputer extends Outputer {
 		this.options = options;
     }
 
-    public void makeFile(String comp, String filename,
+    public void makeFile(SeedName nscl, String filename,
 			ArrayList<MiniSeed> blks) throws IOException {
 
         MiniSeed ms2 = null;

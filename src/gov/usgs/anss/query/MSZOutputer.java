@@ -40,7 +40,7 @@ public class MSZOutputer extends Outputer {
     }
 
 
-    public void makeFile(String lastComp, String filename,
+    public void makeFile(SeedName nscl, String filename,
 			ArrayList<MiniSeed> blks) throws IOException {
 
         // Process the args for things that affect us
@@ -126,7 +126,7 @@ public class MSZOutputer extends Outputer {
             long expected = runs.get(0).getMS(0).getTimeInMillis();
             long today = expected;
             if (expected % 86400000L > gapThreshold) {
-                logger.info("Start Day Gap : (" + ((expected % 86400000L) / 1000.) + ")    " + lastComp);
+                logger.info("Start Day Gap : (" + ((expected % 86400000L) / 1000.) + ")    " + nscl);
             }
             for (int i = 0; i < runs.size(); i++) {
                 if (hs != null) {
@@ -165,14 +165,14 @@ public class MSZOutputer extends Outputer {
                             Integer.toString(msStart.get(Calendar.MILLISECOND)) + " to " +
                             nextStartStr[1] + " " + nextStartStr[2] + " " + nextStartStr[3] + " " + nextStartStr[5] + " " +
                             Integer.toString(msEnd.get(Calendar.MILLISECOND)) +
-                            " (" + df3.format((msEnd.getTimeInMillis() - msStart.getTimeInMillis()) / 1000.) + " secs)   " + lastComp);
+                            " (" + df3.format((msEnd.getTimeInMillis() - msStart.getTimeInMillis()) / 1000.) + " secs)   " + nscl);
 
                 }
                 expected = runs.get(i).getMS(runs.get(i).getNBlocks() - 1).getNextExpectedTimeInMillis();
             }
             long gp = ((today / 86400000L + 1) * 86400000L) - expected;
             if (gp > gapThreshold) {
-                logger.info("End Day Gap : (" + (gp / 1000.) + ")     " + lastComp);
+                logger.info("End Day Gap : (" + (gp / 1000.) + ")     " + nscl);
             }
             logger.fine("expected=" + expected + " bound=" + ((today / 86400000L + 1) * 86400000L) + " gp=" + gp);
 
@@ -195,7 +195,7 @@ public class MSZOutputer extends Outputer {
         MiniSeedOutputFile outms = new MiniSeedOutputFile(filename);
         MiniSeed ms = (MiniSeed) blks.get(0);
         GregorianCalendar st = span.getStart();
-        RawToMiniSeed rwms = new RawToMiniSeed(lastComp, ms.getRate(),
+        RawToMiniSeed rwms = new RawToMiniSeed(nscl.toString(), ms.getRate(),
                 options.blocksize / 64 - 1,
                 ms.getYear(), ms.getDay(),
                 (int) ((st.getTimeInMillis() % 86400000L) / 1000L),

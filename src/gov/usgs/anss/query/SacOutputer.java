@@ -38,7 +38,7 @@ public class SacOutputer extends Outputer {
         this.options = options;
     }
 
-    public void makeFile(String lastComp, String filename,
+    public void makeFile(SeedName nscl, String filename,
             ArrayList<MiniSeed> blks) throws IOException {
 
         // TODO - these could be in an argument object?

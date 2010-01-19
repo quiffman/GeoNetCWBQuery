@@ -9,7 +9,7 @@ package gov.usgs.anss.query.metadata;
  *
  * @author geoffc
  */
-public class StationMetaData {
+public class ChannelMetaData {
 
     private String code;
 
@@ -136,7 +136,7 @@ public class StationMetaData {
         this.azimuth = azimuth;
     }
 
-    public StationMetaData(String network, String code, String component, String location) {
+    public ChannelMetaData(String network, String code, String component, String location) {
         this.code = code;
         this.network = network;
         this.component = component;

@@ -18,12 +18,12 @@ import static org.junit.Assert.*;
  *
  * @author geoffc
  */
-public class StationMetaDataTest {
+public class ChannelMetaDataTest {
 
     private static MetaDataServer metaDataServer;
     private static DateTimeZone tz = DateTimeZone.forID("UTC");
 
-    public StationMetaDataTest() {
+    public ChannelMetaDataTest() {
     }
 
     @BeforeClass
@@ -51,7 +51,7 @@ public class StationMetaDataTest {
     // Can we stub the server?
     @Test
     public void testGetStationMetaData() {
-        StationMetaData md = metaDataServer.getStationMetaData("NZ", "WEL  ", "HHZ", "10", 
+        ChannelMetaData md = metaDataServer.getChannelMetaData("NZ", "WEL  ", "HHZ", "10",
                 new DateTime(2009, 1, 1, 11, 11, 11, 0, tz));
         assertTrue("Network ", md.getNetwork().equals("NZ"));
         assertTrue("Code ", md.getCode().equals("WEL  "));
@@ -68,7 +68,7 @@ public class StationMetaDataTest {
     // Can we stub the server?
     @Test
     public void testGetStationMetaDataNull() {
-        StationMetaData md = metaDataServer.getStationMetaData("NZ", "ZZZZZ", "HHZ", "10", 
+        ChannelMetaData md = metaDataServer.getChannelMetaData("NZ", "ZZZZZ", "HHZ", "10",
                 new DateTime(2009, 1, 1, 11, 11, 11, 0, tz));
         assertTrue("Network ", md.getNetwork().equals("NZ"));
         assertTrue("Code ", md.getCode().equals("ZZZZZ"));

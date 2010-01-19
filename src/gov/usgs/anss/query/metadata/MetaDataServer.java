@@ -52,7 +52,7 @@ public class MetaDataServer {
      * @param date
      * @return
      */
-    public StationMetaData getStationMetaData(
+    public ChannelMetaData getChannelMetaData(
             String network,
             String code,
             String component,
@@ -61,7 +61,7 @@ public class MetaDataServer {
         System.out.println(parseBeginFormat.withZone(DateTimeZone.UTC).print(date));
         String s = getResponseData(network, code, component, location, date, pzunit);
 
-        StationMetaData md = new StationMetaData(network, code, component, location);
+        ChannelMetaData md = new ChannelMetaData(network, code, component, location);
 
         try {
             BufferedReader in = new BufferedReader(new StringReader(s));

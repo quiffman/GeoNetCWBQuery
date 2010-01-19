@@ -8,7 +8,7 @@
  */
 package gov.usgs.anss.query;
 
-import gov.usgs.anss.query.metadata.StationMetaData;
+import gov.usgs.anss.query.metadata.ChannelMetaData;
 import gov.usgs.anss.query.metadata.MetaDataServer;
 import java.util.GregorianCalendar;
 import java.util.Calendar;
@@ -105,7 +105,7 @@ public class SacOutputer extends Outputer {
 
         // Get station meta data and repsonse info (if requested)
         // Give a default if there is noMeta
-        StationMetaData md = new StationMetaData(network, code, component, location);
+        ChannelMetaData md = new ChannelMetaData(network, code, component, location);
         if (!noMeta) {
 
             metaDataServer = new MetaDataServer(
@@ -119,7 +119,7 @@ public class SacOutputer extends Outputer {
                 metaDataServer.getSACResponse(network, code, component, location, options.getBegin(), options.pzunit, filename + ".pz");
             }
 
-            md = metaDataServer.getStationMetaData(network, code, component, location, options.getBegin());
+            md = metaDataServer.getChannelMetaData(network, code, component, location, options.getBegin());
         }
 
         // Set the byteOrder based on native architecture and sac statics

@@ -27,6 +27,13 @@ public class SeedName {
 		}
 	}
 
+	/**
+	 * TODO: handle whitespace and/or wildcards...?
+	 * @param network
+	 * @param station
+	 * @param channel
+	 * @param location
+	 */
 	public SeedName(String network, String station, String channel, String location) {
 		this.network = network;
 		this.station = station;
@@ -107,9 +114,20 @@ public class SeedName {
 		this.location = location;
 	}
 
+	/**
+	 * True if both SeedName objects are not null and both NSCL String
+	 * components are equal.
+	 * Throws an NullPointerException if any of the NSCL components in this are null.
+	 * @param obj
+	 * @return
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		SeedName other = (SeedName) obj;
+		if (other == null) {
+			return false;
+		}
+
 		return this.network.equals(other.network) &&
 				this.station.equals(other.station) &&
 				this.channel.equals(other.channel) &&

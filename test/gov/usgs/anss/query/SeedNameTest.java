@@ -169,12 +169,35 @@ public class SeedNameTest {
 	public void testEquals() {
 		System.out.println("equals");
 		Object obj = null;
-		SeedName instance = null;
+		SeedName instance = new SeedName("NZ", "WEL  ", "BHZ", "10");
 		boolean expResult = false;
 		boolean result = instance.equals(obj);
-		assertEquals(expResult, result);
-		// TODO review the generated test code and remove the default call to fail.
-		fail("The test case is a prototype.");
+		assertEquals("in-equal when other SeedName is null.", expResult, result);
+
+		obj = new SeedName("NZ", "WEL  ", "BHZ", "10");
+		expResult = true;
+		result = instance.equals(obj);
+		assertEquals("equal when all NSCL components are equal.", expResult, result);
+
+		obj = new SeedName("", "WEL  ", "BHZ", "10");
+		expResult = false;
+		result = instance.equals(obj);
+		assertEquals("unmatching network.", expResult, result);
+
+		obj = new SeedName("NZ", "", "BHZ", "10");
+		expResult = false;
+		result = instance.equals(obj);
+		assertEquals("unmatching station.", expResult, result);
+
+		obj = new SeedName("NZ", "WEL  ", "", "10");
+		expResult = false;
+		result = instance.equals(obj);
+		assertEquals("unmatching channel.", expResult, result);
+
+		obj = new SeedName("", "WEL  ", "BHZ", "");
+		expResult = false;
+		result = instance.equals(obj);
+		assertEquals("unmatching location.", expResult, result);
 	}
 
 	/**

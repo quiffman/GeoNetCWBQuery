@@ -42,12 +42,12 @@ public class SacOutputer extends Outputer {
             ArrayList<MiniSeed> blks) throws IOException {
 
         // TODO - these could be in an argument object?
-        String network = lastComp.substring(0, 2);
-        String code = lastComp.substring(2, 7);
-        String component = lastComp.substring(7, 10);
-        String location = lastComp.substring(10, 12);
+//        String network = lastComp.substring(0, 2);
+//        String code = lastComp.substring(2, 7);
+//        String component = lastComp.substring(7, 10);
+//        String location = lastComp.substring(10, 12);
 
-        // Process the args for things that affect us
+              // Process the args for things that affect us
         if (blks.size() == 0) {
             return;    // no data to save
         }
@@ -89,7 +89,7 @@ public class SacOutputer extends Outputer {
         int noval = span.getNMissingData();
 
         if (nogaps && span.hasGapsBeforeEnd()) {
-            logger.warning("  ** " + lastComp + " has gaps - discarded # missing =" + noval);
+            logger.warning("  ** " + nscl.toString() + " has gaps - discarded # missing =" + noval);
             return;
         }
         if (options.filemask.equals("%N")) {
@@ -105,7 +105,7 @@ public class SacOutputer extends Outputer {
 
         // Get station meta data and repsonse info (if requested)
         // Give a default if there is noMeta
-        ChannelMetaData md = new ChannelMetaData(network, code, component, location);
+        ChannelMetaData md = new ChannelMetaData(nscl);
         if (!noMeta) {
 
             metaDataServer = new MetaDataServer(
@@ -116,10 +116,10 @@ public class SacOutputer extends Outputer {
             time = time.substring(0, 4) + "," + time.substring(5, 8) + "-" + time.substring(9, 17);
 
             if (options.sacpz) {
-                metaDataServer.getSACResponse(network, code, component, location, options.getBegin(), options.pzunit, filename + ".pz");
+                metaDataServer.getSACResponse(nscl, options.getBegin(), options.pzunit, filename + ".pz");
             }
 
-            md = metaDataServer.getChannelMetaData(network, code, component, location, options.getBegin());
+            md = metaDataServer.getChannelMetaData(nscl, options.getBegin());
         }
 
         // Set the byteOrder based on native architecture and sac statics
@@ -139,10 +139,10 @@ public class SacOutputer extends Outputer {
         sac.nzmsec = span.getStart().get(Calendar.MILLISECOND);
         sac.iztype = SacTimeSeries.IB;
 
-        sac.knetwk = network;
-        sac.kstnm = code;
-        sac.kcmpnm = component;
-        sac.khole = location;
+        sac.knetwk = nscl.getNetwork();
+        sac.kstnm = nscl.getStation();
+        sac.kcmpnm = nscl.getChannel();
+        sac.khole = nscl.getLocation();
 
         if (md.getLatitude() != Double.MIN_VALUE) {
             sac.stla = md.getLatitude();

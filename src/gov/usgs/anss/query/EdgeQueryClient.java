@@ -165,14 +165,6 @@ public class EdgeQueryClient {
     public EdgeQueryClient() {
     }
 
-    public static String listChannels(DateTime begin, Double duration) {
-        EdgeQueryOptions options = new EdgeQueryOptions();
-        options.lschannels = true;
-        options.setBegin(begin);
-        options.setDuration(duration);
-        return listQuery(options);
-    }
-
     public static String listQuery(EdgeQueryOptions options) {
         try {
             String line = "";

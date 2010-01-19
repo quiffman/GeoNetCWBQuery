@@ -1,16 +1,10 @@
 package gov.usgs.anss.query.metadata;
 
-import gov.usgs.anss.query.EdgeQueryOptions;
 import gov.usgs.anss.util.StaSrv;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringReader;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;

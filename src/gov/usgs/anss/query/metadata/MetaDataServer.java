@@ -1,5 +1,6 @@
 package gov.usgs.anss.query.metadata;
 
+import gov.usgs.anss.query.SeedName;
 import gov.usgs.anss.util.StaSrv;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -52,16 +53,11 @@ public class MetaDataServer {
      * @param date
      * @return
      */
-    public ChannelMetaData getChannelMetaData(
-            String network,
-            String code,
-            String component,
-            String location,
-            DateTime date) {
+    public ChannelMetaData getChannelMetaData(SeedName nscl,  DateTime date) {
         System.out.println(parseBeginFormat.withZone(DateTimeZone.UTC).print(date));
-        String s = getResponseData(network, code, component, location, date, pzunit);
+        String s = getResponseData(nscl, date, pzunit);
 
-        ChannelMetaData md = new ChannelMetaData(network, code, component, location);
+        ChannelMetaData md = new ChannelMetaData(nscl);
 
         try {
             BufferedReader in = new BufferedReader(new StringReader(s));
@@ -87,27 +83,21 @@ public class MetaDataServer {
         }
 
         if (md.getLatitude() == Double.MIN_VALUE && md.getLongitude() == Double.MIN_VALUE) {
-            logger.warning("      ***** " + network + code + component + location +
+            logger.warning("      ***** " + nscl.toString() +
                     " Did not get station location.  Server is down or missing meta data?");
         }
 
         if (md.getAzimuth() == Double.MIN_VALUE && md.getDip() == Double.MIN_VALUE) {
-            logger.warning("      ***** " + network + code + component + location +
+            logger.warning("      ***** " + nscl.toString() +
                     " Did not get component orientation.  Server is down or missing meta data?");
         }
 
         return md;
     }
 
-    private String getResponseData(
-            String network,
-            String code,
-            String component,
-            String location,
-            DateTime date,
-            String units) {
+    private String getResponseData(SeedName nscl, DateTime date, String units) {
         // TODO - should be able to use NSCL object here eventually.
-        String s = stasrv.getSACResponse(network.toUpperCase() + code.toUpperCase() + component.toUpperCase() + location, 
+        String s = stasrv.getSACResponse(nscl.toString(),
                 parseBeginFormat.withZone(DateTimeZone.UTC).print(date),
                 units);
 
@@ -124,7 +114,7 @@ public class MetaDataServer {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
             }
-            s = stasrv.getSACResponse(network.toUpperCase() + code.toUpperCase() + component.toUpperCase() + location, parseBeginFormat.withZone(DateTimeZone.UTC).print(date), pzunit);
+            s = stasrv.getSACResponse(nscl.toString(), parseBeginFormat.withZone(DateTimeZone.UTC).print(date), pzunit);
         }
         return s;
     }
@@ -140,14 +130,11 @@ public class MetaDataServer {
      * @param filename
      */
     public void getSACResponse(
-            String network,
-            String code,
-            String component,
-            String location,
+            SeedName nscl,
             DateTime date,
             String units,
             String filename) {
-        String s = getResponseData(network, code, component, location, date, pzunit);
+        String s = getResponseData(nscl, date, pzunit);
 
         try {
             PrintWriter fout = new PrintWriter(filename);

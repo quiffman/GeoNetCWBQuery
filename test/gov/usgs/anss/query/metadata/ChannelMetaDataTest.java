@@ -51,7 +51,7 @@ public class ChannelMetaDataTest {
     // Can we stub the server?
     @Test
     public void testGetStationMetaData() {
-        ChannelMetaData md = metaDataServer.getChannelMetaData("NZ", "WEL  ", "HHZ", "10",
+        ChannelMetaData md = metaDataServer.getChannelMetaData(new SeedName("NZ", "WEL  ", "HHZ", "10"),
                 new DateTime(2009, 1, 1, 11, 11, 11, 0, tz));
         assertTrue("Network ", md.getNetwork().equals("NZ"));
         assertTrue("Code ", md.getCode().equals("WEL  "));
@@ -68,7 +68,7 @@ public class ChannelMetaDataTest {
     // Can we stub the server?
     @Test
     public void testGetStationMetaDataNull() {
-        ChannelMetaData md = metaDataServer.getChannelMetaData("NZ", "ZZZZZ", "HHZ", "10",
+        ChannelMetaData md = metaDataServer.getChannelMetaData(new SeedName("NZ", "ZZZZZ", "HHZ", "10"),
                 new DateTime(2009, 1, 1, 11, 11, 11, 0, tz));
         assertTrue("Network ", md.getNetwork().equals("NZ"));
         assertTrue("Code ", md.getCode().equals("ZZZZZ"));

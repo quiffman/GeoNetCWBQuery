@@ -2,8 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package gov.usgs.anss.query.metadata;
+
+import gov.usgs.anss.query.SeedName;
 
 /**
  *
@@ -21,7 +22,6 @@ public class ChannelMetaData {
     public String getCode() {
         return code;
     }
-
     private String network;
 
     /**
@@ -92,7 +92,6 @@ public class ChannelMetaData {
     public double getAzimuth() {
         return azimuth;
     }
-
     private double dip = Double.MIN_VALUE;
 
     /**
@@ -143,6 +142,13 @@ public class ChannelMetaData {
         this.location = location;
     }
 
+    public ChannelMetaData(SeedName nscl) {
+        this.code = nscl.getStation();
+        this.network = nscl.getNetwork();
+        this.component = nscl.getChannel();
+        this.location = nscl.getLocation();
+    }
+
     public void setComponent(String component) {
         this.component = component;
     }
@@ -170,5 +176,4 @@ public class ChannelMetaData {
     public void setCode(String code) {
         this.code = code;
     }
-
 }

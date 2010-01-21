@@ -10,6 +10,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
@@ -259,13 +260,15 @@ public class EdgeQueryOptions {
 			}
 		}
 
-		if (getType() == OutputType.sac && getCompareLength() < 10) {
-			logger.severe("\n    ***** Sac files must have names including the channel! *****");
-			return false;
-		}
-		if (getType() == OutputType.msz && getCompareLength() < 10) {
-			logger.severe("\n    ***** msz files must have names including the channel! *****");
-			return false;
+		if (getNsclComparator() == SeedName.NetworkComparator || getNsclComparator() == SeedName.StationComparator) {
+			if (getType() == OutputType.sac) {
+				logger.severe("\n    ***** Sac files must have names including the channel! *****");
+				return false;
+			}
+			if (getType() == OutputType.msz) {
+				logger.severe("\n    ***** msz files must have names including the channel! *****");
+				return false;
+			}
 		}
 
 		// TODO more checking to come.
@@ -292,25 +295,26 @@ public class EdgeQueryOptions {
 		return null;
 	}
 
-	public int getCompareLength() {
-		// The length at which our compare for changes depends on the output file mask
-		int compareLength = 12;
+	public Comparator getNsclComparator() {
+		// default to LocationComparator
+		Comparator comparator = SeedName.LocationComparator;
 		if (filemask.indexOf("%n") >= 0) {
-			compareLength = 2;
+			comparator = SeedName.NetworkComparator;
 		}
 		if (filemask.indexOf("%s") >= 0) {
-			compareLength = 7;
+			comparator = SeedName.StationComparator;
 		}
 		if (filemask.indexOf("%c") >= 0) {
-			compareLength = 10;
-		}
-		if (filemask.indexOf("%l") >= 0) {
-			compareLength = 12;
+			comparator = SeedName.ChannelComparator;
 		}
 		if (filemask.indexOf("%N") >= 0) {
-			compareLength = 12;
+			comparator = SeedName.LocationComparator;
 		}
-		return compareLength;
+		if (filemask.indexOf("%N") >= 0) {
+			comparator = SeedName.LocationComparator;
+		}
+		
+		return comparator;
 	}
 
 	/**

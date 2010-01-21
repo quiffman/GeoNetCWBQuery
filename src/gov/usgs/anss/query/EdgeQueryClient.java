@@ -20,6 +20,7 @@ import java.util.Collections;
 
 import gov.usgs.anss.util.SeedUtil;
 import java.text.DecimalFormat;
+import java.util.Comparator;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -301,7 +302,7 @@ public class EdgeQueryClient {
                 }
 
                 // The length at which our compare for changes depends on the output file mask
-                int compareLength = options.getCompareLength();
+                Comparator nsclComparator = options.getNsclComparator();
 
                 long maxTime = 0;
                 int ndups = 0;
@@ -312,7 +313,7 @@ public class EdgeQueryClient {
                     boolean perfStart = true;
                     outtcp.write(line.getBytes());
                     int iblk = 0;
-                    String lastComp = "            ";
+                    SeedName nscl = SeedName.nsclStringToSeedName("            ");
                     boolean eof = false;
                     MiniSeed ms = null;
                     int npur = 0;
@@ -358,8 +359,8 @@ public class EdgeQueryClient {
                                 System.out.print("\r            \r" + iblk + "...");
                             }
 
-                            if (eof || (lastComp.trim().length() > 0 &&
-                                    (ms == null ? true : !lastComp.substring(0, compareLength).equals(ms.getSeedName().substring(0, compareLength))))) {
+                            if (eof || (nscl != null &&
+                                    (ms == null ? true : nsclComparator.compare(nscl, SeedName.nsclStringToSeedName(ms.getSeedName())) != 0))) {
                                 msTransfer += (System.currentTimeMillis() - startPhase);
                                 startPhase = System.currentTimeMillis();
                                 if (!options.quiet) {
@@ -375,7 +376,7 @@ public class EdgeQueryClient {
                                         DateTime dt = new DateTime().withZone(DateTimeZone.forID("UTC"));
 
 
-                                        logger.info(hmsFormat.print(dt.getMillis()) + " Query on " + lastComp.substring(0, compareLength) + " " +
+                                        logger.info(hmsFormat.print(dt.getMillis()) + " Query on " + nscl + " " +
                                                 df6.format(blks.size()) + " mini-seed blks " +
                                                 (blks.get(0) == null ? "Null" : ((MiniSeed) blks.get(0)).getTimeString()) + " " +
                                                 (blks.get((blks.size() - 1)) == null ? "Null" : (blks.get(blks.size() - 1)).getEndTimeString()) + " " +
@@ -400,9 +401,9 @@ public class EdgeQueryClient {
                                                 options.getType() == OutputType.dcc ||
                                                 options.getType() == OutputType.dcc512 ||
                                                 options.getType() == OutputType.msz) {
-                                            filename = EdgeQueryClient.makeFilename(options.filemask, lastComp, ms2);
+                                            filename = EdgeQueryClient.makeFilename(options.filemask, nscl.toString(), ms2);
                                         } else {
-                                            filename = EdgeQueryClient.makeFilename(options.filemask, lastComp, options.getBeginAsDate());
+                                            filename = EdgeQueryClient.makeFilename(options.filemask, nscl.toString(), options.getBeginAsDate());
                                         }
 
 
@@ -433,7 +434,7 @@ public class EdgeQueryClient {
                                         blks.trimToSize();
                                         //for(int i=0; i<blks.size(); i++) logger.finest(((MiniSeed) blks.get(i)).toString());
                                         // TODO: Change the signature to pass options only once.
-                                        out.makeFile(SeedName.nsclStringToSeedName(lastComp), filename, blks);
+                                        out.makeFile(nscl, filename, blks);
                                     }
                                 }
                                 maxTime = 0;
@@ -477,7 +478,7 @@ public class EdgeQueryClient {
                                     }
                                     maxTime = ms.getTimeInMillis();
                                 }
-                                lastComp = ms.getSeedName();
+                                nscl = SeedName.nsclStringToSeedName(ms.getSeedName());
                             }
                         } catch (IllegalSeednameException e) {
                             logger.severe("Seedname exception making a seed record e=" + e.getMessage());

@@ -127,18 +127,17 @@ public class SeedName {
 		return (network + station + channel + location);
 	}
 
-	public class NetworkComparator implements Comparator {
+	public static Comparator NetworkComparator = new Comparator() {
 		public int compare(Object o1, Object o2) {
 			SeedName s1 = (SeedName) o1;
 			SeedName s2 = (SeedName) o2;
 			return s1.getNetwork().compareTo(s2.getNetwork());
 		}
-	}
+	};
 
-	public class StationComparator implements Comparator {
-		private NetworkComparator nc = new NetworkComparator();
+	public static Comparator StationComparator = new Comparator() {
 		public int compare(Object o1, Object o2) {
-			int result = nc.compare(o1, o2);
+			int result = NetworkComparator.compare(o1, o2);
 			if (result != 0) {
 				return result;
 			}
@@ -146,12 +145,11 @@ public class SeedName {
 			SeedName s2 = (SeedName) o2;
 			return s1.getStation().compareTo(s2.getStation());
 		}
-	}
+	};
 
-	public class ChannelComparator implements Comparator {
-		private StationComparator nc = new StationComparator();
+	public static Comparator ChannelComparator = new Comparator() {
 		public int compare(Object o1, Object o2) {
-			int result = nc.compare(o1, o2);
+			int result = StationComparator.compare(o1, o2);
 			if (result != 0) {
 				return result;
 			}
@@ -159,12 +157,11 @@ public class SeedName {
 			SeedName s2 = (SeedName) o2;
 			return s1.getChannel().compareTo(s2.getChannel());
 		}
-	}
+	};
 
-	public class LocationComparator implements Comparator {
-		private ChannelComparator nc = new ChannelComparator();
+	public static Comparator LocationComparator = new Comparator() {
 		public int compare(Object o1, Object o2) {
-			int result = nc.compare(o1, o2);
+			int result = ChannelComparator.compare(o1, o2);
 			if (result != 0) {
 				return result;
 			}
@@ -172,5 +169,5 @@ public class SeedName {
 			SeedName s2 = (SeedName) o2;
 			return s1.getLocation().compareTo(s2.getLocation());
 		}
-	}
+	};
 }

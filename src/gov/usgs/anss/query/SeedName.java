@@ -1,31 +1,22 @@
 package gov.usgs.anss.query;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Comparator;
 
 /**
- *
+ * An object for the encapsulation of data and methods for data channels named
+ * according to SEED conventions.
+ * 
+ * All NSCL fields are fixed width, ASCII, alphanumeric fields left justified
+ * (no leading spaces), and paded with spaces (after the field’s contents).
+ * Network Operator Code, 2 ULN (upper case, lower case or numeric digits).
+ * Station Identifier, 5 UN.
+ * Channel Identifier, 2 UN.
+ * Location Identifier, 2 UN.
+ * 
  * @author richardg
  */
 public class SeedName {
 	private String network,station,channel,location;
-	
-	public enum Format {
-		NSCL(Pattern.compile("([A-Z]{2})([A-Z ]{5})([A-Z]{3})([0-9]{2})")),
-		SCNL(Pattern.compile("")),
-		SLCN(Pattern.compile(""));
-		
-		private Pattern pattern;
-
-		Format(Pattern pattern) {
-			this.pattern = pattern;
-		}
-
-		public String[] split(String input) {
-			Matcher m = pattern.matcher(input);
-			return new String[]{m.group(1), m.group(2), m.group(3), m.group(4)};
-		}
-	}
 
 	/**
 	 * TODO: handle whitespace and/or wildcards...?
@@ -39,13 +30,6 @@ public class SeedName {
 		this.station = station;
 		this.channel = channel;
 		this.location = location;
-	}
-
-	//TODO throw IllegalArgumentException...?
-	public static SeedName stringToSeedName(SeedName.Format format, String input) {
-		String[] e = format.split(input);
-		
-		return new SeedName(e[0],e[1],e[2],e[3]);
 	}
 
 	/**
@@ -66,11 +50,12 @@ public class SeedName {
 	}
 
 	/**
+	 * SEED: 2 ULN
 	 * @param network the network to set
 	 */
 	public void setNetwork(String network) {
 		this.network = network;
-	}
+		}
 
 	/**
 	 * @return the station
@@ -80,6 +65,7 @@ public class SeedName {
 	}
 
 	/**
+	 * SEED: 5 UN
 	 * @param station the station to set
 	 */
 	public void setStation(String station) {
@@ -94,6 +80,7 @@ public class SeedName {
 	}
 
 	/**
+	 * SEED: 3 UN
 	 * @param channel the channel to set
 	 */
 	public void setChannel(String channel) {
@@ -108,6 +95,7 @@ public class SeedName {
 	}
 
 	/**
+	 * SEED: 2 UN
 	 * @param location the location to set
 	 */
 	public void setLocation(String location) {
@@ -139,4 +127,50 @@ public class SeedName {
 		return (network + station + channel + location);
 	}
 
+	public class NetworkComparator implements Comparator {
+		public int compare(Object o1, Object o2) {
+			SeedName s1 = (SeedName) o1;
+			SeedName s2 = (SeedName) o2;
+			return s1.getNetwork().compareTo(s2.getNetwork());
+		}
+	}
+
+	public class StationComparator implements Comparator {
+		private NetworkComparator nc = new NetworkComparator();
+		public int compare(Object o1, Object o2) {
+			int result = nc.compare(o1, o2);
+			if (result != 0) {
+				return result;
+			}
+			SeedName s1 = (SeedName) o1;
+			SeedName s2 = (SeedName) o2;
+			return s1.getStation().compareTo(s2.getStation());
+		}
+	}
+
+	public class ChannelComparator implements Comparator {
+		private StationComparator nc = new StationComparator();
+		public int compare(Object o1, Object o2) {
+			int result = nc.compare(o1, o2);
+			if (result != 0) {
+				return result;
+			}
+			SeedName s1 = (SeedName) o1;
+			SeedName s2 = (SeedName) o2;
+			return s1.getChannel().compareTo(s2.getChannel());
+		}
+	}
+
+	public class LocationComparator implements Comparator {
+		private ChannelComparator nc = new ChannelComparator();
+		public int compare(Object o1, Object o2) {
+			int result = nc.compare(o1, o2);
+			if (result != 0) {
+				return result;
+			}
+			SeedName s1 = (SeedName) o1;
+			SeedName s2 = (SeedName) o2;
+			return s1.getLocation().compareTo(s2.getLocation());
+		}
+	}
 }

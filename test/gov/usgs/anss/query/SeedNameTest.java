@@ -5,7 +5,6 @@
 
 package gov.usgs.anss.query;
 
-import gov.usgs.anss.query.SeedName.Format;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -28,18 +27,6 @@ public class SeedNameTest {
 	public static void tearDownClass() throws Exception {
 	}
 
-	/**
-	 * Test of stringToSeedName method, of class SeedName.
-	 */
-	@Test
-	public void testStringToSeedName() {
-		System.out.println("stringToSeedName");
-		String input = "NZWEL  BHZ10";
-		String n="NZ", s="WEL  ", c="BHZ", l="10";
-		SeedName expResult = new SeedName(n,s,c,l);
-		SeedName result = SeedName.stringToSeedName(SeedName.Format.NSCL, input);
-		assertEquals(expResult, result);
-	}
 
 	/**
 	 * Test of getNetwork method, of class SeedName.

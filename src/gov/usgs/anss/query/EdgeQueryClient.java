@@ -166,6 +166,8 @@ public class EdgeQueryClient {
     public EdgeQueryClient() {
     }
 
+    // TODO put this into its own class.  Pass the options as
+    // method parameters?
     public static String listQuery(EdgeQueryOptions options) {
         try {
             String line = "";

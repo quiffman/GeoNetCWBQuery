@@ -137,7 +137,7 @@ public class NSCLTest {
 	}
 
 	/**
-	 * Test of nsclStringToSeedName method, of class NSCL.
+	 * Test of stringToNSCL method, of class NSCL.
 	 */
 	@Test
 	public void testNsclStringToSeedName() {
@@ -145,7 +145,7 @@ public class NSCLTest {
 		String input = "NZWEL  BHZ10";
 		String n="NZ", s="WEL  ", c="BHZ", l="10";
 		NSCL expResult = new NSCL(n,s,c,l);
-		NSCL result = NSCL.nsclStringToSeedName(input);
+		NSCL result = NSCL.stringToNSCL(input);
 		assertEquals(expResult, result);
 	}
 

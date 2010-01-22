@@ -38,7 +38,10 @@ public class NSCL {
 	 * @param input 12 character String formatted as NNSSSSSCCLL.
 	 * @return a new NSCL representation of the input NSCL.
 	 */
-	public static NSCL nsclStringToSeedName(String input) {
+	public static NSCL stringToNSCL(String input) {
+		if (input.length() != 12) {
+			throw new IllegalArgumentException("NSCL code must be 12 characters long.");
+		}
 		return new NSCL(input.substring(0, 2), input.substring(2, 7),
 				input.substring(7, 10), input.substring(10, 12));
 	}

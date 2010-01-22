@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import gov.usgs.anss.util.PNZ;
 import gov.usgs.anss.seed.*;
 import edu.sc.seis.TauP.SacTimeSeries;
+import gov.usgs.anss.query.metadata.MetaDataQuery;
+import gov.usgs.anss.query.metadata.MetaDataServerImpl;
 
 /**
  *
@@ -26,7 +28,8 @@ import edu.sc.seis.TauP.SacTimeSeries;
 public class SacOutputer extends Outputer {
 
     boolean dbg;
-    private static MetaDataServer metaDataServer;
+    private static MetaDataServerImpl metaDataServer;
+    private static MetaDataQuery metaDataQuery;
 
 
     static {
@@ -47,7 +50,7 @@ public class SacOutputer extends Outputer {
 //        String component = lastComp.substring(7, 10);
 //        String location = lastComp.substring(10, 12);
 
-              // Process the args for things that affect us
+        // Process the args for things that affect us
         if (blks.size() == 0) {
             return;    // no data to save
         }
@@ -108,18 +111,22 @@ public class SacOutputer extends Outputer {
         ChannelMetaData md = new ChannelMetaData(nscl);
         if (!noMeta) {
 
-            metaDataServer = new MetaDataServer(
+            metaDataServer = new MetaDataServerImpl(
                     QueryProperties.getNeicMetadataServerIP(),
                     QueryProperties.getNeicMetadataServerPort());
+
+            metaDataQuery = new MetaDataQuery(metaDataServer);
 
             String time = blks.get(0).getTimeString();
             time = time.substring(0, 4) + "," + time.substring(5, 8) + "-" + time.substring(9, 17);
 
+
+
             if (options.sacpz) {
-                metaDataServer.getSACResponse(nscl, options.getBegin(), options.pzunit, filename + ".pz");
+                metaDataQuery.getSACResponse(nscl, options.getBegin(), options.pzunit, filename + ".pz");
             }
 
-            md = metaDataServer.getChannelMetaData(nscl, options.getBegin());
+            md = metaDataQuery.getChannelMetaData(nscl, options.getBegin());
         }
 
         // Set the byteOrder based on native architecture and sac statics

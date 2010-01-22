@@ -16,7 +16,8 @@ import java.util.Comparator;
  * @author richardg
  */
 public class SeedName {
-	private String network,station,channel,location;
+
+	private String network, station, channel, location;
 
 	/**
 	 * TODO: handle whitespace and/or wildcards...?
@@ -55,7 +56,7 @@ public class SeedName {
 	 */
 	public void setNetwork(String network) {
 		this.network = network;
-		}
+	}
 
 	/**
 	 * @return the station

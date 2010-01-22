@@ -31,20 +31,6 @@ abstract public class Outputer {
     abstract public void makeFile(NSCL nscl, String filename,
 			ArrayList<MiniSeed> blks) throws IOException;
 
-      /** convert to hex string
-     *@param b The item to convert to hex
-     *@return The hex string */
-    protected static String toHex(byte b) {
-        return toHex(((long) b) & 0xFFL);
-    }
-
-    /** convert to hex string
-     *@param b The item to convert to hex
-     *@return The hex string */
-    protected static String toHex(short b) {
-        return toHex(((long) b) & 0xFFFFL);
-    }
-
     /** convert to hex string
      *@param b The item to convert to hex
      *@return The hex string */

@@ -32,15 +32,15 @@ public class ChannelMetaData {
     public String getNetwork() {
         return network;
     }
-    private String component;
+    private String channel;
 
     /**
-     * Get the value of component
+     * Get the value of channel
      *
-     * @return the value of component
+     * @return the value of channel
      */
-    public String getComponent() {
-        return component;
+    public String getChannel() {
+        return channel;
     }
     private String location;
 
@@ -135,22 +135,22 @@ public class ChannelMetaData {
         this.azimuth = azimuth;
     }
 
-    public ChannelMetaData(String network, String code, String component, String location) {
+    public ChannelMetaData(String network, String code, String channel, String location) {
         this.code = code;
         this.network = network;
-        this.component = component;
+        this.channel = channel;
         this.location = location;
     }
 
     public ChannelMetaData(NSCL nscl) {
         this.code = nscl.getStation();
         this.network = nscl.getNetwork();
-        this.component = nscl.getChannel();
+        this.channel = nscl.getChannel();
         this.location = nscl.getLocation();
     }
 
-    public void setComponent(String component) {
-        this.component = component;
+    public void setChannel(String channel) {
+        this.channel = channel;
     }
 
     public void setElevation(double elevation) {

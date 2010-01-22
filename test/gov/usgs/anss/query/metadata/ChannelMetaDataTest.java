@@ -103,7 +103,7 @@ public class ChannelMetaDataTest {
                 new DateTime(2009, 1, 1, 11, 11, 11, 0, tz));
         assertTrue("Network ", md.getNetwork().equals("NZ"));
         assertTrue("Code ", md.getCode().equals("WEL  "));
-        assertTrue("component", md.getComponent().equals("HHZ"));
+        assertTrue("component", md.getChannel().equals("HHZ"));
         assertTrue("location ", md.getLocation().equals("10"));
         assertEquals("longitude", 174.76802d, md.getLongitude(), 0);
         assertEquals("latitude", -41.28576d, md.getLatitude(), 0);
@@ -121,7 +121,7 @@ public class ChannelMetaDataTest {
                 new DateTime(2009, 1, 1, 11, 11, 11, 0, tz));
         assertTrue("Network ", md.getNetwork().equals("NZ"));
         assertTrue("Code ", md.getCode().equals("ZZZZZ"));
-        assertTrue("component", md.getComponent().equals("HHZ"));
+        assertTrue("component", md.getChannel().equals("HHZ"));
         assertTrue("location ", md.getLocation().equals("10"));
         assertEquals("longitude", Double.MIN_VALUE, md.getLongitude(), 0);
         assertEquals("latitude", Double.MIN_VALUE, md.getLatitude(), 0);

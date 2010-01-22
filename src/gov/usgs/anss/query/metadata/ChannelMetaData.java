@@ -4,7 +4,7 @@
  */
 package gov.usgs.anss.query.metadata;
 
-import gov.usgs.anss.query.SeedName;
+import gov.usgs.anss.query.NSCL;
 
 /**
  *
@@ -142,7 +142,7 @@ public class ChannelMetaData {
         this.location = location;
     }
 
-    public ChannelMetaData(SeedName nscl) {
+    public ChannelMetaData(NSCL nscl) {
         this.code = nscl.getStation();
         this.network = nscl.getNetwork();
         this.component = nscl.getChannel();

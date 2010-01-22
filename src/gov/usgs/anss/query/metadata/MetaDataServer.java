@@ -1,6 +1,6 @@
 package gov.usgs.anss.query.metadata;
 
-import gov.usgs.anss.query.SeedName;
+import gov.usgs.anss.query.NSCL;
 import gov.usgs.anss.util.StaSrv;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -53,7 +53,7 @@ public class MetaDataServer {
      * @param date
      * @return
      */
-    public ChannelMetaData getChannelMetaData(SeedName nscl,  DateTime date) {
+    public ChannelMetaData getChannelMetaData(NSCL nscl,  DateTime date) {
         System.out.println(parseBeginFormat.withZone(DateTimeZone.UTC).print(date));
         String s = getResponseData(nscl, date, pzunit);
 
@@ -95,7 +95,7 @@ public class MetaDataServer {
         return md;
     }
 
-    private String getResponseData(SeedName nscl, DateTime date, String units) {
+    private String getResponseData(NSCL nscl, DateTime date, String units) {
         // TODO - should be able to use NSCL object here eventually.
         String s = stasrv.getSACResponse(nscl.toString(),
                 parseBeginFormat.withZone(DateTimeZone.UTC).print(date),
@@ -130,7 +130,7 @@ public class MetaDataServer {
      * @param filename
      */
     public void getSACResponse(
-            SeedName nscl,
+            NSCL nscl,
             DateTime date,
             String units,
             String filename) {

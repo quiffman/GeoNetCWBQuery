@@ -26,7 +26,7 @@ public class TextOutputer extends Outputer {
     }
 
 
-    public void makeFile(SeedName nscl, String filename,
+    public void makeFile(NSCL nscl, String filename,
 			ArrayList<MiniSeed> blks) throws IOException {
 
         // Process the args for things that affect us

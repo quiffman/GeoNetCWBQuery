@@ -313,7 +313,7 @@ public class EdgeQueryClient {
                     boolean perfStart = true;
                     outtcp.write(line.getBytes());
                     int iblk = 0;
-                    SeedName nscl = SeedName.nsclStringToSeedName("            ");
+                    NSCL nscl = NSCL.nsclStringToSeedName("            ");
                     boolean eof = false;
                     MiniSeed ms = null;
                     int npur = 0;
@@ -360,7 +360,7 @@ public class EdgeQueryClient {
                             }
 
                             if (eof || (nscl != null &&
-                                    (ms == null ? true : nsclComparator.compare(nscl, SeedName.nsclStringToSeedName(ms.getSeedName())) != 0))) {
+                                    (ms == null ? true : nsclComparator.compare(nscl, NSCL.nsclStringToSeedName(ms.getSeedName())) != 0))) {
                                 msTransfer += (System.currentTimeMillis() - startPhase);
                                 startPhase = System.currentTimeMillis();
                                 if (!options.quiet) {
@@ -478,7 +478,7 @@ public class EdgeQueryClient {
                                     }
                                     maxTime = ms.getTimeInMillis();
                                 }
-                                nscl = SeedName.nsclStringToSeedName(ms.getSeedName());
+                                nscl = NSCL.nsclStringToSeedName(ms.getSeedName());
                             }
                         } catch (IllegalSeednameException e) {
                             logger.severe("Seedname exception making a seed record e=" + e.getMessage());

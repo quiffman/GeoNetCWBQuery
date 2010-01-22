@@ -260,7 +260,7 @@ public class EdgeQueryOptions {
 			}
 		}
 
-		if (getNsclComparator() == SeedName.NetworkComparator || getNsclComparator() == SeedName.StationComparator) {
+		if (getNsclComparator() == NSCL.NetworkComparator || getNsclComparator() == NSCL.StationComparator) {
 			if (getType() == OutputType.sac) {
 				logger.severe("\n    ***** Sac files must have names including the channel! *****");
 				return false;
@@ -297,21 +297,21 @@ public class EdgeQueryOptions {
 
 	public Comparator getNsclComparator() {
 		// default to LocationComparator
-		Comparator comparator = SeedName.LocationComparator;
+		Comparator comparator = NSCL.LocationComparator;
 		if (filemask.indexOf("%n") >= 0) {
-			comparator = SeedName.NetworkComparator;
+			comparator = NSCL.NetworkComparator;
 		}
 		if (filemask.indexOf("%s") >= 0) {
-			comparator = SeedName.StationComparator;
+			comparator = NSCL.StationComparator;
 		}
 		if (filemask.indexOf("%c") >= 0) {
-			comparator = SeedName.ChannelComparator;
+			comparator = NSCL.ChannelComparator;
 		}
 		if (filemask.indexOf("%N") >= 0) {
-			comparator = SeedName.LocationComparator;
+			comparator = NSCL.LocationComparator;
 		}
 		if (filemask.indexOf("%N") >= 0) {
-			comparator = SeedName.LocationComparator;
+			comparator = NSCL.LocationComparator;
 		}
 		
 		return comparator;

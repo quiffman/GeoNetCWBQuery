@@ -15,7 +15,7 @@ import java.util.Comparator;
  * 
  * @author richardg
  */
-public class SeedName {
+public class NSCL {
 
 	private String network, station, channel, location;
 
@@ -26,7 +26,7 @@ public class SeedName {
 	 * @param channel
 	 * @param location
 	 */
-	public SeedName(String network, String station, String channel, String location) {
+	public NSCL(String network, String station, String channel, String location) {
 		this.network = network;
 		this.station = station;
 		this.channel = channel;
@@ -34,12 +34,12 @@ public class SeedName {
 	}
 
 	/**
-	 * Returns a new SeedName object constructed from the NNSSSSSCCCLL input String.
+	 * Returns a new NSCL object constructed from the NNSSSSSCCCLL input String.
 	 * @param input 12 character String formatted as NNSSSSSCCLL.
-	 * @return a new SeedName representation of the input NSCL.
+	 * @return a new NSCL representation of the input NSCL.
 	 */
-	public static SeedName nsclStringToSeedName(String input) {
-		return new SeedName(input.substring(0, 2), input.substring(2, 7),
+	public static NSCL nsclStringToSeedName(String input) {
+		return new NSCL(input.substring(0, 2), input.substring(2, 7),
 				input.substring(7, 10), input.substring(10, 12));
 	}
 
@@ -104,7 +104,7 @@ public class SeedName {
 	}
 
 	/**
-	 * True if both SeedName objects are not null and both NSCL String
+	 * True if both NSCL objects are not null and both NSCL String
 	 * components are equal.
 	 * Throws an NullPointerException if any of the NSCL components in this are null.
 	 * @param obj
@@ -112,7 +112,7 @@ public class SeedName {
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		SeedName other = (SeedName) obj;
+		NSCL other = (NSCL) obj;
 		if (other == null) {
 			return false;
 		}
@@ -130,8 +130,8 @@ public class SeedName {
 
 	public static Comparator NetworkComparator = new Comparator() {
 		public int compare(Object o1, Object o2) {
-			SeedName s1 = (SeedName) o1;
-			SeedName s2 = (SeedName) o2;
+			NSCL s1 = (NSCL) o1;
+			NSCL s2 = (NSCL) o2;
 			return s1.getNetwork().compareTo(s2.getNetwork());
 		}
 	};
@@ -142,8 +142,8 @@ public class SeedName {
 			if (result != 0) {
 				return result;
 			}
-			SeedName s1 = (SeedName) o1;
-			SeedName s2 = (SeedName) o2;
+			NSCL s1 = (NSCL) o1;
+			NSCL s2 = (NSCL) o2;
 			return s1.getStation().compareTo(s2.getStation());
 		}
 	};
@@ -154,8 +154,8 @@ public class SeedName {
 			if (result != 0) {
 				return result;
 			}
-			SeedName s1 = (SeedName) o1;
-			SeedName s2 = (SeedName) o2;
+			NSCL s1 = (NSCL) o1;
+			NSCL s2 = (NSCL) o2;
 			return s1.getChannel().compareTo(s2.getChannel());
 		}
 	};
@@ -166,8 +166,8 @@ public class SeedName {
 			if (result != 0) {
 				return result;
 			}
-			SeedName s1 = (SeedName) o1;
-			SeedName s2 = (SeedName) o2;
+			NSCL s1 = (NSCL) o1;
+			NSCL s2 = (NSCL) o2;
 			return s1.getLocation().compareTo(s2.getLocation());
 		}
 	};

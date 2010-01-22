@@ -103,7 +103,7 @@ public class DCCOutputer extends Outputer implements MiniSeedOutputHandler {
 		this.options = options;
     }
 
-    public void makeFile(SeedName nscl, String filename,
+    public void makeFile(NSCL nscl, String filename,
 			ArrayList<MiniSeed> blks) throws IOException {
         MiniSeed ms2 = null;
         frames = new byte[4096 - 64];   // scratch space for decompression

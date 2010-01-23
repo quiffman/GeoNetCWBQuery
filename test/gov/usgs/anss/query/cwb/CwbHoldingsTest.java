@@ -57,13 +57,11 @@ public class CwbHoldingsTest {
 
         cwbServer.setChannels(channels);
 
-        NSCL nscl = NSCL.stringToNSCL("NZBFZ  BNE20");
-
         DateTime begin = new DateTime(2009, 1, 1, 11, 11, 11, 0, tz);
         Double duration = 1800.00;
         ArrayList result = cwbQuery.listChannels(begin, duration);
         assertTrue("Number of results", result.size() == 3);
-        assertEquals("First nscl", result.get(0), nscl);
-        
+        assertEquals("First nscl", result.get(0), NSCL.stringToNSCL("NZBFZ  BNE20"));
+
     }
 }

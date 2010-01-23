@@ -10,6 +10,7 @@ package gov.usgs.anss.query;
 
 import gov.usgs.anss.edge.*;
 import gov.usgs.anss.query.EdgeQueryOptions.OutputType;
+import gov.usgs.anss.query.cwb.CWBServerImpl;
 import gov.usgs.anss.seed.MiniSeed;
 import java.io.*;
 import java.net.*;
@@ -164,50 +165,6 @@ public class EdgeQueryClient {
 
     /** Creates a new instance of EdgeQueryClient */
     public EdgeQueryClient() {
-    }
-
-    // TODO put this into its own class.  Pass the options as
-    // method parameters?
-    public static String listQuery(EdgeQueryOptions options) {
-        try {
-            String line = "";
-            byte[] b = new byte[4096];
-            Socket ds = new Socket(options.host, options.port);
-            ds.setReceiveBufferSize(512000);
-            //ds.setTcpNoDelay(true);
-            InputStream in = ds.getInputStream();        // Get input and output streams
-            OutputStream outtcp = ds.getOutputStream();
-            if (options.exclude != null) {
-                line = "'-el' '" + options.exclude + "' ";
-            } else {
-                line = "";
-            }
-            if (options.getBegin() != null) {
-                line += "'-b' '" + options.getBeginAsString() + "' ";
-            }
-            if (options.getDuration() != null) {
-                line += "'-d' '" + options.getDuration() + "' ";
-            }
-            if (options.lschannels) {
-                if (options.showIllegals) {
-                    line += "'-si' ";
-                }
-                line += "'-lsc'\n";
-            } else {
-                line += "'-ls'\n";
-            }
-            logger.config("line=" + line + ":");
-            outtcp.write(line.getBytes());
-            StringBuffer sb = new StringBuffer(100000);
-            int len = 0;
-            while ((len = in.read(b, 0, 512)) > 0) {
-                sb.append(new String(b, 0, len));
-            }
-            return sb.toString();
-        } catch (IOException e) {
-            logger.severe(e + " Getting a directory");
-            return null;
-        }
     }
 
     /** do a query.  The command line arguments are passed in as they are for the query tool
@@ -576,9 +533,12 @@ public class EdgeQueryClient {
 
         EdgeQueryOptions options = new EdgeQueryOptions(args);
 
+
+       CWBServerImpl cwbServer = new CWBServerImpl(options.host, options.port);
+
         // The ls option does not require any args checking
         if (options.isListQuery()) {
-            logger.info(listQuery(options));
+            logger.info(cwbServer.listChannels(options.getBegin(), options.getDuration()));
         } else {
             query(options);
         }

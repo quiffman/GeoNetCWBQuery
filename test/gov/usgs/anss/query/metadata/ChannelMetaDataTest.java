@@ -4,6 +4,7 @@
  */
 package gov.usgs.anss.query.metadata;
 
+import gov.usgs.anss.query.metadata.*;
 import gov.usgs.anss.query.*;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -112,8 +113,7 @@ public class ChannelMetaDataTest {
         assertEquals("azimuth", 0.0d, md.getAzimuth(), 0);
     }
 
-    // TODO this test is brittle, it depends on the meta data server.
-    // Can we stub the server?
+    
     @Test
     public void testGetStationMetaDataNull() {
         metaDataServer.setS("");

@@ -11,6 +11,7 @@ package gov.usgs.anss.query;
 import gov.usgs.anss.edge.*;
 import gov.usgs.anss.query.EdgeQueryOptions.OutputType;
 import gov.usgs.anss.query.cwb.CWBServerImpl;
+import gov.usgs.anss.query.outputter.Filename;
 import gov.usgs.anss.seed.MiniSeed;
 import java.io.*;
 import java.net.*;
@@ -82,86 +83,6 @@ public class EdgeQueryClient {
         logger.fine("$Id$");
     }
     private static DateTimeFormatter hmsFormat = ISODateTimeFormat.time().withZone(DateTimeZone.forID("UTC"));
-
-    // TODO: push the makeFilename methods into the outputters.
-    public static String makeFilename(String mask, String seedname, MiniSeed ms) {
-        StringBuffer sb = new StringBuffer(100);
-        if (df2 == null) {
-            df2 = new DecimalFormat("00");
-        }
-        if (df4 == null) {
-            df4 = new DecimalFormat("0000");
-        }
-        if (df6 == null) {
-            df6 = new DecimalFormat("000000");
-        }
-        seedname = seedname.replaceAll(" ", "_");
-        int[] ymd = SeedUtil.fromJulian(ms.getJulian());
-        String name = mask;
-        name = name.replaceAll("%N", seedname.substring(0, 12));
-        name = name.replaceAll("%n", seedname.substring(0, 2));
-        name = name.replaceAll("%s", seedname.substring(2, 7));
-        name = name.replaceAll("%c", seedname.substring(7, 10));
-        name = name.replaceAll("%l", seedname.substring(10, 12));
-        name = name.replaceAll("%y", "" + ms.getYear());
-        name = name.replaceAll("%Y", ("" + ms.getYear()).substring(2, 4));
-        name = name.replaceAll("%j", df4.format(ms.getDay()).substring(1, 4));
-        name = name.replaceAll("%J", "" + ms.getJulian());
-        name = name.replaceAll("%d", df2.format(ymd[2]));
-        name = name.replaceAll("%D", df2.format(ymd[2]));
-        name = name.replaceAll("%M", df2.format(ymd[1]));
-        name = name.replaceAll("%h", df2.format(ms.getHour()));
-        name = name.replaceAll("%m", df2.format(ms.getMinute()));
-        name = name.replaceAll("%S", df2.format(ms.getSeconds()));
-        name = name.replaceAll("%h", df2.format(ms.getHour()));
-        if (name.indexOf("%z") >= 0) {
-            name = name.replaceAll("%z", "");
-            name = name.replaceAll("_", "");
-        }
-        return name;
-
-    }
-
-    public static String makeFilename(String mask, String seedname, java.util.Date beg) {
-        GregorianCalendar g = new GregorianCalendar();
-        g.setTimeInMillis(beg.getTime());
-
-        StringBuffer sb = new StringBuffer(100);
-        if (df2 == null) {
-            df2 = new DecimalFormat("00");
-        }
-        if (df4 == null) {
-            df4 = new DecimalFormat("0000");
-        }
-        if (df6 == null) {
-            df6 = new DecimalFormat("000000");
-        }
-        seedname = seedname.replaceAll(" ", "_");
-        String name = mask;
-        name = name.replaceAll("%N", seedname.substring(0, 12));
-        name = name.replaceAll("%n", seedname.substring(0, 2));
-        name = name.replaceAll("%s", seedname.substring(2, 7));
-        name = name.replaceAll("%c", seedname.substring(7, 10));
-        name = name.replaceAll("%l", seedname.substring(10, 12));
-        name = name.replaceAll("%y", "" + g.get(Calendar.YEAR));
-        name = name.replaceAll("%Y", ("" + g.get(Calendar.YEAR)).substring(2, 4));
-        name = name.replaceAll("%j", df4.format(g.get(Calendar.DAY_OF_YEAR)).substring(1, 4));
-
-        name = name.replaceAll("%J", "" + SeedUtil.toJulian(g));
-        name = name.replaceAll("%d", df2.format(g.get(Calendar.DAY_OF_MONTH)));
-        name = name.replaceAll("%D", df2.format(g.get(Calendar.DAY_OF_MONTH)));
-        name = name.replaceAll("%M", df2.format(g.get(Calendar.MONTH) + 1));
-        name = name.replaceAll("%h", df2.format(g.get(Calendar.HOUR_OF_DAY)));
-        name = name.replaceAll("%m", df2.format(g.get(Calendar.MINUTE)));
-        name = name.replaceAll("%S", df2.format(g.get(Calendar.SECOND)));
-        name = name.replaceAll("%h", df2.format(g.get(Calendar.HOUR_OF_DAY)));
-        if (name.indexOf("%z") >= 0) {
-            name = name.replaceAll("%z", "");
-            name = name.replaceAll("_", "");
-        }
-        return name;
-
-    }
 
     /** Creates a new instance of EdgeQueryClient */
     public EdgeQueryClient() {
@@ -360,9 +281,9 @@ public class EdgeQueryClient {
                                                 options.getType() == OutputType.dcc ||
                                                 options.getType() == OutputType.dcc512 ||
                                                 options.getType() == OutputType.msz) {
-                                            filename = EdgeQueryClient.makeFilename(options.filemask, nscl.toString(), ms2);
+                                            filename = Filename.makeFilename(options.filemask, nscl, ms2);
                                         } else {
-                                            filename = EdgeQueryClient.makeFilename(options.filemask, nscl.toString(), options.getBeginAsDate());
+                                            filename = Filename.makeFilename(options.filemask, nscl, options.getBegin());
                                         }
 
 

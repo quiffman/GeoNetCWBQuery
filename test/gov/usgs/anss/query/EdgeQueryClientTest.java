@@ -8,10 +8,14 @@ package gov.usgs.anss.query;
 import gov.usgs.anss.seed.MiniSeed;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -27,19 +31,38 @@ public class EdgeQueryClientTest {
 
     @Parameters
     public static Collection data() {
-        return Arrays.asList(new Object[][]{
-			// args line,	filenames...
-			// Note the -t NULL
-			{"-b \"2009/01/01 00:00:00\" -s \"NZWLGT.BTZ40\" -d 600 -t NULL", new String[] {"test/NZWLGT_BTZ40-09-01-01-00-00-00.ms"}},
+		return Arrays.asList(new Object[][]{
+					// args line,	filenames...
+					{"-b \"2009/01/01 00:00:00\" -s \"NZWLGT.BTZ40\" -d 600",
+						new String[]{"build/NZWLGT_BTZ40-2009-01-01-00-00-00.ms"}
+					},
+					{"-b \"2009/06/01 12:00:00\" -s \"NZ.....BTZ..\" -d 600",
+						new String[]{"build/NZAUCT_BTZ40-2009-06-01-11-59-51.ms", "build/NZAUCT_BTZ41-2009-06-01-11-59-17.ms", "build/NZCHIT_BTZ40-2009-06-01-11-59-27.ms", "build/NZCHIT_BTZ41-2009-06-01-11-59-33.ms", "build/NZGIST_BTZ40-2009-06-01-11-59-50.ms", "build/NZGIST_BTZ41-2009-06-01-11-59-38.ms", "build/NZLOTT_BTZ40-2009-06-01-11-59-58.ms", "build/NZLOTT_BTZ41-2009-06-01-11-59-37.ms", "build/NZNAPT_BTZ40-2009-06-01-11-59-40.ms", "build/NZNAPT_BTZ41-2009-06-01-11-59-32.ms", "build/NZNCPT_BTZ40-2009-06-01-11-59-58.ms", "build/NZNCPT_BTZ41-2009-06-01-11-59-50.ms", "build/NZRBCT_BTZ40-2009-06-01-11-59-40.ms", "build/NZRBCT_BTZ41-2009-06-01-11-59-43.ms", "build/NZRFRT_BTZ40-2009-06-01-11-59-50.ms", "build/NZRFRT_BTZ41-2009-06-01-11-59-58.ms", "build/NZTAUT_BTZ40-2009-06-01-11-59-47.ms", "build/NZTAUT_BTZ41-2009-06-01-11-59-21.ms", "build/NZWLGT_BTZ40-2009-06-01-11-59-56.ms", "build/NZWLGT_BTZ41-2009-06-01-11-59-35.ms"}
+					},
 		});
     }
 
-	private EdgeQueryOptions options;
+	private String queryLine;
 	private String[] filenames;
 
     public EdgeQueryClientTest(String queryLine, String[] filenames) {
-        this.options = new EdgeQueryOptions(queryLine);
+		// Note the -t NULL
+        this.queryLine = queryLine;
 		this.filenames = filenames;
+	}
+
+	@Before
+	public void getMSUsingOldClient() throws Exception {
+		System.out.println("get ms using old client");
+		try {
+			Process getMS =
+			Runtime.getRuntime().exec(
+					"java -jar lib-ivy/external/GeoNetCWBQuery-2.0.0-RC1.jar "
+					+ queryLine + " -t ms -o build/%N-%y-%M-%D-%h-%m-%S.ms");
+			getMS.waitFor();
+		} catch (IOException ex) {
+			Logger.getLogger(EdgeQueryClientTest.class.getName()).log(Level.SEVERE, null, ex);
+		}
 	}
 
 	/**
@@ -69,8 +92,9 @@ public class EdgeQueryClientTest {
 			expResult.add(blks);
 		}
 		
-		// Run the query
-		ArrayList<ArrayList<MiniSeed>> result = EdgeQueryClient.query(options);
+		// Run the query. Note the -t NULL
+		ArrayList<ArrayList<MiniSeed>> result = EdgeQueryClient.query(
+				new EdgeQueryOptions(queryLine + " -t NULL"));
 		assertCollectionEquals("entire collection", expResult.get(0), result.get(0));
 	}
 

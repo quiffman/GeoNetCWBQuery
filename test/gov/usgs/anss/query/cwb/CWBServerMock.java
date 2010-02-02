@@ -4,6 +4,9 @@
  */
 package gov.usgs.anss.query.cwb;
 
+import gov.usgs.anss.query.EdgeQueryOptions;
+import gov.usgs.anss.seed.MiniSeed;
+import java.util.ArrayList;
 import org.joda.time.DateTime;
 
 /**
@@ -23,5 +26,9 @@ public class CWBServerMock implements CWBServer {
 
     public String listChannels(DateTime begin, Double duration) {
         return this.channels;
+    }
+
+    public ArrayList<ArrayList<MiniSeed>> query(EdgeQueryOptions options) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

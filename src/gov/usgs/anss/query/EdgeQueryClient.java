@@ -17,10 +17,8 @@ import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
-import java.util.Calendar;
 import java.util.Collections;
 
-import gov.usgs.anss.util.SeedUtil;
 import java.text.DecimalFormat;
 import java.util.Comparator;
 import java.util.TimeZone;
@@ -203,6 +201,7 @@ public class EdgeQueryClient {
                         try {
                             // Try to read a mini-seed, if it failes mark eof
                             if (read(in, b, 0, (options.gapsonly ? 64 : 512))) {
+                                
                                 if (b[0] == '<' && b[1] == 'E' && b[2] == 'O' && b[3] == 'R' && b[4] == '>') {
                                     eof = true;
                                     ms = null;
@@ -244,6 +243,7 @@ public class EdgeQueryClient {
                                 msTransfer += (System.currentTimeMillis() - startPhase);
                                 startPhase = System.currentTimeMillis();
                                 if (!options.quiet) {
+                                    // TODO could go into a helper method
                                     int nsgot = 0;
                                     if (blks.size() > 0) {
                                         Collections.sort(blks);
@@ -268,6 +268,7 @@ public class EdgeQueryClient {
 
 
                                 }
+
                                 if (blks.size() > 0) {
                                     MiniSeed ms2 = blks.get(0);
                                     if (out == null) {     // Get the array list output
@@ -286,8 +287,8 @@ public class EdgeQueryClient {
                                             filename = Filename.makeFilename(options.filemask, nscl, options.getBegin());
                                         }
 
-
                                         //filename = lastComp;
+                                        // TODO - should happen in the makeFilename methods.
                                         filename = filename.replaceAll(" ", "_");
 
                                         logger.finest(((MiniSeed) blks.get(0)).getTimeString() + " to " +
@@ -314,6 +315,7 @@ public class EdgeQueryClient {
                                         blks.trimToSize();
                                         //for(int i=0; i<blks.size(); i++) logger.finest(((MiniSeed) blks.get(i)).toString());
                                         // TODO: Change the signature to pass options only once.
+
                                         out.makeFile(nscl, filename, blks);
                                     }
                                 }
@@ -334,6 +336,8 @@ public class EdgeQueryClient {
                              * blocks here.  If it is massively out of order , all of these block checks will slow things
                              * down.
                              **/
+
+
                             boolean isDuplicate = false;
                             if (ms != null) {
                                 if (ms.getTimeInMillis() <= maxTime) {    // No need to check duplicates if this is newest seen
@@ -455,7 +459,7 @@ public class EdgeQueryClient {
         EdgeQueryOptions options = new EdgeQueryOptions(args);
 
 
-       CWBServerImpl cwbServer = new CWBServerImpl(options.host, options.port);
+        CWBServerImpl cwbServer = new CWBServerImpl(options.host, options.port);
 
         // The ls option does not require any args checking
         if (options.isListQuery()) {

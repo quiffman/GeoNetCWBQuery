@@ -39,7 +39,7 @@ public class EdgeQueryOptions {
 		logger.fine("$Id$");
 	}
 	
-	protected enum OutputType {
+	public enum OutputType {
 		ms,
 		msz,
 		sac,

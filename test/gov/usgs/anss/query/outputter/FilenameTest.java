@@ -5,8 +5,6 @@
 package gov.usgs.anss.query.outputter;
 
 import gov.usgs.anss.query.NSCL;
-import gov.usgs.anss.seed.MiniSeed;
-import java.util.Date;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.AfterClass;

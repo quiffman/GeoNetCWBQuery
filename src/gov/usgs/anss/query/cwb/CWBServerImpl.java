@@ -36,12 +36,11 @@ import gov.usgs.anss.query.EdgeQueryOptions.OutputType;
  */
 public class CWBServerImpl implements CWBServer {
 
-    static DecimalFormat df2;
-    static DecimalFormat df4;
-    static DecimalFormat df6;
+    static DecimalFormat df6 = new DecimalFormat("000000");
 
     private static final Logger logger = Logger.getLogger(CWBServerImpl.class.getName());
     private static DateTimeFormatter hmsFormat = ISODateTimeFormat.time().withZone(DateTimeZone.forID("UTC"));
+
 
     static {
         logger.fine("$Id$");
@@ -111,9 +110,6 @@ public class CWBServerImpl implements CWBServer {
         byte[] b = new byte[4096];
         Outputer out = null;
 
-        if (df6 == null) {
-            df6 = new DecimalFormat("000000");
-        }
         GregorianCalendar jan_01_2007 = new GregorianCalendar(2007, 0, 1);
 
         ArrayList<ArrayList<MiniSeed>> blksAll = null;
@@ -416,7 +412,7 @@ public class CWBServerImpl implements CWBServer {
         return null;
     }
 
-        public static boolean read(InputStream in, byte[] b, int off, int l)
+    public static boolean read(InputStream in, byte[] b, int off, int l)
             throws IOException {
         int len;
         while ((len = in.read(b, off, l)) > 0) {

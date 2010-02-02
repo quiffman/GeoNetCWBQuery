@@ -98,10 +98,7 @@ public class CWBServerImpl implements CWBServer {
 
     public ArrayList<ArrayList<MiniSeed>> query(EdgeQueryOptions options) {
 
-
         String line = "";
-
-
 
         long msSetup = 0;
         long msConnect = 0;
@@ -140,13 +137,13 @@ public class CWBServerImpl implements CWBServer {
             Socket ds = null;
             while (ds == null) {
                 try {
-                    ds = new Socket(options.host, options.port);
+                    ds = new Socket(this.host, this.port);
                 } catch (IOException e) {
                     ds = null;
                     if (e != null) {
                         if (e.getMessage() != null) {
                             if (e.getMessage().indexOf("Connection refused") >= 0) {
-                                logger.warning("Got a connection refused. " + options.host + "/" + options.port + "  Is the server up?  Wait 20 and try again");
+                                logger.warning("Got a connection refused. " + this.host + "/" + this.port + "  Is the server up?  Wait 20 and try again");
                             }
                         } else {
                             logger.warning("Got IOError opening socket to server e=" + e);
@@ -383,7 +380,7 @@ public class CWBServerImpl implements CWBServer {
                     }
                     blks.clear();
                 } catch (UnknownHostException e) {
-                    logger.severe("EQC main: Host is unknown=" + options.host + "/" + options.port);
+                    logger.severe("EQC main: Host is unknown=" + this.host + "/" + this.port);
                     if (out != null) {
                         System.exit(1);
                     }
@@ -393,7 +390,7 @@ public class CWBServerImpl implements CWBServer {
                         logger.severe("The connection was refused.  Server is likely down or is blocked. This should never happen.");
                         return null;
                     } else {
-                        logger.severe(e + " EQC main: IO error opening/reading socket=" + options.host + "/" + options.port);
+                        logger.severe(e + " EQC main: IO error opening/reading socket=" + this.host + "/" + this.port);
                         if (out != null) {
                             System.exit(1);
                         }

@@ -110,9 +110,7 @@ public class CWBServerImpl implements CWBServer {
         byte[] b = new byte[4096];
         Outputer out = null;
 
-        GregorianCalendar jan_01_2007 = new GregorianCalendar(2007, 0, 1);
-
-        ArrayList<ArrayList<MiniSeed>> blksAll = null;
+         ArrayList<ArrayList<MiniSeed>> blksAll = null;
         String filename = "";
         BufferedReader infile = null;
 
@@ -294,22 +292,6 @@ public class CWBServerImpl implements CWBServer {
                                                 " " + (((MiniSeed) blks.get(0)).getGregorianCalendar().getTimeInMillis() -
                                                 ((MiniSeed) blks.get(blks.size() - 1)).getGregorianCalendar().getTimeInMillis()) / 1000L);
 
-                                        // Due to a foul up in data in Nov, Dec 2006 it is possible the Q330s got the
-                                        // same baler block twice, but the last 7 512's of the block zeroed and the other
-                                        // correct.  Find these and purge the bad ones.
-
-                                        if (!options.gapsonly) {
-                                            for (int i = blks.size() - 1; i >= 0; i--) {
-                                                if (blks.get(i).getBlockSize() == 4096 && // Has to be a big block or it does not happen
-                                                        blks.get(i).getGregorianCalendar().compareTo(jan_01_2007) < 0 &&
-                                                        blks.get(i).getUsedFrameCount() < blks.get(i).getB1001FrameCount() &&
-                                                        blks.get(i).getUsedFrameCount() <= 7 && blks.get(i).getB1001FrameCount() > 7) {
-                                                    blks.remove(i);
-                                                    npur++;
-                                                }
-                                            }
-                                        }
-                                        logger.finer("Found " + npur + " recs with on first block of 4096 valid");
                                         blks.trimToSize();
                                         //for(int i=0; i<blks.size(); i++) logger.finest(((MiniSeed) blks.get(i)).toString());
                                         // TODO: Change the signature to pass options only once.

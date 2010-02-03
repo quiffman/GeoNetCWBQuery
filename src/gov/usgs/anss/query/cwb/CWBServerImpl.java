@@ -90,14 +90,6 @@ public class CWBServerImpl implements CWBServer {
 
     public ArrayList<ArrayList<MiniSeed>> query(EdgeQueryOptions options, DateTime begin, Double duration, NSCL nscl) {
 
-        long msSetup = 0;
-        long msConnect = 0;
-        long msTransfer = 0;
-        long msOutput = 0;
-        long msCommand = 0;
-        long startTime = System.currentTimeMillis();
-        long startPhase = startTime;
-
         byte[] b = new byte[4096];
         //       Outputer out = null;
 
@@ -138,8 +130,6 @@ public class CWBServerImpl implements CWBServer {
             }
             InputStream in = ds.getInputStream();        // Get input and output streams
             OutputStream outtcp = ds.getOutputStream();
-            msConnect += (System.currentTimeMillis() - startPhase);
-            startPhase = System.currentTimeMillis();
 
                 blksAll = new ArrayList<ArrayList<MiniSeed>>(20);
 
@@ -149,9 +139,6 @@ public class CWBServerImpl implements CWBServer {
                 long maxTime = 0;
                 int ndups = 0;
                 try {
-                    msSetup += (System.currentTimeMillis() - startPhase);
-                    startPhase = System.currentTimeMillis();
-                    boolean perfStart = true;
                      outtcp.write(CWBQueryFormatter.miniSEED(begin, duration, nscl).getBytes());
                     int iblk = 0;
                     NSCL nsclComp = NSCL.stringToNSCL("            ");
@@ -186,12 +173,6 @@ public class CWBServerImpl implements CWBServer {
                                 ms = null;
                                 logger.warning("   *** Unexpected EOF Found");
                             }
-                            if (perfStart) {
-                                msCommand += (System.currentTimeMillis() - startPhase);
-                                startPhase = System.currentTimeMillis();
-                                perfStart = false;
-
-                            }
                             logger.finest(iblk + " " + ms);
                             if (!options.quiet && iblk % 1000 == 0 && iblk > 0) {
                                 // This is a user-feedback counter.
@@ -200,8 +181,6 @@ public class CWBServerImpl implements CWBServer {
 
                             if (eof || (nsclComp != null &&
                                     (ms == null ? true : nsclComparator.compare(nsclComp, NSCL.stringToNSCL(ms.getSeedName())) != 0))) {
-                                msTransfer += (System.currentTimeMillis() - startPhase);
-                                startPhase = System.currentTimeMillis();
                                 if (!options.quiet) {
                                     // TODO could go into a helper method
                                     int nsgot = 0;
@@ -242,8 +221,6 @@ public class CWBServerImpl implements CWBServer {
                                     blks.clear();
                                     System.gc();        // Lots of memory just abandoned.  Try garbage collector
                                 }
-                                msOutput += (System.currentTimeMillis() - startPhase);
-                                startPhase = System.currentTimeMillis();
                             }
 
                             // If this block is the first in a new component, clear the blks array
@@ -287,9 +264,7 @@ public class CWBServerImpl implements CWBServer {
                         }
                     }   // while(!eof)
                     if (!options.quiet && iblk > 0) {
-                        logger.info(iblk + " Total blocks transferred in " +
-                                (System.currentTimeMillis() - startTime) + " ms " +
-                                (iblk * 1000L / Math.max(System.currentTimeMillis() - startTime, 1)) + " b/s " + npur + " #dups=" + ndups);
+                        logger.info(iblk + " blocks transferred.");
                     }
                     blks.clear();
                     return blksAll;      // If called in no file output mode, return the blocks
@@ -310,11 +285,6 @@ public class CWBServerImpl implements CWBServer {
                     ds.close();
                 } catch (IOException e) {
                 }
-            }
-            if (options.perfMonitor) {
-                long msEnd = System.currentTimeMillis() - startPhase;
-                logger.info("Perf setup=" + msSetup + " connect=" + msConnect + " Cmd=" + msCommand + " xfr=" + msTransfer + " out=" + msOutput +
-                        " last=" + msEnd + " tot=" + (msSetup + msConnect + msTransfer + msOutput + msEnd) + " #blks=" + totblks + " #lines=" + nline);
             }
             return null;
         } catch (IOException e) {

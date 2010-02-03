@@ -7,8 +7,6 @@ package gov.usgs.anss.query.cwb;
 import gov.usgs.anss.edge.IllegalSeednameException;
 import gov.usgs.anss.query.EdgeQueryOptions;
 import gov.usgs.anss.query.NSCL;
-import gov.usgs.anss.query.Outputer;
-import gov.usgs.anss.query.outputter.Filename;
 import gov.usgs.anss.seed.MiniSeed;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -21,14 +19,12 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.GregorianCalendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
-import gov.usgs.anss.query.EdgeQueryOptions.OutputType;
 
 /**
  *
@@ -37,7 +33,6 @@ import gov.usgs.anss.query.EdgeQueryOptions.OutputType;
 public class CWBServerImpl implements CWBServer {
 
     static DecimalFormat df6 = new DecimalFormat("000000");
-
     private static final Logger logger = Logger.getLogger(CWBServerImpl.class.getName());
     private static DateTimeFormatter hmsFormat = ISODateTimeFormat.time().withZone(DateTimeZone.forID("UTC"));
 
@@ -108,9 +103,9 @@ public class CWBServerImpl implements CWBServer {
         long startPhase = startTime;
 
         byte[] b = new byte[4096];
-        Outputer out = null;
+        //       Outputer out = null;
 
-         ArrayList<ArrayList<MiniSeed>> blksAll = null;
+        ArrayList<ArrayList<MiniSeed>> blksAll = null;
         String filename = "";
         BufferedReader infile = null;
 
@@ -170,10 +165,7 @@ public class CWBServerImpl implements CWBServer {
                     return null;
                 }
 
-                out = options.getOutputter();
-                if (out == null) {
-                    blksAll = new ArrayList<ArrayList<MiniSeed>>(20);
-                }
+                blksAll = new ArrayList<ArrayList<MiniSeed>>(20);
 
                 // The length at which our compare for changes depends on the output file mask
                 Comparator nsclComparator = options.getNsclComparator();
@@ -185,6 +177,7 @@ public class CWBServerImpl implements CWBServer {
                     msSetup += (System.currentTimeMillis() - startPhase);
                     startPhase = System.currentTimeMillis();
                     boolean perfStart = true;
+                    System.out.println("Query to server: " + line);
                     outtcp.write(line.getBytes());
                     int iblk = 0;
                     NSCL nscl = NSCL.stringToNSCL("            ");
@@ -218,9 +211,6 @@ public class CWBServerImpl implements CWBServer {
                                 eof = true;         // still need to process this last channel THIS SHOULD NEVER  HAPPEN unless socket is lost
                                 ms = null;
                                 logger.warning("   *** Unexpected EOF Found");
-                                if (out != null) {
-                                    System.exit(1);      // error out with no file
-                                }
                             }
                             if (perfStart) {
                                 msCommand += (System.currentTimeMillis() - startPhase);
@@ -267,37 +257,11 @@ public class CWBServerImpl implements CWBServer {
 
                                 if (blks.size() > 0) {
                                     MiniSeed ms2 = blks.get(0);
-                                    if (out == null) {     // Get the array list output
-                                        ArrayList<MiniSeed> newBlks = new ArrayList<MiniSeed>(blks.size());
-                                        for (int i = 0; i < blks.size(); i++) {
-                                            newBlks.add(i, blks.get(i));
-                                        }
-                                        blksAll.add(newBlks);
-                                    } else {      // create the output file
-                                        if (options.getType() == OutputType.ms ||
-                                                options.getType() == OutputType.dcc ||
-                                                options.getType() == OutputType.dcc512 ||
-                                                options.getType() == OutputType.msz) {
-                                            filename = Filename.makeFilename(options.filemask, nscl, ms2);
-                                        } else {
-                                            filename = Filename.makeFilename(options.filemask, nscl, options.getBegin());
-                                        }
-
-                                        //filename = lastComp;
-                                        // TODO - should happen in the makeFilename methods.
-                                        filename = filename.replaceAll(" ", "_");
-
-                                        logger.finest(((MiniSeed) blks.get(0)).getTimeString() + " to " +
-                                                ((MiniSeed) blks.get(blks.size() - 1)).getTimeString() +
-                                                " " + (((MiniSeed) blks.get(0)).getGregorianCalendar().getTimeInMillis() -
-                                                ((MiniSeed) blks.get(blks.size() - 1)).getGregorianCalendar().getTimeInMillis()) / 1000L);
-
-                                        blks.trimToSize();
-                                        //for(int i=0; i<blks.size(); i++) logger.finest(((MiniSeed) blks.get(i)).toString());
-                                        // TODO: Change the signature to pass options only once.
-
-                                        out.makeFile(nscl, filename, blks);
+                                    ArrayList<MiniSeed> newBlks = new ArrayList<MiniSeed>(blks.size());
+                                    for (int i = 0; i < blks.size(); i++) {
+                                        newBlks.add(i, blks.get(i));
                                     }
+                                    blksAll.add(newBlks);
                                 }
                                 maxTime = 0;
                                 if (blks.size() > 0) {
@@ -353,15 +317,10 @@ public class CWBServerImpl implements CWBServer {
                                 (System.currentTimeMillis() - startTime) + " ms " +
                                 (iblk * 1000L / Math.max(System.currentTimeMillis() - startTime, 1)) + " b/s " + npur + " #dups=" + ndups);
                     }
-                    if (out == null) {
-                        return blksAll;      // If called in no file output mode, return the blocks
-                    }
                     blks.clear();
+                    return blksAll;      // If called in no file output mode, return the blocks
                 } catch (UnknownHostException e) {
                     logger.severe("EQC main: Host is unknown=" + this.host + "/" + this.port);
-                    if (out != null) {
-                        System.exit(1);
-                    }
                     return null;
                 } catch (IOException e) {
                     if (e.getMessage().equalsIgnoreCase("Connection refused")) {
@@ -369,9 +328,6 @@ public class CWBServerImpl implements CWBServer {
                         return null;
                     } else {
                         logger.severe(e + " EQC main: IO error opening/reading socket=" + this.host + "/" + this.port);
-                        if (out != null) {
-                            System.exit(1);
-                        }
                     }
                 }
             }       // End of readline

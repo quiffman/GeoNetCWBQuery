@@ -2,9 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package gov.usgs.anss.query.cwb;
 
+import gov.usgs.anss.query.NSCL;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -21,7 +21,6 @@ public class CWBQueryFormatter {
     private static String beginFormat = "YYYY/MM/dd HH:mm:ss";
     private static DateTimeFormatter parseBeginFormat = DateTimeFormat.forPattern(beginFormat).withZone(DateTimeZone.forID("UTC"));
 
-
     /**
      * String for listing available channels.
      *
@@ -33,4 +32,8 @@ public class CWBQueryFormatter {
         return "'-b' '" + parseBeginFormat.withZone(DateTimeZone.UTC).print(begin) + "' " + "'-d' '" + duration + "' " + "'-lsc'\n";
     }
 
+    static String miniSEED(DateTime begin, Double duration, NSCL nscl) {
+//        '-b' '2009/01/01 00:00:00' '-s' 'NZMRZ..HHZ10' '-d' '1800'\n
+        return "'-b' '" + parseBeginFormat.withZone(DateTimeZone.UTC).print(begin) + "' '-s' '" +  nscl.toString() + "' '-d' '" + duration + "'\n";
+    }
 }

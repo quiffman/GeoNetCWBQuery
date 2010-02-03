@@ -8,8 +8,6 @@ import gov.usgs.anss.edge.IllegalSeednameException;
 import gov.usgs.anss.query.EdgeQueryOptions;
 import gov.usgs.anss.query.NSCL;
 import gov.usgs.anss.seed.MiniSeed;
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -90,9 +88,7 @@ public class CWBServerImpl implements CWBServer {
         }
     }
 
-    public ArrayList<ArrayList<MiniSeed>> query(EdgeQueryOptions options) {
-
-        String line = "";
+    public ArrayList<ArrayList<MiniSeed>> query(EdgeQueryOptions options, DateTime begin, Double duration, NSCL nscl) {
 
         long msSetup = 0;
         long msConnect = 0;
@@ -106,15 +102,6 @@ public class CWBServerImpl implements CWBServer {
         //       Outputer out = null;
 
         ArrayList<ArrayList<MiniSeed>> blksAll = null;
-        String filename = "";
-        BufferedReader infile = null;
-
-        // TODO: Push this into EdgeQueryOptions in favour of a command line iterator.
-        try {
-            infile = new BufferedReader(options.getAsReader());
-        } catch (FileNotFoundException ex) {
-            logger.severe("did not find the input file=" + options.filenamein);
-        }
 
         // the "in" BufferedReader will give us the command lines we need for the other end
         try {
@@ -153,17 +140,6 @@ public class CWBServerImpl implements CWBServer {
             OutputStream outtcp = ds.getOutputStream();
             msConnect += (System.currentTimeMillis() - startPhase);
             startPhase = System.currentTimeMillis();
-            while ((line = infile.readLine()) != null) {
-                if (line.length() < 2) {
-                    continue;
-                }
-                nline++;
-
-                options = new EdgeQueryOptions(line);
-                if (!options.isValid()) {
-                    logger.severe("Error @line " + nline);
-                    return null;
-                }
 
                 blksAll = new ArrayList<ArrayList<MiniSeed>>(20);
 
@@ -172,15 +148,13 @@ public class CWBServerImpl implements CWBServer {
 
                 long maxTime = 0;
                 int ndups = 0;
-                line = options.getSingleQuotedCommand();
                 try {
                     msSetup += (System.currentTimeMillis() - startPhase);
                     startPhase = System.currentTimeMillis();
                     boolean perfStart = true;
-                    System.out.println("Query to server: " + line);
-                    outtcp.write(line.getBytes());
+                     outtcp.write(CWBQueryFormatter.miniSEED(begin, duration, nscl).getBytes());
                     int iblk = 0;
-                    NSCL nscl = NSCL.stringToNSCL("            ");
+                    NSCL nsclComp = NSCL.stringToNSCL("            ");
                     boolean eof = false;
                     MiniSeed ms = null;
                     int npur = 0;
@@ -224,8 +198,8 @@ public class CWBServerImpl implements CWBServer {
                                 System.out.print("\r            \r" + iblk + "...");
                             }
 
-                            if (eof || (nscl != null &&
-                                    (ms == null ? true : nsclComparator.compare(nscl, NSCL.stringToNSCL(ms.getSeedName())) != 0))) {
+                            if (eof || (nsclComp != null &&
+                                    (ms == null ? true : nsclComparator.compare(nsclComp, NSCL.stringToNSCL(ms.getSeedName())) != 0))) {
                                 msTransfer += (System.currentTimeMillis() - startPhase);
                                 startPhase = System.currentTimeMillis();
                                 if (!options.quiet) {
@@ -242,7 +216,7 @@ public class CWBServerImpl implements CWBServer {
                                         DateTime dt = new DateTime().withZone(DateTimeZone.forID("UTC"));
 
 
-                                        logger.info(hmsFormat.print(dt.getMillis()) + " Query on " + nscl + " " +
+                                        logger.info(hmsFormat.print(dt.getMillis()) + " Query on " + nsclComp + " " +
                                                 df6.format(blks.size()) + " mini-seed blks " +
                                                 (blks.get(0) == null ? "Null" : ((MiniSeed) blks.get(0)).getTimeString()) + " " +
                                                 (blks.get((blks.size() - 1)) == null ? "Null" : (blks.get(blks.size() - 1)).getEndTimeString()) + " " +
@@ -306,7 +280,7 @@ public class CWBServerImpl implements CWBServer {
                                     }
                                     maxTime = ms.getTimeInMillis();
                                 }
-                                nscl = NSCL.stringToNSCL(ms.getSeedName());
+                                nsclComp = NSCL.stringToNSCL(ms.getSeedName());
                             }
                         } catch (IllegalSeednameException e) {
                             logger.severe("Seedname exception making a seed record e=" + e.getMessage());
@@ -330,7 +304,6 @@ public class CWBServerImpl implements CWBServer {
                         logger.severe(e + " EQC main: IO error opening/reading socket=" + this.host + "/" + this.port);
                     }
                 }
-            }       // End of readline
             outtcp.write("\n".getBytes());      // Send end of request marker to query
             if (ds.isClosed()) {
                 try {

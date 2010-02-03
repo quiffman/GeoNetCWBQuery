@@ -4,6 +4,7 @@
  */
 package gov.usgs.anss.query.cwb;
 
+import gov.usgs.anss.query.NSCL;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.AfterClass;
@@ -37,5 +38,14 @@ public class CWBQueryFormatterTest {
         String result = CWBQueryFormatter.listChannels(begin, duration);
         assertEquals("list query 1", "'-b' '2009/01/01 11:11:11' '-d' '1800.0' '-lsc'\n", result);
 
+    }
+
+    @Test
+    public void testMiniSEEDQuery() {
+        NSCL nscl = NSCL.stringToNSCL("NZMRZ..HHZ10");
+        DateTime begin = new DateTime(2009, 1, 1, 0, 0, 0, 0, tz);
+        Double duration = 1800d;
+        String result = CWBQueryFormatter.miniSEED(begin, duration, nscl);
+        assertEquals("data query 1", "'-b' '2009/01/01 00:00:00' '-s' 'NZMRZ..HHZ10' '-d' '1800.0'\n", result);
     }
 }

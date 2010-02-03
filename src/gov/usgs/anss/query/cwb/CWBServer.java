@@ -6,6 +6,7 @@
 package gov.usgs.anss.query.cwb;
 
 import gov.usgs.anss.query.EdgeQueryOptions;
+import gov.usgs.anss.query.NSCL;
 import gov.usgs.anss.seed.MiniSeed;
 import java.util.ArrayList;
 import org.joda.time.DateTime;
@@ -24,6 +25,6 @@ public interface CWBServer {
      */
     String listChannels(DateTime begin, Double duration);
 
-    public ArrayList<ArrayList<MiniSeed>> query(EdgeQueryOptions options);
+    public ArrayList<ArrayList<MiniSeed>> query(EdgeQueryOptions options, DateTime begin, Double duration, NSCL nscl);
 
 }

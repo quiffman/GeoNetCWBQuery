@@ -15,6 +15,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -31,6 +33,7 @@ import static org.junit.Assert.*;
 public class CWBServerImplTest {
 
     private static CWBServerImpl cwbServer;
+    private static DateTimeZone tz = DateTimeZone.forID("UTC");
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -40,25 +43,39 @@ public class CWBServerImplTest {
     @Parameters
     public static Collection data() {
         return Arrays.asList(new Object[][]{
-                    // args line,	filenames...
                     {"-b \"2009/01/01 00:00:00\" -s \"NZWLGT.BTZ40\" -d 600",
+                        new DateTime(2009, 1, 1, 0, 0, 0, 0, tz),
+                        600d,
+                        NSCL.stringToNSCL("NZWLGT.BTZ40"),
                         new String[]{"build/NZWLGT_BTZ40-2009-01-01-00-00-00.ms"}
                     },
                     {"-b \"2009/06/01 12:00:00\" -s \"NZ.....BTZ..\" -d 600",
+                        new DateTime(2009, 6, 1, 12, 0, 0, 0, tz),
+                        600d,
+                        NSCL.stringToNSCL("NZ.....BTZ.."),
                         new String[]{"build/NZAUCT_BTZ40-2009-06-01-11-59-51.ms", "build/NZAUCT_BTZ41-2009-06-01-11-59-17.ms", "build/NZCHIT_BTZ40-2009-06-01-11-59-27.ms", "build/NZCHIT_BTZ41-2009-06-01-11-59-33.ms", "build/NZGIST_BTZ40-2009-06-01-11-59-50.ms", "build/NZGIST_BTZ41-2009-06-01-11-59-38.ms", "build/NZLOTT_BTZ40-2009-06-01-11-59-58.ms", "build/NZLOTT_BTZ41-2009-06-01-11-59-37.ms", "build/NZNAPT_BTZ40-2009-06-01-11-59-40.ms", "build/NZNAPT_BTZ41-2009-06-01-11-59-32.ms", "build/NZNCPT_BTZ40-2009-06-01-11-59-58.ms", "build/NZNCPT_BTZ41-2009-06-01-11-59-50.ms", "build/NZRBCT_BTZ40-2009-06-01-11-59-40.ms", "build/NZRBCT_BTZ41-2009-06-01-11-59-43.ms", "build/NZRFRT_BTZ40-2009-06-01-11-59-50.ms", "build/NZRFRT_BTZ41-2009-06-01-11-59-58.ms", "build/NZTAUT_BTZ40-2009-06-01-11-59-47.ms", "build/NZTAUT_BTZ41-2009-06-01-11-59-21.ms", "build/NZWLGT_BTZ40-2009-06-01-11-59-56.ms", "build/NZWLGT_BTZ41-2009-06-01-11-59-35.ms"}
                     },
                     {"-b \"2009/01/01 00:00:00\" -s \"NZMRZ..HHZ10\" -d 1800",
+                        new DateTime(2009, 1, 1, 0, 0, 0, 0, tz),
+                        1800d,
+                        NSCL.stringToNSCL("NZMRZ..HHZ10"),
                         new String[]{"build/NZMRZ__HHZ10-2009-01-01-00-00-00.ms"}
                     }
                 });
     }
     private String queryLine;
+    private DateTime begin;
+    private Double duration;
+    private NSCL nscl;
     private String[] filenames;
 
-    public CWBServerImplTest(String queryLine, String[] filenames) {
+    public CWBServerImplTest(String queryLine, DateTime begin, Double duration, NSCL nscl, String[] filenames) {
         // Note the -t NULL
         this.queryLine = queryLine;
         this.filenames = filenames;
+        this.begin = begin;
+        this.duration = duration;
+        this.nscl = nscl;
     }
 
     @Before
@@ -104,7 +121,7 @@ public class CWBServerImplTest {
         }
 
         // Run the query. Note the -t NULL
-		ArrayList<ArrayList<MiniSeed>> result = cwbServer.query(new EdgeQueryOptions(queryLine));
+        ArrayList<ArrayList<MiniSeed>> result = cwbServer.query(new EdgeQueryOptions(queryLine), begin, duration, nscl);
         assertCollectionEquals("entire collection", expResult.get(0), result.get(0));
     }
 

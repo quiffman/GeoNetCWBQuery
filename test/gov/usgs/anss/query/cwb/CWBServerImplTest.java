@@ -122,7 +122,14 @@ public class CWBServerImplTest {
 
         // Run the query. Note the -t NULL
         ArrayList<ArrayList<MiniSeed>> result = cwbServer.query(new EdgeQueryOptions(queryLine), begin, duration, nscl);
-        assertCollectionEquals("entire collection", expResult.get(0), result.get(0));
+
+        assertEquals("collection lengths", expResult.size(), result.size());
+
+        for (int i = 0; i < result.size(); i++) {
+            assertCollectionEquals("entire collection", expResult.get(i), result.get(i));
+        }
+
+        
     }
 
     private static void assertCollectionEquals(

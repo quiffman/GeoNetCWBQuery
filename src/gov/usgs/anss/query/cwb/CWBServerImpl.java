@@ -266,6 +266,9 @@ public class CWBServerImpl implements CWBServer {
                     if (!options.quiet && iblk > 0) {
                         logger.info(iblk + " blocks transferred.");
                     }
+                    // TODO convert this to return blks, not blksAll and have a hasNext method to
+                    // allow multiple calls to this method.
+                    blks.trimToSize();
                     blks.clear();
                     return blksAll;      // If called in no file output mode, return the blocks
                 } catch (UnknownHostException e) {

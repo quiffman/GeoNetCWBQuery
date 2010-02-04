@@ -17,6 +17,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -90,6 +91,14 @@ public class CWBServerImplTest {
             Logger.getLogger(CWBServerImplTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
+	/**
+	 * To make netbeans work with junit tests incorporating System.out.print calls.
+	 */
+    @After
+    public void tearDown() {
+		System.out.println();
+	}
 
     /**
      * Test of query method, of class EdgeQueryClient.

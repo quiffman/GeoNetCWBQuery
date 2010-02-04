@@ -55,12 +55,12 @@ public class CWBServerMSEEDTest {
                         NSCL.stringToNSCL("NZ.....BTZ.."),
                         new String[]{"build/NZAUCT_BTZ40-2009-06-01-11-59-51.ms", "build/NZAUCT_BTZ41-2009-06-01-11-59-17.ms", "build/NZCHIT_BTZ40-2009-06-01-11-59-27.ms", "build/NZCHIT_BTZ41-2009-06-01-11-59-33.ms", "build/NZGIST_BTZ40-2009-06-01-11-59-50.ms", "build/NZGIST_BTZ41-2009-06-01-11-59-38.ms", "build/NZLOTT_BTZ40-2009-06-01-11-59-58.ms", "build/NZLOTT_BTZ41-2009-06-01-11-59-37.ms", "build/NZNAPT_BTZ40-2009-06-01-11-59-40.ms", "build/NZNAPT_BTZ41-2009-06-01-11-59-32.ms", "build/NZNCPT_BTZ40-2009-06-01-11-59-58.ms", "build/NZNCPT_BTZ41-2009-06-01-11-59-50.ms", "build/NZRBCT_BTZ40-2009-06-01-11-59-40.ms", "build/NZRBCT_BTZ41-2009-06-01-11-59-43.ms", "build/NZRFRT_BTZ40-2009-06-01-11-59-50.ms", "build/NZRFRT_BTZ41-2009-06-01-11-59-58.ms", "build/NZTAUT_BTZ40-2009-06-01-11-59-47.ms", "build/NZTAUT_BTZ41-2009-06-01-11-59-21.ms", "build/NZWLGT_BTZ40-2009-06-01-11-59-56.ms", "build/NZWLGT_BTZ41-2009-06-01-11-59-35.ms"}
                     },
-//                    {"-b \"2009/01/01 00:00:00\" -s \"NZMRZ..HHZ10\" -d 1800",
-//                        new DateTime(2009, 1, 1, 0, 0, 0, 0, tz),
-//                        1800d,
-//                        NSCL.stringToNSCL("NZMRZ..HHZ10"),
-//                        new String[]{"build/NZMRZ__HHZ10-2009-01-01-00-00-00.ms"}
-//                    }
+                    {"-b \"2009/01/01 00:00:00\" -s \"NZMRZ..HHZ10\" -d 1800",
+                        new DateTime(2009, 1, 1, 0, 0, 0, 0, tz),
+                        1800d,
+                        NSCL.stringToNSCL("NZMRZ..HHZ10"),
+                        new String[]{"build/NZMRZ__HHZ10-2009-01-01-00-00-00.ms"}
+                    }
                 });
     }
     private String queryLine;
@@ -131,20 +131,16 @@ public class CWBServerMSEEDTest {
 
         cwbServer = new CWBServerMSEED("cwb.geonet.org.nz", 80, begin, duration, nscl);
         ArrayList<ArrayList<MiniSeed>> result = new ArrayList<ArrayList<MiniSeed>>();
-//        while (cwbServer.hasNext()) {
-//            System.out.println("hasNext");
+        while (cwbServer.hasNext()) {
+            System.out.println("hasNext");
             result.add(cwbServer.query(new EdgeQueryOptions(queryLine)));
-//        }
+        }
 
-        assertEquals("first collection lengths", expResult.get(0).size(), result.get(0).size());
         assertEquals("collection lengths", expResult.size(), result.size());
-//
-//        for (int i = 0; i < result.size(); i++) {
-//            assertCollectionEquals("entire collection", expResult.get(i), result.get(i));
-//        }
 
-//     TODO - temp to test first element only while we refactor.
-//        assertCollectionEquals("entire collection", expResult.get(0), result.get(0));
+        for (int i = 0; i < result.size(); i++) {
+            assertCollectionEquals("entire collection", expResult.get(i), result.get(i));
+        }
     }
 
     private static void assertCollectionEquals(

@@ -143,6 +143,7 @@ public class CWBServerMSEED {
                         lastNSCL = newNSCL;
                     } else {
                         incomingMiniSEED.drainTo(blks);
+                        incomingMiniSEED.add(ms);
                         lastNSCL = newNSCL;
                         break read;
                     }
@@ -154,7 +155,7 @@ public class CWBServerMSEED {
 
         // This is triggered from the last channel off the stream
         // There is probably a way to handle this in the logic above.
-        if (incomingMiniSEED.size() > 1) {
+        if (blks.isEmpty()) {
             incomingMiniSEED.drainTo(blks);
         }
 
@@ -162,6 +163,13 @@ public class CWBServerMSEED {
 
         return blks;
     }
+
+	public boolean hasNext() {
+		if (lastNSCL == null) {
+			return true;
+		}
+		return !incomingMiniSEED.isEmpty();
+	}
 
 
 //      public ArrayList<MiniSeed> query(EdgeQueryOptions options) {

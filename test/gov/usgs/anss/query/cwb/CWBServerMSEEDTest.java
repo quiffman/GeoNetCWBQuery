@@ -133,7 +133,7 @@ public class CWBServerMSEEDTest {
         cwbServer = new CWBServerMSEED("cwb.geonet.org.nz", 80, begin, duration, nscl);
         ArrayList<TreeSet<MiniSeed>> result = new ArrayList<TreeSet<MiniSeed>>();
         while (cwbServer.hasNext()) {
-              result.add(cwbServer.query(new EdgeQueryOptions(queryLine)));
+              result.add(cwbServer.getNext());
         }
 
         assertEquals("collection lengths", expResult.size(), result.size());

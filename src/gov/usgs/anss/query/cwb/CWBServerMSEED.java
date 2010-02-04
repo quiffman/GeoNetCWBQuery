@@ -5,7 +5,6 @@
 package gov.usgs.anss.query.cwb;
 
 import gov.usgs.anss.edge.IllegalSeednameException;
-import gov.usgs.anss.query.EdgeQueryOptions;
 import gov.usgs.anss.query.NSCL;
 import gov.usgs.anss.seed.MiniSeed;
 import java.io.IOException;
@@ -28,7 +27,6 @@ import org.joda.time.format.ISODateTimeFormat;
  */
 public class CWBServerMSEED {
 
-    static DecimalFormat df6 = new DecimalFormat("000000");
     private static final Logger logger = Logger.getLogger(CWBServerMSEED.class.getName());
     private static DateTimeFormatter hmsFormat = ISODateTimeFormat.time().withZone(DateTimeZone.forID("UTC"));
 
@@ -48,9 +46,6 @@ public class CWBServerMSEED {
     public CWBServerMSEED(String host, int port, DateTime begin, Double duration, NSCL nscl) {
         this.host = host;
         this.port = port;
-
-        // particularly for the DCC we want this program to not error out if we cannot connect to the server
-        // So make sure we can connect and print messages
 
         while (ds == null) {
             try {
@@ -86,19 +81,20 @@ public class CWBServerMSEED {
         incomingMiniSEED = new LinkedBlockingQueue<MiniSeed>();
     }
 
-    public TreeSet<MiniSeed> query(EdgeQueryOptions options) {
+    public TreeSet<MiniSeed> getNext() {
 
         TreeSet<MiniSeed> blks = new TreeSet<MiniSeed>();
 
         byte[] b = new byte[4096];
         try {
             read:
-            while (read(inStream, b, 0, options.gapsonly ? 64 : 512)) {
+            while (read(inStream, b, 0, 512)) {
                 MiniSeed ms = null;
                 // It doens't look like the GeoNet CWB server actually does this
                 // but I'm going to leave this in anyway.
                 if (b[0] == '<' && b[1] == 'E' && b[2] == 'O' && b[3] == 'R' && b[4] == '>') {
                     logger.fine("EOR found");
+                    break read;
                 } else {
 
                     try {
@@ -107,7 +103,7 @@ public class CWBServerMSEED {
                         Logger.getLogger(CWBServerMSEED.class.getName()).log(Level.SEVERE, null, ex);
                     }
 
-                    if (!options.gapsonly && ms.getBlockSize() != 512) {
+                    if (ms.getBlockSize() != 512) {
                         read(inStream, b, 512, ms.getBlockSize() - 512);
 
                         try {
@@ -120,6 +116,10 @@ public class CWBServerMSEED {
                 }
 
                 if (ms != null) {
+
+                    if (ms.getIndicator().compareTo("D ") < 0) {
+                        continue read;
+                    }
 
                     // This sets up the NSCL on the very first miniSEED block
                     if (lastNSCL == null) {
@@ -171,5 +171,16 @@ public class CWBServerMSEED {
 
         }
         return false;
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        try {
+            outStream.write(("\n").getBytes());
+        } catch (IOException ex) {
+            Logger.getLogger(CWBServerMSEED.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        ds.close();
     }
 }

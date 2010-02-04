@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.joda.time.DateTime;
@@ -130,10 +131,9 @@ public class CWBServerMSEEDTest {
 
 
         cwbServer = new CWBServerMSEED("cwb.geonet.org.nz", 80, begin, duration, nscl);
-        ArrayList<ArrayList<MiniSeed>> result = new ArrayList<ArrayList<MiniSeed>>();
+        ArrayList<TreeSet<MiniSeed>> result = new ArrayList<TreeSet<MiniSeed>>();
         while (cwbServer.hasNext()) {
-            System.out.println("hasNext");
-            result.add(cwbServer.query(new EdgeQueryOptions(queryLine)));
+              result.add(cwbServer.query(new EdgeQueryOptions(queryLine)));
         }
 
         assertEquals("collection lengths", expResult.size(), result.size());

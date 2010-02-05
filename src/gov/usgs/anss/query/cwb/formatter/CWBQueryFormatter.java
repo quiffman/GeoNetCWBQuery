@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package gov.usgs.anss.query.cwb;
+package gov.usgs.anss.query.cwb.formatter;
 
 import gov.usgs.anss.query.NSCL;
 import org.joda.time.DateTime;
@@ -32,7 +32,7 @@ public class CWBQueryFormatter {
         return "'-b' '" + parseBeginFormat.withZone(DateTimeZone.UTC).print(begin) + "' " + "'-d' '" + duration + "' " + "'-lsc'\n";
     }
 
-    static String miniSEED(DateTime begin, Double duration, NSCL nscl) {
+    public static String miniSEED(DateTime begin, Double duration, NSCL nscl) {
 //        '-b' '2009/01/01 00:00:00' '-s' 'NZMRZ..HHZ10' '-d' '1800'\n
         return "'-b' '" + parseBeginFormat.withZone(DateTimeZone.UTC).print(begin) + "' '-s' '" +  nscl.toString() + "' '-d' '" + duration + "'\n";
     }

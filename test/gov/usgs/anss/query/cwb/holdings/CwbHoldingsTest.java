@@ -2,10 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package gov.usgs.anss.query.cwb;
+package gov.usgs.anss.query.cwb.holdings;
 
 import gov.usgs.anss.query.*;
-import gov.usgs.anss.query.cwb.CWBQuery;
+import gov.usgs.anss.query.cwb.holdings.CWBHoldingsQuery;
 import java.util.ArrayList;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -21,7 +21,7 @@ import static org.junit.Assert.*;
 public class CwbHoldingsTest {
 
     private static CWBServerMock cwbServer;
-    private static CWBQuery cwbQuery;
+    private static CWBHoldingsQuery cwbQuery;
     private static DateTimeZone tz = DateTimeZone.forID("UTC");
 
     public CwbHoldingsTest() {
@@ -30,7 +30,7 @@ public class CwbHoldingsTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
         cwbServer = new CWBServerMock("mocked.host", 9999);
-        cwbQuery = new CWBQuery(cwbServer);
+        cwbQuery = new CWBHoldingsQuery(cwbServer);
     }
 
     @AfterClass
@@ -39,12 +39,12 @@ public class CwbHoldingsTest {
 
     @Test
     public void testLscToNsc() {
-        assertEquals("lsc 1", CWBQuery.lscToNscl("NZTRVZ VKI01 #days=1    09_001"), NSCL.stringToNSCL("NZTRVZ VKI01"));
-        assertEquals("lsc 2", CWBQuery.lscToNscl("NZTSZ  ACE01 #days=1    09_001"), NSCL.stringToNSCL("NZTSZ  ACE01"));
-        assertEquals("lsc 3", CWBQuery.lscToNscl("NZTSZ  HHE10 #days=1    09_001"), NSCL.stringToNSCL("NZTSZ  HHE10"));
-        assertEquals("lsc 4", CWBQuery.lscToNscl("NZTSZ  HHN10 #days=1    09_001"), NSCL.stringToNSCL("NZTSZ  HHN10"));
-        assertNull("Empty string", CWBQuery.lscToNscl(""));
-        assertNull("There are...", CWBQuery.lscToNscl("There are 248 stations"));
+        assertEquals("lsc 1", CWBHoldingsQuery.lscToNscl("NZTRVZ VKI01 #days=1    09_001"), NSCL.stringToNSCL("NZTRVZ VKI01"));
+        assertEquals("lsc 2", CWBHoldingsQuery.lscToNscl("NZTSZ  ACE01 #days=1    09_001"), NSCL.stringToNSCL("NZTSZ  ACE01"));
+        assertEquals("lsc 3", CWBHoldingsQuery.lscToNscl("NZTSZ  HHE10 #days=1    09_001"), NSCL.stringToNSCL("NZTSZ  HHE10"));
+        assertEquals("lsc 4", CWBHoldingsQuery.lscToNscl("NZTSZ  HHN10 #days=1    09_001"), NSCL.stringToNSCL("NZTSZ  HHN10"));
+        assertNull("Empty string", CWBHoldingsQuery.lscToNscl(""));
+        assertNull("There are...", CWBHoldingsQuery.lscToNscl("There are 248 stations"));
     }
 
     @Test

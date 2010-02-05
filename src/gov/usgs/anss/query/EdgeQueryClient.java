@@ -10,7 +10,7 @@ package gov.usgs.anss.query;
 
 import gov.usgs.anss.edge.*;
 import gov.usgs.anss.query.EdgeQueryOptions.OutputType;
-import gov.usgs.anss.query.cwb.CWBServerImpl;
+import gov.usgs.anss.query.cwb.holdings.CWBHoldingsServerImpl;
 import gov.usgs.anss.query.outputter.Filename;
 import gov.usgs.anss.seed.MiniSeed;
 import java.io.*;
@@ -459,7 +459,7 @@ public class EdgeQueryClient {
         EdgeQueryOptions options = new EdgeQueryOptions(args);
 
 
-        CWBServerImpl cwbServer = new CWBServerImpl(options.host, options.port);
+        CWBHoldingsServerImpl cwbServer = new CWBHoldingsServerImpl(options.host, options.port);
 
         // The ls option does not require any args checking
         if (options.isListQuery()) {

@@ -2,15 +2,16 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package gov.usgs.anss.query.cwb;
+package gov.usgs.anss.query.cwb.holdings;
 
+import gov.usgs.anss.query.cwb.holdings.CWBHoldingsServer;
 import org.joda.time.DateTime;
 
 /**
  *
  * @author geoffc
  */
-public class CWBServerMock implements CWBServer {
+public class CWBServerMock implements CWBHoldingsServer {
 
     public CWBServerMock(String host, int port) {
     }

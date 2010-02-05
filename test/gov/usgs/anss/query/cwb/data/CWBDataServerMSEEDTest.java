@@ -2,8 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package gov.usgs.anss.query.cwb;
+package gov.usgs.anss.query.cwb.data;
 
+import gov.usgs.anss.query.cwb.data.CWBDataServerMSEED;
 import gov.usgs.anss.query.*;
 import gov.usgs.anss.seed.MiniSeed;
 import java.io.File;
@@ -32,9 +33,9 @@ import static org.junit.Assert.*;
  * @author richardg
  */
 @RunWith(Parameterized.class)
-public class CWBServerMSEEDTest {
+public class CWBDataServerMSEEDTest {
 
-    private static CWBServerMSEED cwbServer;
+    private static CWBDataServerMSEED cwbServer;
     private static DateTimeZone tz = DateTimeZone.forID("UTC");
 
     @BeforeClass
@@ -70,7 +71,7 @@ public class CWBServerMSEEDTest {
     private NSCL nscl;
     private String[] filenames;
 
-    public CWBServerMSEEDTest(String queryLine, DateTime begin, Double duration, NSCL nscl, String[] filenames) {
+    public CWBDataServerMSEEDTest(String queryLine, DateTime begin, Double duration, NSCL nscl, String[] filenames) {
         // Note the -t NULL
         this.queryLine = queryLine;
         this.filenames = filenames;
@@ -88,7 +89,7 @@ public class CWBServerMSEEDTest {
                     "java -jar lib-ivy/external/GeoNetCWBQuery-2.0.0-RC1.jar " + queryLine + " -t ms -o build/%N-%y-%M-%D-%h-%m-%S.ms");
             getMS.waitFor();
         } catch (IOException ex) {
-            Logger.getLogger(CWBServerMSEEDTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CWBDataServerMSEEDTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -130,7 +131,7 @@ public class CWBServerMSEEDTest {
         }
 
 
-        cwbServer = new CWBServerMSEED("cwb.geonet.org.nz", 80, begin, duration, nscl);
+        cwbServer = new CWBDataServerMSEED("cwb.geonet.org.nz", 80, begin, duration, nscl);
         ArrayList<TreeSet<MiniSeed>> result = new ArrayList<TreeSet<MiniSeed>>();
         while (cwbServer.hasNext()) {
               result.add(cwbServer.getNext());

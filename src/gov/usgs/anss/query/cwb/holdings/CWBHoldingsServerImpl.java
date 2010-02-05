@@ -2,8 +2,11 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package gov.usgs.anss.query.cwb;
+package gov.usgs.anss.query.cwb.holdings;
 
+import gov.usgs.anss.query.cwb.formatter.CWBQueryFormatter;
+import gov.usgs.anss.query.cwb.*;
+import gov.usgs.anss.query.cwb.holdings.CWBHoldingsServer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -18,19 +21,19 @@ import org.joda.time.format.ISODateTimeFormat;
  *
  * @author geoffc
  */
-public class CWBServerImpl implements CWBServer {
+public class CWBHoldingsServerImpl implements CWBHoldingsServer {
 
-    private static final Logger logger = Logger.getLogger(CWBServerImpl.class.getName());
+    private static final Logger logger = Logger.getLogger(CWBHoldingsServerImpl.class.getName());
     private static DateTimeFormatter hmsFormat = ISODateTimeFormat.time().withZone(DateTimeZone.forID("UTC"));
 
 
     static {
-        logger.fine("$Id$");
+        logger.fine("$Id: CWBServerImpl.java 1831 2010-02-04 23:55:40Z geoffc $");
     }
     private String host;
     private int port;
 
-    public CWBServerImpl(String host, int port) {
+    public CWBHoldingsServerImpl(String host, int port) {
         this.host = host;
         this.port = port;
     }

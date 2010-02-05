@@ -2,8 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package gov.usgs.anss.query.cwb;
+package gov.usgs.anss.query.cwb.holdings;
 
+import gov.usgs.anss.query.cwb.*;
 import gov.usgs.anss.query.*;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,17 +18,17 @@ import org.joda.time.DateTime;
  *
  * @author geoffc
  */
-public class CWBQuery {
+public class CWBHoldingsQuery {
 
-    private CWBServer cwb;
-    protected static final Logger logger = Logger.getLogger(CWBQuery.class.getName());
+    private CWBHoldingsServer cwb;
+    protected static final Logger logger = Logger.getLogger(CWBHoldingsQuery.class.getName());
 
     /**
      * Allows queries to made against a CWB server.
      *
      * @param cwb
      */
-    public CWBQuery(CWBServer cwb) {
+    public CWBHoldingsQuery(CWBHoldingsServer cwb) {
         this.cwb = cwb;
     }
 
@@ -55,7 +56,7 @@ public class CWBQuery {
                 }
             }
         } catch (IOException ex) {
-            Logger.getLogger(CWBQuery.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CWBHoldingsQuery.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return nscl;

@@ -2,8 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package gov.usgs.anss.query.cwb;
+package gov.usgs.anss.query.cwb.data;
 
+import gov.usgs.anss.query.cwb.formatter.CWBQueryFormatter;
 import gov.usgs.anss.edge.IllegalSeednameException;
 import gov.usgs.anss.query.NSCL;
 import gov.usgs.anss.seed.MiniSeed;
@@ -11,7 +12,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.text.DecimalFormat;
 import java.util.TreeSet;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
@@ -25,9 +25,9 @@ import org.joda.time.format.ISODateTimeFormat;
  *
  * @author geoffc
  */
-public class CWBServerMSEED {
+public class CWBDataServerMSEED implements CWBDataServer {
 
-    private static final Logger logger = Logger.getLogger(CWBServerMSEED.class.getName());
+    private static final Logger logger = Logger.getLogger(CWBDataServerMSEED.class.getName());
     private static DateTimeFormatter hmsFormat = ISODateTimeFormat.time().withZone(DateTimeZone.forID("UTC"));
 
 
@@ -43,7 +43,7 @@ public class CWBServerMSEED {
     private NSCL newNSCL = null;
     private NSCL lastNSCL = null;
 
-    public CWBServerMSEED(String host, int port, DateTime begin, Double duration, NSCL nscl) {
+    public CWBDataServerMSEED(String host, int port, DateTime begin, Double duration, NSCL nscl) {
         this.host = host;
         this.port = port;
 
@@ -75,7 +75,7 @@ public class CWBServerMSEED {
             outStream = ds.getOutputStream();
             outStream.write(CWBQueryFormatter.miniSEED(begin, duration, nscl).getBytes());
         } catch (IOException ex) {
-            Logger.getLogger(CWBServerMSEED.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CWBDataServerMSEED.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         incomingMiniSEED = new LinkedBlockingQueue<MiniSeed>();
@@ -90,9 +90,8 @@ public class CWBServerMSEED {
             read:
             while (read(inStream, b, 0, 512)) {
                 MiniSeed ms = null;
-                // It doens't look like the GeoNet CWB server actually does this
-                // but I'm going to leave this in anyway.
-                if (b[0] == '<' && b[1] == 'E' && b[2] == 'O' && b[3] == 'R' && b[4] == '>') {
+                // It doens't look like the GeoNet CWB server actually returns this.
+                 if (b[0] == '<' && b[1] == 'E' && b[2] == 'O' && b[3] == 'R' && b[4] == '>') {
                     logger.fine("EOR found");
                     break read;
                 } else {
@@ -100,7 +99,7 @@ public class CWBServerMSEED {
                     try {
                         ms = new MiniSeed(b);
                     } catch (IllegalSeednameException ex) {
-                        Logger.getLogger(CWBServerMSEED.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(CWBDataServerMSEED.class.getName()).log(Level.SEVERE, null, ex);
                     }
 
                     if (ms.getBlockSize() != 512) {
@@ -109,7 +108,7 @@ public class CWBServerMSEED {
                         try {
                             ms = new MiniSeed(b);
                         } catch (IllegalSeednameException ex) {
-                            Logger.getLogger(CWBServerMSEED.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(CWBDataServerMSEED.class.getName()).log(Level.SEVERE, null, ex);
                         }
 
                     }
@@ -140,7 +139,7 @@ public class CWBServerMSEED {
                 }
             }
         } catch (IOException ex) {
-            Logger.getLogger(CWBServerMSEED.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CWBDataServerMSEED.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         // This is triggered for the last channel off the stream.
@@ -158,6 +157,7 @@ public class CWBServerMSEED {
         return !incomingMiniSEED.isEmpty();
     }
 
+
     public static boolean read(InputStream in, byte[] b, int off, int l)
             throws IOException {
         int len;
@@ -173,13 +173,14 @@ public class CWBServerMSEED {
         return false;
     }
 
+    
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
         try {
             outStream.write(("\n").getBytes());
         } catch (IOException ex) {
-            Logger.getLogger(CWBServerMSEED.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CWBDataServerMSEED.class.getName()).log(Level.SEVERE, null, ex);
         }
         ds.close();
     }

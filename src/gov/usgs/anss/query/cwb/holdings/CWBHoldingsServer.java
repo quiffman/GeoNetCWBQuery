@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package gov.usgs.anss.query.cwb;
+package gov.usgs.anss.query.cwb.holdings;
 
 import org.joda.time.DateTime;
 
@@ -10,7 +10,7 @@ import org.joda.time.DateTime;
  *
  * @author geoffc
  */
-public interface CWBServer {
+public interface CWBHoldingsServer {
 
     /**
      *

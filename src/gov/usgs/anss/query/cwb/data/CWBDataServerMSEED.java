@@ -43,6 +43,15 @@ public class CWBDataServerMSEED implements CWBDataServer {
     private NSCL newNSCL = null;
     private NSCL lastNSCL = null;
 
+    /**
+     * Runs a query against a CWB server and provides methods to retrieve miniSEED data.
+     *
+     * @param host the CWB server name.
+     * @param port the CWB server port.
+     * @param begin the start time for the data query.
+     * @param duration the duration in seconds to extract data for.
+     * @param nscl the network, station, channel, and location data to query for.  These are all possible wild carded.
+     */
     public CWBDataServerMSEED(String host, int port, DateTime begin, Double duration, NSCL nscl) {
         this.host = host;
         this.port = port;
@@ -81,6 +90,11 @@ public class CWBDataServerMSEED implements CWBDataServer {
         incomingMiniSEED = new LinkedBlockingQueue<MiniSeed>();
     }
 
+    /**
+     * Returns the next data record.  This is equivalent to the data for a fully qualified NSCL.
+     *
+     * @return
+     */
     public TreeSet<MiniSeed> getNext() {
 
         TreeSet<MiniSeed> blks = new TreeSet<MiniSeed>();
@@ -150,6 +164,11 @@ public class CWBDataServerMSEED implements CWBDataServer {
         return blks;
     }
 
+    /**
+     * Returns true if there are more data records.
+     *
+     * @return
+     */
     public boolean hasNext() {
         if (lastNSCL == null) {
             return true;

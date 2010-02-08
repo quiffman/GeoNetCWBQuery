@@ -8,9 +8,9 @@ import gov.usgs.anss.edge.IllegalSeednameException;
 import gov.usgs.anss.query.NSCL;
 import gov.usgs.anss.seed.MiniSeed;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.TreeSet;
@@ -24,41 +24,47 @@ import org.joda.time.DateTime;
  */
 public class CWBDataServerMSEEDMock implements CWBDataServer {
 
-    private ArrayList<ArrayList<MiniSeed>> expResult;
-    private Iterator iter;
+    private ArrayList<TreeSet<MiniSeed>> expResult;
+    private Iterator<TreeSet<MiniSeed>> iter;
 
     CWBDataServerMSEEDMock(String host, int port) {
     }
 
-    private void loadMSEEDFiles(String[] filenames) throws FileNotFoundException, IOException {
-        expResult = new ArrayList<ArrayList<MiniSeed>>();
+    protected void loadMSEEDFiles(String[] filenames) {
+        expResult = new ArrayList<TreeSet<MiniSeed>>();
         for (String filename : filenames) {
-            File ms = new File(filename);
-            long fileSize = ms.length();
-            ArrayList<MiniSeed> blks = new ArrayList<MiniSeed>((int) (fileSize / 512));
+
+            long fileSize = CWBDataServerMSEEDMockTest.class.getResource(filename).getFile().length();
+
+            TreeSet<MiniSeed> blks = new TreeSet<MiniSeed>();
+//            ArrayList<MiniSeed> blks = new ArrayList<MiniSeed>((int) (fileSize / 512));
 
             byte[] buf = new byte[512];
-            FileInputStream in = new FileInputStream(ms);
+            InputStream in = CWBDataServerMSEEDMock.class.getResourceAsStream(filename);
             for (long pos = 0; pos < fileSize; pos += 512) {
-                if (in.read(buf) == -1) {
-                    break;
-                }
                 try {
-                    blks.add(new MiniSeed(buf));
-                } catch (IllegalSeednameException ex) {
+                    if (in.read(buf) == -1) {
+                        break;
+                    }
+                    try {
+                        blks.add(new MiniSeed(buf));
+                    } catch (IllegalSeednameException ex) {
+                        Logger.getLogger(CWBDataServerMSEEDMock.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } catch (IOException ex) {
                     Logger.getLogger(CWBDataServerMSEEDMock.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
             expResult.add(blks);
         }
-        iter = expResult.iterator();
+        iter = expResult.listIterator();
     }
 
     public void query(DateTime begin, Double duration, NSCL nscl) {
     }
 
     public TreeSet<MiniSeed> getNext() {
-        return new TreeSet((ArrayList<MiniSeed>)iter.next());
+        return iter.next();
     }
 
     public boolean hasNext() {

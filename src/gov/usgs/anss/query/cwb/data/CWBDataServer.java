@@ -20,5 +20,7 @@ public interface CWBDataServer {
     TreeSet<MiniSeed> getNext();
 
     boolean hasNext();
+
+    void quiet();
     
 }

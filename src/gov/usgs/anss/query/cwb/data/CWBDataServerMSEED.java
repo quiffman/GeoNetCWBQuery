@@ -7,6 +7,7 @@ package gov.usgs.anss.query.cwb.data;
 import gov.usgs.anss.query.cwb.formatter.CWBQueryFormatter;
 import gov.usgs.anss.edge.IllegalSeednameException;
 import gov.usgs.anss.query.NSCL;
+import gov.usgs.anss.query.cwb.messages.MessageFormatter;
 import gov.usgs.anss.seed.MiniSeed;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,6 +43,7 @@ public class CWBDataServerMSEED implements CWBDataServer {
     private LinkedBlockingQueue<MiniSeed> incomingMiniSEED;
     private NSCL newNSCL = null;
     private NSCL lastNSCL = null;
+    private boolean quiet = false;
 
     /**
      * Provides methods for running queries against a CWB server.
@@ -65,7 +67,6 @@ public class CWBDataServerMSEED implements CWBDataServer {
 
     }
 
-
     /**
      * Runs a query against the server.
      *
@@ -73,7 +74,7 @@ public class CWBDataServerMSEED implements CWBDataServer {
      * @param duration the duration in seconds to extract data for.
      * @param nscl the network, station, channel, and location data to query for.  These are all possible wild carded.
      */
-    public void query (DateTime begin, Double duration, NSCL nscl) {
+    public void query(DateTime begin, Double duration, NSCL nscl) {
 
         while (ds == null) {
             try {
@@ -124,7 +125,7 @@ public class CWBDataServerMSEED implements CWBDataServer {
             while (read(inStream, b, 0, 512)) {
                 MiniSeed ms = null;
                 // It doens't look like the GeoNet CWB server actually returns this.
-                 if (b[0] == '<' && b[1] == 'E' && b[2] == 'O' && b[3] == 'R' && b[4] == '>') {
+                if (b[0] == '<' && b[1] == 'E' && b[2] == 'O' && b[3] == 'R' && b[4] == '>') {
                     logger.fine("EOR found");
                     break read;
                 } else {
@@ -180,6 +181,10 @@ public class CWBDataServerMSEED implements CWBDataServer {
             incomingMiniSEED.drainTo(blks);
         }
 
+        if (!quiet) {
+            logger.info(MessageFormatter.miniSeedSummary(new DateTime(), blks));
+        }
+
         return blks;
     }
 
@@ -194,7 +199,6 @@ public class CWBDataServerMSEED implements CWBDataServer {
         }
         return !incomingMiniSEED.isEmpty();
     }
-
 
     public static boolean read(InputStream in, byte[] b, int off, int l)
             throws IOException {
@@ -211,7 +215,14 @@ public class CWBDataServerMSEED implements CWBDataServer {
         return false;
     }
 
-    
+    /**
+     * By default some progress information is provided to the user.
+     * This turns that output off.
+     **/
+    public void quiet() {
+        this.quiet = true;
+    }
+
     @Override
     protected void finalize() throws Throwable {
         super.finalize();

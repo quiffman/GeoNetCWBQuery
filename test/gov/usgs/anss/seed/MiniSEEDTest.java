@@ -52,8 +52,6 @@ public class MiniSEEDTest {
             blks.add(new MiniSeed(buf));
         }
 
-        System.out.println("size " + blks.size());
-
         TreeSet<MiniSeed> sorted = new TreeSet<MiniSeed>();
 
         for (int i = blks.size() - 1; i > 0; i--) {

@@ -4,7 +4,6 @@
  */
 package gov.usgs.anss.query.cwb.data;
 
-import gov.usgs.anss.query.*;
 import gov.usgs.anss.seed.MiniSeed;
 import java.io.File;
 import java.io.FileInputStream;

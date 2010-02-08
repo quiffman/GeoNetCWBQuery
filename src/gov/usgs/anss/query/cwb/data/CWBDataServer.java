@@ -4,7 +4,6 @@
  */
 package gov.usgs.anss.query.cwb.data;
 
-import gov.usgs.anss.query.NSCL;
 import gov.usgs.anss.seed.MiniSeed;
 import java.util.TreeSet;
 import org.joda.time.DateTime;

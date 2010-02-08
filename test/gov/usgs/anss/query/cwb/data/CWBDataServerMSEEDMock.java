@@ -5,10 +5,7 @@
 package gov.usgs.anss.query.cwb.data;
 
 import gov.usgs.anss.edge.IllegalSeednameException;
-import gov.usgs.anss.query.NSCL;
 import gov.usgs.anss.seed.MiniSeed;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;

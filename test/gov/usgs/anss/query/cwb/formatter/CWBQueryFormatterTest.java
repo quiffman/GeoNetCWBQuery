@@ -4,7 +4,6 @@
  */
 package gov.usgs.anss.query.cwb.formatter;
 
-import gov.usgs.anss.query.cwb.formatter.CWBQueryFormatter;
 import gov.usgs.anss.query.NSCL;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;

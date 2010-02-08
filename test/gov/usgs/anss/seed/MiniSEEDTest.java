@@ -5,7 +5,6 @@
 package gov.usgs.anss.seed;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,7 +40,7 @@ public class MiniSEEDTest {
         String filename = "/miniseed-data/test-one/NZMRZ__HHN10.ms";
 
         File ms = new File(filename);
-        long fileSize = ms.length();
+		long fileSize = MiniSEEDTest.class.getResource(filename).getFile().length();
         ArrayList<MiniSeed> blks = new ArrayList<MiniSeed>((int) (fileSize / 512));
 
         byte[] buf = new byte[512];
@@ -65,6 +64,7 @@ public class MiniSEEDTest {
             sorted.add(blks.get(i));
         }
 
+		assertEquals("Empty", false, blks.isEmpty());
         assertEquals(sorted.size(), blks.size());
         assertCollectionEquals("entire collection", sorted, blks);
     }

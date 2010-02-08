@@ -39,7 +39,6 @@ public class MiniSEEDTest {
 
         String filename = "/miniseed-data/test-one/NZMRZ__HHN10.ms";
 
-        File ms = new File(filename);
 		long fileSize = MiniSEEDTest.class.getResource(filename).getFile().length();
         ArrayList<MiniSeed> blks = new ArrayList<MiniSeed>((int) (fileSize / 512));
 

@@ -58,9 +58,8 @@ public class MessageFormatterTest {
 
        DateTime now = new DateTime(2010, 2, 5, 2, 7, 45, 992, tz);
 
-        String expResult = "02:07:45.992Z Query on NZAPZ  HHZ10 000423 mini-seed blks 2009 001:00:00:00.0083 2009 001:00:30:00.438  ns=180044";
+        String expResult = "02:07:45.992Z Query on NZAPZ  HHZ10 000423 mini-seed blks 2009 001:00:00:00.008 2009 001:00:29:59.998 ns=180000";
         String result = MessageFormatter.miniSeedSummary(now, miniSeed);
-        assertEquals(expResult, result);
-        fail("The test case is a prototype.");
+         assertEquals(expResult, result);
     }
 }

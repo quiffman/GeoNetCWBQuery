@@ -45,7 +45,7 @@ public class MiniSEEDTest {
         ArrayList<MiniSeed> blks = new ArrayList<MiniSeed>((int) (fileSize / 512));
 
         byte[] buf = new byte[512];
-        InputStream in = MiniSEEDTest.class.getResourceAsStream("/miniseed-data/test-one/NZMRZ__HHN10.ms");
+        InputStream in = MiniSEEDTest.class.getResourceAsStream(filename);
         for (long pos = 0; pos < fileSize; pos += 512) {
             if (in.read(buf) == -1) {
                 break;

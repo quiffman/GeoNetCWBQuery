@@ -44,17 +44,36 @@ public class CWBDataServerMSEED implements CWBDataServer {
     private NSCL lastNSCL = null;
 
     /**
-     * Runs a query against a CWB server and provides methods to retrieve miniSEED data.
+     * Provides methods for running queries against a CWB server.
+     *
+     * Typical usage would look like:
+     *
+     * cwbServer = new CWBDataServerMSEED("cwb.geonet.org.nz", 80);
+     *   cwbServer.query(begin, duration, nscl);
+     *
+     *  while (cwbServer.hasNext()) {
+     *       result.add(cwbServer.getNext());
+     *   }
+     *
      *
      * @param host the CWB server name.
      * @param port the CWB server port.
+     */
+    public CWBDataServerMSEED(String host, int port) {
+        this.host = host;
+        this.port = port;
+
+    }
+
+
+    /**
+     * Runs a query against the server.
+     *
      * @param begin the start time for the data query.
      * @param duration the duration in seconds to extract data for.
      * @param nscl the network, station, channel, and location data to query for.  These are all possible wild carded.
      */
-    public CWBDataServerMSEED(String host, int port, DateTime begin, Double duration, NSCL nscl) {
-        this.host = host;
-        this.port = port;
+    public void query (DateTime begin, Double duration, NSCL nscl) {
 
         while (ds == null) {
             try {

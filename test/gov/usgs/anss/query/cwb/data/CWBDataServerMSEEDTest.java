@@ -4,7 +4,6 @@
  */
 package gov.usgs.anss.query.cwb.data;
 
-import gov.usgs.anss.query.cwb.data.CWBDataServerMSEED;
 import gov.usgs.anss.query.*;
 import gov.usgs.anss.seed.MiniSeed;
 import java.io.File;
@@ -93,13 +92,13 @@ public class CWBDataServerMSEEDTest {
         }
     }
 
-	/**
-	 * To make netbeans work with junit tests incorporating System.out.print calls.
-	 */
+    /**
+     * To make netbeans work with junit tests incorporating System.out.print calls.
+     */
     @After
     public void tearDown() {
-		System.out.println();
-	}
+        System.out.println();
+    }
 
     /**
      * Test of query method, of class EdgeQueryClient.
@@ -131,10 +130,12 @@ public class CWBDataServerMSEEDTest {
         }
 
 
-        cwbServer = new CWBDataServerMSEED("cwb.geonet.org.nz", 80, begin, duration, nscl);
         ArrayList<TreeSet<MiniSeed>> result = new ArrayList<TreeSet<MiniSeed>>();
+        cwbServer = new CWBDataServerMSEED("cwb.geonet.org.nz", 80);
+        cwbServer.query(begin, duration, nscl);
+
         while (cwbServer.hasNext()) {
-              result.add(cwbServer.getNext());
+            result.add(cwbServer.getNext());
         }
 
         assertEquals("collection lengths", expResult.size(), result.size());

@@ -6,6 +6,7 @@ package gov.usgs.anss.seed;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -37,20 +38,22 @@ public class MiniSEEDTest {
     @Test
     public void testMiniSeedSortingAndOrdering() throws Exception {
 
-        String filename = "build/test/classes/gov/usgs/anss/seed/NZPXZ__HHZ10.ms";
+        String filename = "/miniseed-data/test-one/NZMRZ__HHN10.ms";
 
         File ms = new File(filename);
         long fileSize = ms.length();
         ArrayList<MiniSeed> blks = new ArrayList<MiniSeed>((int) (fileSize / 512));
 
         byte[] buf = new byte[512];
-        FileInputStream in = new FileInputStream(ms);
+        InputStream in = MiniSEEDTest.class.getResourceAsStream("/miniseed-data/test-one/NZMRZ__HHN10.ms");
         for (long pos = 0; pos < fileSize; pos += 512) {
             if (in.read(buf) == -1) {
                 break;
             }
             blks.add(new MiniSeed(buf));
         }
+
+        System.out.println("size " + blks.size());
 
         TreeSet<MiniSeed> sorted = new TreeSet<MiniSeed>();
 

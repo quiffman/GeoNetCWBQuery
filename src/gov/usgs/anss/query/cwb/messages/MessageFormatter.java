@@ -18,15 +18,12 @@ import org.joda.time.format.DateTimeFormatter;
  */
 public class MessageFormatter {
 
-    //   private static String nowFormat = "YYYY/MM/dd HH:mm:ss";
     private static DateTimeFormatter nowFormat = DateTimeFormat.forPattern("HH:mm:ss.SSS").withZone(DateTimeZone.forID("UTC"));
     private static DateTimeFormatter msFormat = DateTimeFormat.forPattern("YYYY DDD:HH:mm:ss.SSS").withZone(DateTimeZone.forID("UTC"));
 
     public static String miniSeedSummary(DateTime now, Collection<MiniSeed> miniSeed) {
 
         // 02:07:45.992Z Query on NZAPZ  HHZ10 000431 mini-seed blks 2009 001:00:00:00.0083 2009 001:00:30:00.438  ns=180044
-
-
 
         Iterator<MiniSeed> iter = miniSeed.iterator();
         MiniSeed ms = iter.next();

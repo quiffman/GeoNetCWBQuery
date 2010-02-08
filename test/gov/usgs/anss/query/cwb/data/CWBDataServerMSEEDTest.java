@@ -47,19 +47,19 @@ public class CWBDataServerMSEEDTest {
                     {"-b \"2009/01/01 00:00:00\" -s \"NZWLGT.BTZ40\" -d 600",
                         new DateTime(2009, 1, 1, 0, 0, 0, 0, tz),
                         600d,
-                        NSCL.stringToNSCL("NZWLGT.BTZ40"),
+                        "NZWLGT.BTZ40",
                         new String[]{"build/NZWLGT_BTZ40-2009-01-01-00-00-00.ms"}
                     },
                     {"-b \"2009/06/01 12:00:00\" -s \"NZ.....BTZ..\" -d 600",
                         new DateTime(2009, 6, 1, 12, 0, 0, 0, tz),
                         600d,
-                        NSCL.stringToNSCL("NZ.....BTZ.."),
+                        "NZ.....BTZ..",
                         new String[]{"build/NZAUCT_BTZ40-2009-06-01-11-59-51.ms", "build/NZAUCT_BTZ41-2009-06-01-11-59-17.ms", "build/NZCHIT_BTZ40-2009-06-01-11-59-27.ms", "build/NZCHIT_BTZ41-2009-06-01-11-59-33.ms", "build/NZGIST_BTZ40-2009-06-01-11-59-50.ms", "build/NZGIST_BTZ41-2009-06-01-11-59-38.ms", "build/NZLOTT_BTZ40-2009-06-01-11-59-58.ms", "build/NZLOTT_BTZ41-2009-06-01-11-59-37.ms", "build/NZNAPT_BTZ40-2009-06-01-11-59-40.ms", "build/NZNAPT_BTZ41-2009-06-01-11-59-32.ms", "build/NZNCPT_BTZ40-2009-06-01-11-59-58.ms", "build/NZNCPT_BTZ41-2009-06-01-11-59-50.ms", "build/NZRBCT_BTZ40-2009-06-01-11-59-40.ms", "build/NZRBCT_BTZ41-2009-06-01-11-59-43.ms", "build/NZRFRT_BTZ40-2009-06-01-11-59-50.ms", "build/NZRFRT_BTZ41-2009-06-01-11-59-58.ms", "build/NZTAUT_BTZ40-2009-06-01-11-59-47.ms", "build/NZTAUT_BTZ41-2009-06-01-11-59-21.ms", "build/NZWLGT_BTZ40-2009-06-01-11-59-56.ms", "build/NZWLGT_BTZ41-2009-06-01-11-59-35.ms"}
                     },
                     {"-b \"2009/01/01 00:00:00\" -s \"NZMRZ..HHZ10\" -d 1800",
                         new DateTime(2009, 1, 1, 0, 0, 0, 0, tz),
                         1800d,
-                        NSCL.stringToNSCL("NZMRZ..HHZ10"),
+                        "NZMRZ..HHZ10",
                         new String[]{"build/NZMRZ__HHZ10-2009-01-01-00-00-00.ms"}
                     }
                 });
@@ -67,16 +67,16 @@ public class CWBDataServerMSEEDTest {
     private String queryLine;
     private DateTime begin;
     private Double duration;
-    private NSCL nscl;
+    private String nsclSelectString;
     private String[] filenames;
 
-    public CWBDataServerMSEEDTest(String queryLine, DateTime begin, Double duration, NSCL nscl, String[] filenames) {
+    public CWBDataServerMSEEDTest(String queryLine, DateTime begin, Double duration, String nscl, String[] filenames) {
         // Note the -t NULL
         this.queryLine = queryLine;
         this.filenames = filenames;
         this.begin = begin;
         this.duration = duration;
-        this.nscl = nscl;
+        this.nsclSelectString = nscl;
     }
 
     @Before
@@ -132,7 +132,7 @@ public class CWBDataServerMSEEDTest {
 
         ArrayList<TreeSet<MiniSeed>> result = new ArrayList<TreeSet<MiniSeed>>();
         cwbServer = new CWBDataServerMSEED("cwb.geonet.org.nz", 80);
-        cwbServer.query(begin, duration, nscl);
+        cwbServer.query(begin, duration, nsclSelectString);
 
         while (cwbServer.hasNext()) {
             result.add(cwbServer.getNext());

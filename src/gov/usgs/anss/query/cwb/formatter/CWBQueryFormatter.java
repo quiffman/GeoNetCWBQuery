@@ -36,4 +36,9 @@ public class CWBQueryFormatter {
 //        '-b' '2009/01/01 00:00:00' '-s' 'NZMRZ..HHZ10' '-d' '1800'\n
         return "'-b' '" + parseBeginFormat.withZone(DateTimeZone.UTC).print(begin) + "' '-s' '" +  nscl.toString() + "' '-d' '" + duration + "'\n";
     }
+
+        public static String miniSEED(DateTime begin, Double duration, String nsclSelectString) {
+//        '-b' '2009/01/01 00:00:00' '-s' 'NZMRZ..HHZ10' '-d' '1800'\n
+        return "'-b' '" + parseBeginFormat.withZone(DateTimeZone.UTC).print(begin) + "' '-s' '" +  nsclSelectString + "' '-d' '" + duration + "'\n";
+    }
 }

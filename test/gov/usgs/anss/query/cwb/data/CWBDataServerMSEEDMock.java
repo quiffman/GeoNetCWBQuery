@@ -60,7 +60,7 @@ public class CWBDataServerMSEEDMock implements CWBDataServer {
         iter = expResult.listIterator();
     }
 
-    public void query(DateTime begin, Double duration, NSCL nscl) {
+    public void query(DateTime begin, Double duration, String nsclSelectString) {
     }
 
     public TreeSet<MiniSeed> getNext() {

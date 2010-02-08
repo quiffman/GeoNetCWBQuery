@@ -74,7 +74,7 @@ public class CWBDataServerMSEED implements CWBDataServer {
      * @param duration the duration in seconds to extract data for.
      * @param nscl the network, station, channel, and location data to query for.  These are all possible wild carded.
      */
-    public void query(DateTime begin, Double duration, NSCL nscl) {
+    public void query(DateTime begin, Double duration, String nsclSelectString) {
 
         while (ds == null) {
             try {
@@ -102,7 +102,7 @@ public class CWBDataServerMSEED implements CWBDataServer {
         try {
             inStream = ds.getInputStream();
             outStream = ds.getOutputStream();
-            outStream.write(CWBQueryFormatter.miniSEED(begin, duration, nscl).getBytes());
+            outStream.write(CWBQueryFormatter.miniSEED(begin, duration, nsclSelectString).getBytes());
         } catch (IOException ex) {
             Logger.getLogger(CWBDataServerMSEED.class.getName()).log(Level.SEVERE, null, ex);
         }

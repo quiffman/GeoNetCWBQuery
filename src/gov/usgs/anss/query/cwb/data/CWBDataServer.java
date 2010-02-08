@@ -15,7 +15,7 @@ import org.joda.time.DateTime;
  */
 public interface CWBDataServer {
 
-    void query(DateTime begin, Double duration, NSCL nscl);
+    void query(DateTime begin, Double duration, String nsclSelectString);
 
     TreeSet<MiniSeed> getNext();
 

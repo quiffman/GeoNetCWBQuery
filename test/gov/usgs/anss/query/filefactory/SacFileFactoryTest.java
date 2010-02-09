@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package gov.usgs.anss.query.filefactory;
 
 import edu.sc.seis.TauP.SacTimeSeries;
@@ -80,14 +79,33 @@ public class SacFileFactoryTest {
 
     @Test
     public void testSetChannelHeader() {
-        System.out.println("setChannelHeader");
-        SacTimeSeries timeSeries = null;
-        ChannelMetaData metaData = null;
+        ChannelMetaData metaData = new ChannelMetaData("test", "test", "test", "test");
+        metaData.setLatitude(-41.28576d);
+        metaData.setLongitude(174.76802d);
+        metaData.setElevation(0.0d);
+        metaData.setDepth(0.0d);
+        metaData.setAzimuth(0.0d);
+        metaData.setDip(-90.0d);
+
         SacFileFactory instance = new SacFileFactory();
-        SacTimeSeries expResult = null;
-        SacTimeSeries result = instance.setChannelHeader(timeSeries, metaData);
-        assertEquals(expResult, result);
-        fail("The test case is a prototype.");
+
+        SacTimeSeries sac = new SacTimeSeries();
+        sac.stla = -41.28576d;
+        sac.stlo = 174.76802d;
+        sac.stel = 138.0d;
+        sac.stdp = 0.0;
+        sac.cmpaz = 0.0;
+        sac.cmpinc = 0.0;
+
+        SacTimeSeries result = instance.setChannelHeader(sac, metaData);
+
+        assertEquals("File", sac, result);
+        assertEquals("Lat", sac.stla, result.stla);
+        assertEquals("Lon", sac.stlo, result.stlo);
+        assertEquals("Elev", sac.stel, result.stel);
+        assertEquals("Depth", sac.stdp, result.stdp);
+        assertEquals("Azimuth", sac.cmpaz, result.cmpaz);
+        assertEquals("Inc", sac.cmpinc, result.cmpinc);
     }
 
     @Test
@@ -110,5 +128,4 @@ public class SacFileFactoryTest {
         instance.outputFile(timeSeries);
         fail("The test case is a prototype.");
     }
-
 }

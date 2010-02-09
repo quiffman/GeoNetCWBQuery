@@ -8,7 +8,10 @@ import edu.sc.seis.TauP.SacTimeSeries;
 import gov.usgs.anss.query.cwb.data.CWBDataServer;
 import gov.usgs.anss.query.metadata.ChannelMetaData;
 import gov.usgs.anss.query.metadata.MetaDataServer;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.TreeSet;
+import nz.org.geonet.quakeml.v1_0_1.client.QuakemlFactory;
 import nz.org.geonet.quakeml.v1_0_1.domain.Quakeml;
 import org.joda.time.DateTime;
 import org.junit.AfterClass;
@@ -109,15 +112,24 @@ public class SacFileFactoryTest {
     }
 
     @Test
-    public void testSetEventHeader() {
+    public void testSetEventHeader() throws Exception {
         System.out.println("setEventHeader");
-        SacTimeSeries timeSeries = null;
-        Quakeml quakeml = null;
+        SacTimeSeries sac = new SacTimeSeries();
+		//2007-05-12T07:41:04.874Z - 15.874s
+		GregorianCalendar start = new GregorianCalendar(2007, 5, 12, 7, 41, 4);
+		sac.nzyear = start.get(Calendar.YEAR);
+        sac.nzjday = start.get(Calendar.DAY_OF_YEAR);
+        sac.nzhour = start.get(Calendar.HOUR_OF_DAY);
+        sac.nzmin = start.get(Calendar.MINUTE);
+        sac.nzsec = start.get(Calendar.SECOND);
+        sac.nzmsec = start.get(Calendar.MILLISECOND);
+
+        Quakeml quakeml = new QuakemlFactory().getQuakeml(SacFileFactoryTest.class.getResourceAsStream("/quakeml-data/test-one/quakeml_2732452.xml"));
         SacFileFactory instance = new SacFileFactory();
-        SacTimeSeries expResult = null;
-        SacTimeSeries result = instance.setEventHeader(timeSeries, quakeml);
-        assertEquals(expResult, result);
-        fail("The test case is a prototype.");
+
+        SacTimeSeries result = instance.setEventHeader(sac, quakeml);
+        assertEquals("o", 15.874, result.o);
+		assertEquals("ko", "2732452g", result.ko);
     }
 
     @Test

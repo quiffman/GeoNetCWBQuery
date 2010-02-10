@@ -23,7 +23,7 @@ mkdir -p $tmpdir/CWBQueryTestData/$jarversion
 
 mv $tmpdir/CWBQueryTestData-${jarversion}.jar $tmpdir/CWBQueryTestData/$jarversion/
 
-rsync -v --archive --rsh=ssh $tmpdir/CWBQueryTestData repoadmin@repo.geonet.org.nz:/work/maven/public_html/ivy/repo/enterprise/nz/org/geonet/
+rsync -v --archive --no-perms --rsh=ssh $tmpdir/CWBQueryTestData repoadmin@repo.geonet.org.nz:/work/maven/public_html/ivy/repo/enterprise/nz/org/geonet/
 
 rm -rf $tmpdir
 

@@ -50,7 +50,7 @@
 
         <dependency org="nz.org.geonet" name="CWBQueryTestData" rev="1.0.0" conf="test->default"/>
 
-        <dependency org="junit" name="junit" rev="4.1" conf="test->default"/>
+        <dependency org="junit" name="junit" rev="4.7" conf="test->default"/>
 
         <dependency org="com.cenqua.clover" name="clover" rev="latest." conf="optional->default"/>
 

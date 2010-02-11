@@ -4,6 +4,9 @@
  */
 package gov.usgs.anss.query.filefactory;
 
+import edu.sc.seis.TauP.SacTimeSeries;
+import nz.org.geonet.quakeml.v1_0_1.domain.Quakeml;
+
 /**
  *
  * @author geoffc
@@ -66,9 +69,9 @@ public class SacHeaders {
         }
     }
 
-//    public static SacTimeSeries setEventHeader(SacTimeSeries timeSeries, Quakeml quakeml) {
-//        throw new UnsupportedOperationException("Not supported yet.");
-//    }
+    public static SacTimeSeries setEventHeader(SacTimeSeries timeSeries, Quakeml quakeml) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 
 
     public static int sacMagType(String magType) {

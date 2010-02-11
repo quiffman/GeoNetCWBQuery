@@ -61,6 +61,7 @@ public class MiniSEEDTest {
             sorted.add(blks.get(i));
         }
 
+
 		assertEquals("Empty", false, blks.isEmpty());
         assertEquals(sorted.size(), blks.size());
         assertCollectionEquals("entire collection", sorted, blks);

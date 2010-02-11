@@ -104,10 +104,10 @@ public class SacFileFactory {
         sac.nzmsec = span.getStart().get(Calendar.MILLISECOND);
         sac.iztype = SacTimeSeries.IB;
 
-        sac.knetwk = nscl.getNetwork();
-        sac.kstnm = nscl.getStation();
-        sac.kcmpnm = nscl.getChannel();
-        sac.khole = nscl.getLocation();
+        sac.knetwk = nscl.getNetwork().replaceAll("_", "");
+        sac.kstnm = nscl.getStation().replaceAll("_", "");
+        sac.kcmpnm = nscl.getChannel().replaceAll("_", "");
+        sac.khole = nscl.getLocation().replaceAll("_", "");
 
         logger.finer("Sac stla=" + sac.stla + " stlo=" + sac.stlo + " stel=" + sac.stel + " cmpaz=" + sac.cmpaz + " cmpinc=" + sac.cmpinc + " stdp=" + sac.stdp);
         sac.y = new double[span.getNsamp()];   // allocate space for data

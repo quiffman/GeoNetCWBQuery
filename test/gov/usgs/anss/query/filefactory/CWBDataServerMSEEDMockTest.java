@@ -2,8 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package gov.usgs.anss.query.cwb.data;
+package gov.usgs.anss.query.filefactory;
 
+import gov.usgs.anss.query.filefactory.CWBDataServerMSEEDMock;
 import java.util.TreeSet;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;

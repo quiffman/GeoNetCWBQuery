@@ -2,8 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package gov.usgs.anss.query.cwb.data;
+package gov.usgs.anss.query.filefactory;
 
+import gov.usgs.anss.query.cwb.data.*;
 import gov.usgs.anss.edge.IllegalSeednameException;
 import gov.usgs.anss.seed.MiniSeed;
 import java.io.IOException;
@@ -25,9 +26,10 @@ public class CWBDataServerMSEEDMock implements CWBDataServer {
     private Iterator<TreeSet<MiniSeed>> iter;
 
     CWBDataServerMSEEDMock(String host, int port) {
+
     }
 
-    protected void loadMSEEDFiles(String[] filenames) {
+    public void loadMSEEDFiles(String[] filenames) {
         expResult = new ArrayList<TreeSet<MiniSeed>>();
         for (String filename : filenames) {
 

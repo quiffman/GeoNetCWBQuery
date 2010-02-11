@@ -7,6 +7,7 @@ package gov.usgs.anss.query.filefactory;
 import edu.sc.seis.TauP.SacTimeSeries;
 import edu.sc.seis.TauP.SacTimeSeriesTestUtil;
 import gov.usgs.anss.query.NSCL;
+import gov.usgs.anss.query.cwb.data.CWBDataServerMSEED;
 import gov.usgs.anss.query.filefactory.CWBDataServerMSEEDMock;
 import gov.usgs.anss.query.metadata.ChannelMetaData;
 import gov.usgs.anss.query.metadata.MetaDataQuery;
@@ -50,10 +51,10 @@ public class SacFileFactoryTest {
     public void testMakeTimeSeries() throws Exception {
         System.out.println("makeTimeSeries");
 
-        CWBDataServerMSEEDMock cwbServer = new CWBDataServerMSEEDMock("dummy", 666);
-        cwbServer.loadMSEEDFiles(new String[]{"/miniseed-data/test-one/NZMRZ__HHN10.ms"});
+        CWBDataServerMSEED cwbServer = new CWBDataServerMSEED("cwb.geonet.org.nz", 80);
+//        cwbServer.loadMSEEDFiles(new String[]{"/miniseed-data/test-one/NZMRZ__HHN10.ms"});
 
-          //-b "2009/01/01 00:00:00" -d 1800
+        //-b "2009/01/01 00:00:00" -d 1800
         DateTime begin = new DateTime(2009, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC);
         double duration = 1800;
         Integer fill = -12345;
@@ -61,8 +62,9 @@ public class SacFileFactoryTest {
         boolean trim = true;
         SacFileFactory instance = new SacFileFactory();
 
-       SacTimeSeries expResult = SacTimeSeriesTestUtil.loadSacTimeSeriesFromClasspath("/sac-data/test-one/NZMRZ__HHN10.sac");
+        SacTimeSeries expResult = SacTimeSeriesTestUtil.loadSacTimeSeriesFromClasspath("/sac-data/test-one/NZMRZ__HHN10.sac");
 
+        cwbServer.query(begin, duration, "NZMRZ  HHN10");
         SacTimeSeries result = instance.makeTimeSeries(cwbServer.getNext(), begin, duration, fill, gaps, trim);
 
         for (int i = 0; i < result.y.length; i++) {

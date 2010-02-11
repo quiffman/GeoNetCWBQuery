@@ -8,6 +8,7 @@ import edu.sc.seis.TauP.SacTimeSeries;
 import gov.usgs.anss.query.cwb.data.CWBDataServer;
 import gov.usgs.anss.query.metadata.ChannelMetaData;
 import gov.usgs.anss.query.metadata.MetaDataServer;
+import gov.usgs.anss.seed.MiniSeed;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TreeSet;
@@ -54,31 +55,46 @@ public class SacFileFactoryTest {
         fail("The test case is a prototype.");
     }
 
-    @Test
-    public void testMakeFiles() {
-        System.out.println("makeFiles");
-        DateTime being = null;
-        double duration = 0.0;
-        String nsclSelectString = "";
-        String mask = "";
-        Integer fill = null;
-        boolean trim = false;
-        Quakeml quakeml = null;
-        SacFileFactory instance = new SacFileFactory();
-        instance.makeFiles(being, duration, nsclSelectString, mask, fill, trim, quakeml);
-        fail("The test case is a prototype.");
-    }
+	/**
+	 * Test of makeFiles method, of class SacFileFactory.
+	 */
+	@Test
+	public void testMakeFiles() {
+		System.out.println("makeFiles");
+		DateTime begin = null;
+		double duration = 0.0;
+		String nsclSelectString = "";
+		String mask = "";
+		Integer fill = null;
+		boolean gaps = false;
+		boolean trim = false;
+		Quakeml quakeml = null;
+		SacFileFactory instance = new SacFileFactory();
+		instance.makeFiles(begin, duration, nsclSelectString, mask, fill, gaps, trim, quakeml);
+		// TODO review the generated test code and remove the default call to fail.
+		fail("The test case is a prototype.");
+	}
 
-    @Test
-    public void testMakeTimeSeries() {
-        System.out.println("makeTimeSeries");
-        TreeSet miniSeed = null;
-        SacFileFactory instance = new SacFileFactory();
-        SacTimeSeries expResult = null;
-        SacTimeSeries result = instance.makeTimeSeries(miniSeed);
-        assertEquals(expResult, result);
-        fail("The test case is a prototype.");
-    }
+	/**
+	 * Test of makeTimeSeries method, of class SacFileFactory.
+	 */
+	@Test
+	public void testMakeTimeSeries() {
+		System.out.println("makeTimeSeries");
+		TreeSet<MiniSeed> miniSeed = null;
+		DateTime begin = null;
+		double duration = 0.0;
+		String mask = "";
+		Integer fill = null;
+		boolean gaps = false;
+		boolean trim = false;
+		SacFileFactory instance = new SacFileFactory();
+		SacTimeSeries expResult = null;
+		SacTimeSeries result = instance.makeTimeSeries(miniSeed, begin, duration, fill, gaps, trim);
+		assertEquals(expResult, result);
+		// TODO review the generated test code and remove the default call to fail.
+		fail("The test case is a prototype.");
+	}
 
     @Test
     public void testSetChannelHeader() {
@@ -124,7 +140,7 @@ public class SacFileFactoryTest {
         sac.nzsec = start.get(Calendar.SECOND);
         sac.nzmsec = start.get(Calendar.MILLISECOND);
 
-        Quakeml quakeml = new QuakemlFactory().getQuakeml(SacFileFactoryTest.class.getResourceAsStream("/quakeml-data/test-one/quakeml_2732452.xml"));
+        Quakeml quakeml = new QuakemlFactory().getQuakeml(getClass().getResourceAsStream("/quakeml-data/test-one/quakeml_2732452.xml"));
         SacFileFactory instance = new SacFileFactory();
 
         SacTimeSeries result = instance.setEventHeader(sac, quakeml);

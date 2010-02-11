@@ -5,16 +5,19 @@
 package gov.usgs.anss.query.filefactory;
 
 import edu.sc.seis.TauP.SacTimeSeries;
+import edu.sc.seis.TauP.SacTimeSeriesTestUtil;
 import gov.usgs.anss.query.cwb.data.CWBDataServer;
 import gov.usgs.anss.query.metadata.ChannelMetaData;
 import gov.usgs.anss.query.metadata.MetaDataServer;
 import gov.usgs.anss.seed.MiniSeed;
+import java.io.InputStream;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TreeSet;
 import nz.org.geonet.quakeml.v1_0_1.client.QuakemlFactory;
 import nz.org.geonet.quakeml.v1_0_1.domain.Quakeml;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -77,23 +80,37 @@ public class SacFileFactoryTest {
 
 	/**
 	 * Test of makeTimeSeries method, of class SacFileFactory.
+	 * Load the MiniSeed treeset from a miniseed file in the test data jar.
+	 * Load the SacTimeSeries object from the corrosponding sac file in the test data jar.
+	 * Compare data.
 	 */
 	@Test
-	public void testMakeTimeSeries() {
+	public void testMakeTimeSeries() throws Exception {
 		System.out.println("makeTimeSeries");
-		TreeSet<MiniSeed> miniSeed = null;
-		DateTime begin = null;
-		double duration = 0.0;
-		String mask = "";
-		Integer fill = null;
-		boolean gaps = false;
-		boolean trim = false;
+		
+		String filename = "/miniseed-data/test-one/NZMRZ__HHN10.ms";
+
+		long fileSize = getClass().getResource(filename).getFile().length();
+        TreeSet<MiniSeed> miniSeed = new TreeSet<MiniSeed>();
+        byte[] buf = new byte[512];
+        InputStream in = getClass().getResourceAsStream(filename);
+        for (long pos = 0; pos < fileSize; pos += 512) {
+            if (in.read(buf) == -1) {
+                break;
+            }
+            miniSeed.add(new MiniSeed(buf));
+        }
+		
+		//-b "2009/01/01 00:00:00" -d 1800
+		DateTime begin = new DateTime(2009, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC);
+		double duration = 1800;
+		Integer fill = SacTimeSeries.INT_UNDEF;
+		boolean gaps = true;
+		boolean trim = true;
 		SacFileFactory instance = new SacFileFactory();
-		SacTimeSeries expResult = null;
+		SacTimeSeries expResult = SacTimeSeriesTestUtil.loadSacTimeSeriesFromClasspath("/sac-data/test-one/NZMRZ__HHN10.sac");
 		SacTimeSeries result = instance.makeTimeSeries(miniSeed, begin, duration, fill, gaps, trim);
-		assertEquals(expResult, result);
-		// TODO review the generated test code and remove the default call to fail.
-		fail("The test case is a prototype.");
+		assertEquals(true, SacTimeSeriesTestUtil.sacTimeSeriesAreEqual(expResult, result));
 	}
 
     @Test

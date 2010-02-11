@@ -24,21 +24,34 @@ import org.joda.time.DateTime;
  * @author geoffc
  */
 public class SacFileFactory {
-
     private static final Logger logger = Logger.getLogger(SacFileFactory.class.getName());
+	private CWBDataServer cwbServer;
+	private MetaDataServer metaDataServer;
 
     static {
-        logger.fine("$Id$");
+        logger.fine("$Id $");
     }
 
     public void setCWBDataServer(CWBDataServer cwbServer) {
+		this.cwbServer = cwbServer;
     }
 
     public void setMetaDataServer(MetaDataServer metaDataServer) {
+		this.metaDataServer = metaDataServer;
     }
 
     public void makeFiles(DateTime begin, double duration, String nsclSelectString, String mask, Integer fill, boolean gaps, boolean trim, Quakeml quakeml) {
-
+		cwbServer.query(begin, duration, nsclSelectString);
+		while (cwbServer.hasNext()) {
+			SacTimeSeries sac = makeTimeSeries(cwbServer.getNext(), begin, duration, fill, gaps, trim);
+			if (metaDataServer != null) {
+//				setChannelHeader(sac, new ChannelMetaData())
+			}
+			if (quakeml != null) {
+				setEventHeader(sac, quakeml);
+			}
+			outputFile(sac);
+		}
     }
 
     protected SacTimeSeries makeTimeSeries(TreeSet<MiniSeed> miniSeed, DateTime begin, double duration, Integer fill, boolean gaps, boolean trim) {

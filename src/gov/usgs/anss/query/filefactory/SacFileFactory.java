@@ -29,7 +29,7 @@ public class SacFileFactory {
 	private MetaDataServer metaDataServer;
 
     static {
-        logger.fine("$Id $");
+        logger.fine("$Id$");
     }
 
     public void setCWBDataServer(CWBDataServer cwbServer) {

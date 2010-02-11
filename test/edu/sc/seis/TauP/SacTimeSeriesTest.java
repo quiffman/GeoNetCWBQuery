@@ -47,9 +47,7 @@ public class SacTimeSeriesTest {
 	public void serializationTest() throws Exception {
 		MessageDigest digest = MessageDigest.getInstance("MD5");
 
-		String[] jarSacParts = getClass().getResource("/sac-data/test-one/NZOUZ__HHZ10.sac").toString().split("[:!]");
-		JarFile jar = new JarFile(jarSacParts[2]);
-		InputStream in = jar.getInputStream(jar.getJarEntry(jarSacParts[3].substring(1)));
+		InputStream in = getClass().getResourceAsStream("/sac-data/test-one/NZOUZ__HHZ10.sac");
 		
 		File originalFile = File.createTempFile("sac_serialization", null);
 		originalFile.deleteOnExit();

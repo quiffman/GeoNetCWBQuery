@@ -14,6 +14,7 @@ import gov.usgs.anss.seed.MiniSeed;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 import nz.org.geonet.quakeml.v1_0_1.domain.Quakeml;
@@ -24,45 +25,50 @@ import org.joda.time.DateTime;
  * @author geoffc
  */
 public class SacFileFactory {
+
     private static final Logger logger = Logger.getLogger(SacFileFactory.class.getName());
-	private CWBDataServer cwbServer;
-	private MetaDataServer metaDataServer;
+    private CWBDataServer cwbServer;
+    private MetaDataServer metaDataServer;
+
 
     static {
         logger.fine("$Id$");
     }
 
     public void setCWBDataServer(CWBDataServer cwbServer) {
-		this.cwbServer = cwbServer;
+        this.cwbServer = cwbServer;
     }
 
     public void setMetaDataServer(MetaDataServer metaDataServer) {
-		this.metaDataServer = metaDataServer;
+        this.metaDataServer = metaDataServer;
     }
 
     public void makeFiles(DateTime begin, double duration, String nsclSelectString, String mask, Integer fill, boolean gaps, boolean trim, Quakeml quakeml) {
-		cwbServer.query(begin, duration, nsclSelectString);
-		while (cwbServer.hasNext()) {
-			SacTimeSeries sac = makeTimeSeries(cwbServer.getNext(), begin, duration, fill, gaps, trim);
-			if (metaDataServer != null) {
+        cwbServer.query(begin, duration, nsclSelectString);
+        while (cwbServer.hasNext()) {
+            SacTimeSeries sac = makeTimeSeries(cwbServer.getNext(), begin, duration, fill, gaps, trim);
+            if (metaDataServer != null) {
 //				setChannelHeader(sac, new ChannelMetaData())
-			}
-			if (quakeml != null) {
-				setEventHeader(sac, quakeml);
-			}
-			outputFile(sac);
-		}
+            }
+            if (quakeml != null) {
+                setEventHeader(sac, quakeml);
+            }
+            outputFile(sac);
+        }
     }
 
     protected SacTimeSeries makeTimeSeries(TreeSet<MiniSeed> miniSeed, DateTime begin, double duration, Integer fill, boolean gaps, boolean trim) {
-		// This logic isn't strictly the same as SacOutputter.
-		if (!gaps && fill == null) {
-			fill = 2147000000;
-		}
+        // This logic isn't strictly the same as SacOutputter.
+        if (!gaps && fill == null) {
+            fill = 2147000000;
+        }
 
-		NSCL nscl = NSCL.stringToNSCL(miniSeed.first().getSeedName());
+        NSCL nscl = NSCL.stringToNSCL(miniSeed.first().getSeedName());
 
         // Use the span to populate a sac file
+
+        TimeZone tz = TimeZone.getTimeZone("GMT+0");
+        TimeZone.setDefault(tz);
         GregorianCalendar start = new GregorianCalendar();
         start.setTimeInMillis(begin.getMillis());
 
@@ -104,10 +110,10 @@ public class SacFileFactory {
         sac.nzmsec = span.getStart().get(Calendar.MILLISECOND);
         sac.iztype = SacTimeSeries.IB;
 
-        sac.knetwk = nscl.getNetwork().replaceAll("_", "");
-        sac.kstnm = nscl.getStation().replaceAll("_", "");
-        sac.kcmpnm = nscl.getChannel().replaceAll("_", "");
-        sac.khole = nscl.getLocation().replaceAll("_", "");
+        sac.knetwk = nscl.getNetwork().replaceAll("_", "").trim();
+        sac.kstnm = nscl.getStation().replaceAll("_", "").trim();
+        sac.kcmpnm = nscl.getChannel().replaceAll("_", "").trim();
+        sac.khole = nscl.getLocation().replaceAll("_", "").trim();
 
         logger.finer("Sac stla=" + sac.stla + " stlo=" + sac.stlo + " stel=" + sac.stel + " cmpaz=" + sac.cmpaz + " cmpinc=" + sac.cmpinc + " stdp=" + sac.stdp);
         sac.y = new double[span.getNsamp()];   // allocate space for data
@@ -129,8 +135,8 @@ public class SacFileFactory {
             }
         }
 
-		return sac;
-	}
+        return sac;
+    }
 
     protected SacTimeSeries setChannelHeader(SacTimeSeries sac, ChannelMetaData md) {
         if (md.getLatitude() != Double.MIN_VALUE) {

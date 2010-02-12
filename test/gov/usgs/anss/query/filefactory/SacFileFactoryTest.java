@@ -6,15 +6,9 @@ package gov.usgs.anss.query.filefactory;
 
 import edu.sc.seis.TauP.SacTimeSeries;
 import edu.sc.seis.TauP.SacTimeSeriesTestUtil;
-import gov.usgs.anss.query.NSCL;
-import gov.usgs.anss.query.cwb.data.CWBDataServerMSEED;
-import gov.usgs.anss.query.filefactory.CWBDataServerMSEEDMock;
 import gov.usgs.anss.query.metadata.ChannelMetaData;
-import gov.usgs.anss.query.metadata.MetaDataQuery;
-import gov.usgs.anss.seed.MiniSeed;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.TreeSet;
 import nz.org.geonet.quakeml.v1_0_1.client.QuakemlFactory;
 import nz.org.geonet.quakeml.v1_0_1.domain.Quakeml;
 import org.joda.time.DateTime;
@@ -49,9 +43,7 @@ public class SacFileFactoryTest {
      */
     @Test
     public void testMakeTimeSeries() throws Exception {
-        System.out.println("makeTimeSeries");
-
-        CWBDataServerMSEEDMock cwbServer = new CWBDataServerMSEEDMock("cwb.geonet.org.nz", 80);
+        CWBDataServerMSEEDMock cwbServer = new CWBDataServerMSEEDMock("dummy", 666);
 
         String filenames[] = {"/miniseed-data/test-one/NZMRZ__HHN10.ms"};
 
@@ -70,15 +62,41 @@ public class SacFileFactoryTest {
         cwbServer.query(begin, duration, "NZMRZ  HHN10");
         SacTimeSeries result = instance.makeTimeSeries(cwbServer.getNext(), begin, duration, fill, gaps, trim);
 
-        System.out.println("length " + result.y.length);
-
         assertEquals("length ", result.y.length, expResult.y.length);
 
         for (int i = 0; i < result.y.length; i++) {
             assertEquals("data " + i, result.y[i], expResult.y[i], 0.0);
         }
-        assertEquals("year", result.nzyear, expResult.nzyear);
-    // other header guff we have set here
+
+
+        assertEquals("nvhdr", result.nvhdr, expResult.nvhdr);
+        assertEquals("b", result.b, expResult.b, 0.0);
+        assertEquals("e", result.e, expResult.e, 0.0);
+        assertEquals("iftype", result.iftype, expResult.iftype);
+        assertEquals("leven", result.leven, expResult.leven);
+        assertEquals("delta", result.delta, expResult.delta, 0.001);  // Slight discrepancy
+        assertEquals("depmin", result.depmin, expResult.depmin, 0.0);
+        assertEquals("depmax", result.depmax, expResult.depmax, 0.0);
+
+        assertEquals("nzyear", result.nzyear, expResult.nzyear);
+        assertEquals("nzjday", result.nzjday, expResult.nzjday);
+        assertEquals("nzhour", result.nzhour, expResult.nzhour);
+        assertEquals("nzmin", result.nzmin, expResult.nzmin);
+        assertEquals("nzsec", result.nzsec, expResult.nzsec);
+        assertEquals("nzmsec", result.nzmsec, expResult.nzmsec);
+
+        assertEquals("iztype", result.iztype, expResult.iztype);
+
+        // TODO - I'm not sure why these have white space.
+        // The orig outputter doesn't add it.  Maybe reading
+        // in SacTimeSeries does.  The spec implies it should
+        // be there (K should be 8 or 16 char) 
+        // but I haven't seen an issue with reading into SAC.
+        assertEquals("knetwk", result.knetwk, expResult.knetwk.trim());
+        assertEquals("kstnm", result.kstnm, expResult.kstnm.trim());
+        assertEquals("kcmpn", result.kcmpnm, expResult.kcmpnm.trim());
+        assertEquals("khole", result.khole, expResult.khole.trim());
+
     }
 
     @Test

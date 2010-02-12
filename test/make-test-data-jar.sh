@@ -9,9 +9,9 @@ cp make-test-data-jar.sh $tmpdir
 
 mkdir -p $tmpdir/miniseed-data/test-one
 
-echo 'java -jar ../lib-ivy/external/GeoNetCWBQuery-2.0.0-RC1.jar -t msz -b "2009/01/01 00:00:00" -d 1800 -s "NZMRZ..HH.10" -o $tmpdir/miniseed-data/test-one/%N.ms' > $tmpdir/miniseed-data/test-one/command.txt
+echo 'java -jar ../lib-ivy/external/GeoNetCWBQuery-2.0.0-RC1.jar -t ms -b "2009/01/01 00:00:00" -d 1800 -s "NZMRZ..HH.10" -o $tmpdir/miniseed-data/test-one/%N.ms' > $tmpdir/miniseed-data/test-one/command.txt
 
-java -jar ../lib-ivy/external/GeoNetCWBQuery-2.0.0-RC1.jar -t msz -b "2009/01/01 00:00:00" -d 1800 -s "NZMRZ..HH.10" -o $tmpdir/miniseed-data/test-one/%N.ms
+java -jar ../lib-ivy/external/GeoNetCWBQuery-2.0.0-RC1.jar -t ms -b "2009/01/01 00:00:00" -d 1800 -s "NZMRZ..HH.10" -o $tmpdir/miniseed-data/test-one/%N.ms
 
 mkdir -p $tmpdir/sac-data/test-one
 

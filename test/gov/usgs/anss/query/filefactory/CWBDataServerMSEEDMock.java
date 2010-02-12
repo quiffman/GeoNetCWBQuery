@@ -33,7 +33,7 @@ public class CWBDataServerMSEEDMock implements CWBDataServer {
         expResult = new ArrayList<TreeSet<MiniSeed>>();
         for (String filename : filenames) {
 
-            long fileSize = CWBDataServerMSEEDMockTest.class.getResource(filename).getFile().length();
+            long fileSize = CWBDataServerMSEEDMockTest.class.getResource(filename).getFile().length() * 4098;
 
             TreeSet<MiniSeed> blks = new TreeSet<MiniSeed>();
 //            ArrayList<MiniSeed> blks = new ArrayList<MiniSeed>((int) (fileSize / 512));

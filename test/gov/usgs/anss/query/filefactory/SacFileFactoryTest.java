@@ -51,8 +51,11 @@ public class SacFileFactoryTest {
     public void testMakeTimeSeries() throws Exception {
         System.out.println("makeTimeSeries");
 
-        CWBDataServerMSEED cwbServer = new CWBDataServerMSEED("cwb.geonet.org.nz", 80);
-//        cwbServer.loadMSEEDFiles(new String[]{"/miniseed-data/test-one/NZMRZ__HHN10.ms"});
+        CWBDataServerMSEEDMock cwbServer = new CWBDataServerMSEEDMock("cwb.geonet.org.nz", 80);
+
+        String filenames[] = {"/miniseed-data/test-one/NZMRZ__HHN10.ms"};
+
+        cwbServer.loadMSEEDFiles(filenames);
 
         //-b "2009/01/01 00:00:00" -d 1800
         DateTime begin = new DateTime(2009, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC);
@@ -66,6 +69,10 @@ public class SacFileFactoryTest {
 
         cwbServer.query(begin, duration, "NZMRZ  HHN10");
         SacTimeSeries result = instance.makeTimeSeries(cwbServer.getNext(), begin, duration, fill, gaps, trim);
+
+        System.out.println("length " + result.y.length);
+
+        assertEquals("length ", result.y.length, expResult.y.length);
 
         for (int i = 0; i < result.y.length; i++) {
             assertEquals("data " + i, result.y[i], expResult.y[i], 0.0);

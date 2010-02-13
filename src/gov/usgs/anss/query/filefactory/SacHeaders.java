@@ -5,6 +5,7 @@
 package gov.usgs.anss.query.filefactory;
 
 import edu.sc.seis.TauP.SacTimeSeries;
+import gov.usgs.anss.query.metadata.ChannelMetaData;
 import nz.org.geonet.quakeml.v1_0_1.domain.Quakeml;
 
 /**
@@ -71,6 +72,30 @@ public class SacHeaders {
 
     public static SacTimeSeries setEventHeader(SacTimeSeries timeSeries, Quakeml quakeml) {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+
+        public static SacTimeSeries setChannelHeader(SacTimeSeries sac, ChannelMetaData md) {
+        if (md.getLatitude() != Double.MIN_VALUE) {
+            sac.stla = md.getLatitude();
+        }
+        if (md.getLongitude() != Double.MIN_VALUE) {
+            sac.stlo = md.getLongitude();
+        }
+        if (md.getElevation() != Double.MIN_VALUE) {
+            sac.stel = md.getElevation();
+        }
+        if (md.getDepth() != Double.MIN_VALUE) {
+            sac.stdp = md.getDepth();
+        }
+        if (md.getAzimuth() != Double.MIN_VALUE) {
+            sac.cmpaz = md.getAzimuth();
+        }
+        if (md.getDip() != Double.MIN_VALUE) {
+            sac.cmpinc = (md.getDip() + 90.);   // seed is down from horiz, sac is down from vertical
+        }
+
+        return sac;
     }
 
 

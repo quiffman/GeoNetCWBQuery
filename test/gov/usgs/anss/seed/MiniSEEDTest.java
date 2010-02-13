@@ -37,7 +37,7 @@ public class MiniSEEDTest {
     @Test
     public void testMiniSeedSortingAndOrdering() throws Exception {
 
-        String filename = "/miniseed-data/test-one/NZMRZ__HHN10.ms";
+        String filename = "/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHN10.ms";
 
 		long fileSize = MiniSEEDTest.class.getResource(filename).getFile().length();
         ArrayList<MiniSeed> blks = new ArrayList<MiniSeed>((int) (fileSize / 512));

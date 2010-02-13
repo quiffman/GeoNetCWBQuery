@@ -9,6 +9,7 @@ import gov.usgs.anss.query.NSCL;
 import gov.usgs.anss.query.ZeroFilledSpan;
 import gov.usgs.anss.query.cwb.data.CWBDataServer;
 import gov.usgs.anss.query.metadata.ChannelMetaData;
+import gov.usgs.anss.query.metadata.MetaDataQuery;
 import gov.usgs.anss.query.metadata.MetaDataServer;
 import gov.usgs.anss.seed.MiniSeed;
 import java.util.ArrayList;
@@ -46,18 +47,12 @@ public class SacFileFactory {
     public void makeFiles(DateTime begin, double duration, String nsclSelectString, String mask, Integer fill, boolean gaps, boolean trim, Quakeml quakeml) {
         cwbServer.query(begin, duration, nsclSelectString);
         while (cwbServer.hasNext()) {
-            SacTimeSeries sac = makeTimeSeries(cwbServer.getNext(), begin, duration, fill, gaps, trim);
-            if (metaDataServer != null) {
-//				setChannelHeader(sac, new ChannelMetaData())
-            }
-            if (quakeml != null) {
-                setEventHeader(sac, quakeml);
-            }
+            SacTimeSeries sac = makeTimeSeries(cwbServer.getNext(), begin, duration, fill, gaps, trim, quakeml);
             outputFile(sac);
         }
     }
 
-    protected SacTimeSeries makeTimeSeries(TreeSet<MiniSeed> miniSeed, DateTime begin, double duration, Integer fill, boolean gaps, boolean trim) {
+    public SacTimeSeries makeTimeSeries(TreeSet<MiniSeed> miniSeed, DateTime begin, double duration, Integer fill, boolean gaps, boolean trim, Quakeml quakeml) {
         // This logic isn't strictly the same as SacOutputter.
         if (!gaps && fill == null) {
             fill = 2147000000;
@@ -135,27 +130,14 @@ public class SacFileFactory {
             }
         }
 
-        return sac;
-    }
+        if (metaDataServer != null) {
+            MetaDataQuery mdq = new MetaDataQuery(metaDataServer);
+            ChannelMetaData md = mdq.getChannelMetaData(nscl, begin);
+            sac = SacHeaders.setChannelHeader(sac, md);
+            }
 
-    protected SacTimeSeries setChannelHeader(SacTimeSeries sac, ChannelMetaData md) {
-        if (md.getLatitude() != Double.MIN_VALUE) {
-            sac.stla = md.getLatitude();
-        }
-        if (md.getLongitude() != Double.MIN_VALUE) {
-            sac.stlo = md.getLongitude();
-        }
-        if (md.getElevation() != Double.MIN_VALUE) {
-            sac.stel = md.getElevation();
-        }
-        if (md.getDepth() != Double.MIN_VALUE) {
-            sac.stdp = md.getDepth();
-        }
-        if (md.getAzimuth() != Double.MIN_VALUE) {
-            sac.cmpaz = md.getAzimuth();
-        }
-        if (md.getDip() != Double.MIN_VALUE) {
-            sac.cmpinc = (md.getDip() + 90.);   // seed is down from horiz, sac is down from vertical
+        if (quakeml != null) {
+ //           setEventHeader(sac, quakeml);
         }
 
         return sac;

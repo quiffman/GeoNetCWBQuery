@@ -7,21 +7,29 @@ mkdir -p $tmpdir
 
 cp make-test-data-jar.sh $tmpdir
 
-mkdir -p $tmpdir/miniseed-data/test-one
+mkdir -p $tmpdir/test-data/gov/usgs/anss/query/filefactory/no-gaps
+java -jar ../lib-ivy/external/GeoNetCWBQuery-2.0.0-RC1.jar -t ms -b "2009/01/01 00:00:00" -d 1800 -s "NZMRZ..HH.10" -o $tmpdir/test-data/gov/usgs/anss/query/filefactory/no-gaps/%N.ms
+java -jar ../lib-ivy/external/GeoNetCWBQuery-2.0.0-RC1.jar -t sac -sacpz nm -b "2009/01/01 00:00:00" -d 1800 -s "NZMRZ..HH.10" -o $tmpdir/test-data/gov/usgs/anss/query/filefactory/no-gaps/%N.sac
 
-echo 'java -jar ../lib-ivy/external/GeoNetCWBQuery-2.0.0-RC1.jar -t ms -b "2009/01/01 00:00:00" -d 1800 -s "NZMRZ..HH.10" -o $tmpdir/miniseed-data/test-one/%N.ms' > $tmpdir/miniseed-data/test-one/command.txt
 
-java -jar ../lib-ivy/external/GeoNetCWBQuery-2.0.0-RC1.jar -t ms -b "2009/01/01 00:00:00" -d 1800 -s "NZMRZ..HH.10" -o $tmpdir/miniseed-data/test-one/%N.ms
+mkdir -p $tmpdir/test-data/gov/usgs/anss/query/filefactory/no-meta
+java -jar ../lib-ivy/external/GeoNetCWBQuery-2.0.0-RC1.jar -t ms -b "2009/01/01 00:00:00" -d 1800 -s "NZMRZ..HH.10" -o $tmpdir/test-data/gov/usgs/anss/query/filefactory/no-meta/%N.ms
+java -jar ../lib-ivy/external/GeoNetCWBQuery-2.0.0-RC1.jar -t sac -nometa -b "2009/01/01 00:00:00" -d 1800 -s "NZMRZ..HH.10" -o $tmpdir/test-data/gov/usgs/anss/query/filefactory/no-meta/%N.sac
 
-mkdir -p $tmpdir/sac-data/test-one
 
-echo 'java -jar ../lib-ivy/external/GeoNetCWBQuery-2.0.0-RC1.jar -t sac -sacpz nm -b "2009/01/01 00:00:00" -d 1800 -s "NZMRZ..HH.10" -o $tmpdir/sac-data/test-one/%N.ms' > $tmpdir/sac-data/test-one/command.txt
+# This query has gaps.  Use the mseed for testing -nogaps option. Use the SAC for testing gap fill options
+mkdir -p $tmpdir/test-data/gov/usgs/anss/query/filefactory/gaps
+java -jar ../lib-ivy/external/GeoNetCWBQuery-2.0.0-RC1.jar -t ms -b "2009/01/01 00:00:00" -d 1800 -s "NZBFZ..HHE10" -o $tmpdir/test-data/gov/usgs/anss/query/filefactory/gaps/%N.ms
+java -jar ../lib-ivy/external/GeoNetCWBQuery-2.0.0-RC1.jar -t sac -sacpz nm -b "2009/01/01 00:00:00" -d 1800 -s "NZBFZ..HHE10" -o $tmpdir/test-data/gov/usgs/anss/query/filefactory/gaps/%N.sac
 
-java -jar ../lib-ivy/external/GeoNetCWBQuery-2.0.0-RC1.jar -t sac -sacpz nm -b "2009/01/01 00:00:00" -d 1800 -s "NZMRZ..HH.10" -o $tmpdir/sac-data/test-one/%N.sac
+
+mkdir -p $tmpdir/test-data/gov/usgs/anss/query/metadata
+java -jar ../lib-ivy/external/GeoNetCWBQuery-2.0.0-RC1.jar -t sac -sacpz nm -b "2009/01/01 11:11:11" -d 1800 -s "NZWEL..HH.10" -o $tmpdir/test-data/gov/usgs/anss/query/metadata/%N.sac
+rm $tmpdir/test-data/gov/usgs/anss/query/metadata/*.sac
 
 cd $tmpdir
 
-jar -0cvf CWBQueryTestData-${jarversion}.jar miniseed-data sac-data  make-test-data-jar.sh
+jar -0cvf CWBQueryTestData-${jarversion}.jar test-data  make-test-data-jar.sh
 
 cd -
 
@@ -31,5 +39,5 @@ mv $tmpdir/CWBQueryTestData-${jarversion}.jar $tmpdir/CWBQueryTestData/$jarversi
 
 rsync -v --archive --no-perms --rsh=ssh $tmpdir/CWBQueryTestData repoadmin@repo.geonet.org.nz:/work/maven/public_html/ivy/repo/enterprise/nz/org/geonet/
 
-rm -rf $tmpdir
+#rm -rf $tmpdir
 

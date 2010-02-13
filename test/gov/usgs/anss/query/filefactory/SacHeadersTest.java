@@ -5,6 +5,7 @@
 package gov.usgs.anss.query.filefactory;
 
 import edu.sc.seis.TauP.SacTimeSeries;
+import gov.usgs.anss.query.metadata.ChannelMetaData;
 import java.util.List;
 import nz.org.geonet.quakeml.v1_0_1.client.QuakemlFactory;
 import nz.org.geonet.quakeml.v1_0_1.client.QuakemlUtils;
@@ -176,5 +177,34 @@ public class SacHeadersTest {
         assertEquals("MD", 56, SacHeaders.sacMagType("MD"));
         assertEquals("MX", 57, SacHeaders.sacMagType("MX"));
         assertEquals("MB", 57, SacHeaders.sacMagType("something made up"));
+    }
+
+    @Test
+    public void testSetChannelHeader() {
+        ChannelMetaData metaData = new ChannelMetaData("test", "test", "test", "test");
+        metaData.setLatitude(-41.28576d);
+        metaData.setLongitude(174.76802d);
+        metaData.setElevation(0.0d);
+        metaData.setDepth(0.0d);
+        metaData.setAzimuth(0.0d);
+        metaData.setDip(-90.0d);
+
+        SacTimeSeries sac = new SacTimeSeries();
+        sac.stla = -41.28576d;
+        sac.stlo = 174.76802d;
+        sac.stel = 138.0d;
+        sac.stdp = 0.0;
+        sac.cmpaz = 0.0;
+        sac.cmpinc = 0.0;
+
+        SacTimeSeries result = SacHeaders.setChannelHeader(sac, metaData);
+
+        assertEquals("File", sac, result);
+        assertEquals("Lat", sac.stla, result.stla, 0.0);
+        assertEquals("Lon", sac.stlo, result.stlo, 0.0);
+        assertEquals("Elev", sac.stel, result.stel, 0.0);
+        assertEquals("Depth", sac.stdp, result.stdp, 0.0);
+        assertEquals("Azimuth", sac.cmpaz, result.cmpaz, 0.0);
+        assertEquals("Inc", sac.cmpinc, result.cmpinc, 0.0);
     }
 }

@@ -227,9 +227,10 @@ public class CWBDataServerMSEED implements CWBDataServer {
     protected void finalize() throws Throwable {
         super.finalize();
         try {
-            outStream.write(("\n").getBytes());
+			outStream.write(("\n").getBytes());
         } catch (IOException ex) {
-            Logger.getLogger(CWBDataServerMSEED.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CWBDataServerMSEED.class.getName()).log(Level.FINE,
+					"Failed when attempting to close connection.", ex);
         }
         ds.close();
     }

@@ -177,7 +177,10 @@ public class EdgeQueryClient {
                 out = options.getOutputter();
                 if (out == null) {
                     blksAll = new ArrayList<ArrayList<MiniSeed>>(20);
-                }
+                } else if (out instanceof SacOutputer) {
+					((SacOutputer) out).doQuery();
+					continue;
+				}
 
                 // The length at which our compare for changes depends on the output file mask
                 Comparator nsclComparator = options.getNsclComparator();
@@ -450,7 +453,7 @@ public class EdgeQueryClient {
             logger.config("Using custom logging config file: " + customLogConfigFile);
         }
 
-        //TOSO this any any others should get explicitly set on calendars.
+        //TODO this any any others should get explicitly set on calendars. "UTC"?
         TimeZone tz = TimeZone.getTimeZone("GMT+0");
         TimeZone.setDefault(tz);
 
@@ -464,7 +467,7 @@ public class EdgeQueryClient {
         // The ls option does not require any args checking
         if (options.isListQuery()) {
             logger.info(cwbServer.listChannels(options.getBegin(), options.getDuration()));
-        } else {
+		} else {
             query(options);
         }
 

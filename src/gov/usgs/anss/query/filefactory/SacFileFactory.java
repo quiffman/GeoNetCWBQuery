@@ -141,7 +141,8 @@ public class SacFileFactory {
         }
 
         if (quakeml != null) {
-            //           setEventHeader(sac, quakeml);
+            SacHeaders.setEventHeader(sac, quakeml);
+            SacHeaders.setPhasePicks(sac, quakeml);
         }
 
         return sac;

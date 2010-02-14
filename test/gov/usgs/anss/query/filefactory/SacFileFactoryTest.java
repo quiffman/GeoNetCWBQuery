@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import javax.xml.bind.JAXBException;
+import nz.org.geonet.quakeml.v1_0_1.client.QuakemlFactory;
 import nz.org.geonet.quakeml.v1_0_1.domain.Quakeml;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -32,7 +34,7 @@ import static org.junit.Assert.*;
 public class SacFileFactoryTest {
 
     @Parameters
-    public static Collection data() {
+    public static Collection data() throws Exception {
         return Arrays.asList(new Object[][]{
                     {
                         new CWBDataServerMSEEDMock("dummy", 666),
@@ -85,8 +87,20 @@ public class SacFileFactoryTest {
                         true, //gaps
                         true, //trim
                         null //quakml
-                    }
-                });
+                    },
+                    { // Event data.
+                        new CWBDataServerMSEEDMock("dummy", 666),
+                        new MetaDataServerMock("dummy", 666),
+                        new String[]{"/test-data/gov/usgs/anss/query/filefactory/event/NZTSZ__HHN10.ms",},
+                        new String[]{"/test-data/gov/usgs/anss/query/filefactory/event/NZTSZ__HHN10.sac.pz",},
+                        new String[]{"/gov/usgs/anss/query/filefactory/event/200705120730.TSZ.HHN.10.NZ.sac",},
+                        new DateTime(2007, 5, 12, 7, 30, 0, 0, DateTimeZone.UTC),
+                        1800d, //duration
+                        new Integer(-12345), //fill
+                        true, //gaps
+                        true, //trim
+                        new QuakemlFactory().getQuakeml(SacFileFactoryTest.class.getResourceAsStream("/gov/usgs/anss/query/filefactory/quakeml_2732452.xml")) //quakml
+                    },});
     }
     private CWBDataServerMSEEDMock cwbServer;
     private MetaDataServerMock mdServer;
@@ -102,7 +116,7 @@ public class SacFileFactoryTest {
     private ArrayList<SacTimeSeries> expectedSac;
     private Iterator<SacTimeSeries> expectedSacIter;
 
-    public SacFileFactoryTest(CWBDataServerMSEEDMock cwbServer, MetaDataServerMock mdServer, String[] mseedFiles, String[] pazFiles, String[] expectedSacFiles, DateTime begin, double duration, Integer fill, boolean gaps, boolean trim, Quakeml quakeml) throws IOException {
+    public SacFileFactoryTest(CWBDataServerMSEEDMock cwbServer, MetaDataServerMock mdServer, String[] mseedFiles, String[] pazFiles, String[] expectedSacFiles, DateTime begin, double duration, Integer fill, boolean gaps, boolean trim, Quakeml quakeml) throws Exception {
         this.cwbServer = cwbServer;
         this.mdServer = mdServer;
         this.mseedFiles = mseedFiles;
@@ -175,8 +189,8 @@ public class SacFileFactoryTest {
                 }
 
                 assertEquals("nvhdr", result.nvhdr, expResult.nvhdr);
-                assertEquals("b", result.b, expResult.b, 0.0);
-                assertEquals("e", result.e, expResult.e, 0.0);
+                assertEquals("b", result.b, expResult.b, 0.01);
+                assertEquals("e", result.e, expResult.e, 0.01);
                 assertEquals("iftype", result.iftype, expResult.iftype);
                 assertEquals("leven", result.leven, expResult.leven);
                 assertEquals("delta", result.delta, expResult.delta, 0.001);  // Slight discrepancy
@@ -188,7 +202,7 @@ public class SacFileFactoryTest {
                 assertEquals("nzhour", result.nzhour, expResult.nzhour);
                 assertEquals("nzmin", result.nzmin, expResult.nzmin);
                 assertEquals("nzsec", result.nzsec, expResult.nzsec);
-                assertEquals("nzmsec", result.nzmsec, expResult.nzmsec);
+                assertEquals("nzmsec", result.nzmsec, expResult.nzmsec, 2);
 
                 assertEquals("iztype", result.iztype, expResult.iztype);
 
@@ -209,6 +223,20 @@ public class SacFileFactoryTest {
                 assertEquals("Depth", result.stdp, expResult.stdp, 0.0);
                 assertEquals("Azimuth", result.cmpaz, expResult.cmpaz, 0.0);
                 assertEquals("Inc", result.cmpinc, expResult.cmpinc, 0.0);
+
+                if (quakeml != null) {
+                    assertEquals("lat", result.evla, expResult.evla, 0.00001);
+                    assertEquals("lon", result.evlo, expResult.evlo, 0.00001);
+                    assertEquals("dep", result.evdp, expResult.evdp, 0.1);
+                    assertEquals("mag", result.mag, expResult.mag, 0.001);
+                    // TODO - don't seem to be able to hand massage these headers.
+//                    assertEquals("imagtyp", result.imagtyp, expResult.imagtyp);
+//                    assertEquals("ievtyp", result.ievtyp, expResult.ievtyp);
+//                    assertEquals("lcalda", result.lcalda, expResult.lcalda);
+
+                    assertEquals("Phase ", result.kt0, expResult.kt0.trim());
+                    assertEquals("Phase t", result.t0, expResult.t0, 0.001);
+                }
 
             }
         }

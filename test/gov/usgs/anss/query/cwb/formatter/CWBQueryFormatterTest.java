@@ -46,8 +46,8 @@ public class CWBQueryFormatterTest {
         DateTime begin = new DateTime(2009, 1, 1, 0, 0, 0, 0, tz);
         Double duration = 1800d;
         String result = CWBQueryFormatter.miniSEED(begin, duration, nscl);
-        assertEquals("data query 1", "'-b' '2009/01/01 00:00:00' '-s' 'NZMRZ..HHZ10' '-d' '1800.0'\n", result);
+        assertEquals("data query 1", "'-b' '2009/01/01 00:00:00' '-s' 'NZMRZ..HHZ10' '-d' '1800.0'\t", result);
         result = CWBQueryFormatter.miniSEED(begin, duration, "NZMRZ..HHZ10");
-        assertEquals("data query 1", "'-b' '2009/01/01 00:00:00' '-s' 'NZMRZ..HHZ10' '-d' '1800.0'\n", result);
+        assertEquals("data query 1", "'-b' '2009/01/01 00:00:00' '-s' 'NZMRZ..HHZ10' '-d' '1800.0'\t", result);
     }
 }

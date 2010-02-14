@@ -229,10 +229,9 @@ public class SacFileFactoryTest {
                     assertEquals("lon", result.evlo, expResult.evlo, 0.00001);
                     assertEquals("dep", result.evdp, expResult.evdp, 0.1);
                     assertEquals("mag", result.mag, expResult.mag, 0.001);
-                    // TODO - don't seem to be able to hand massage these headers.
-//                    assertEquals("imagtyp", result.imagtyp, expResult.imagtyp);
-//                    assertEquals("ievtyp", result.ievtyp, expResult.ievtyp);
-//                    assertEquals("lcalda", result.lcalda, expResult.lcalda);
+                    assertEquals("imagtyp", result.imagtyp, expResult.imagtyp);
+                    assertEquals("ievtyp", result.ievtyp, expResult.ievtyp);
+                    assertEquals("lcalda", result.lcalda, expResult.lcalda);
 
                     assertEquals("Phase ", result.kt0, expResult.kt0.trim());
                     assertEquals("Phase t", result.t0, expResult.t0, 0.001);

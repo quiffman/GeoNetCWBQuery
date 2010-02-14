@@ -29,14 +29,14 @@ public class MessageFormatter {
         MiniSeed ms = iter.next();
         int numSamples = ms.getNsamp();
 
-        DateTime begin = new DateTime(ms.getGregorianCalendar().getTimeInMillis(), DateTimeZone.forID(ms.getGregorianCalendar().getTimeZone().getID()));
+        DateTime begin = new DateTime(ms.getGregorianCalendar().getTimeInMillis(), DateTimeZone.forID("UTC"));
 
         while (iter.hasNext()) {
             ms = iter.next();
             numSamples += ms.getNsamp();
         }
 
-        DateTime end = new DateTime(ms.getEndTime().getTimeInMillis(), DateTimeZone.forID(ms.getEndTime().getTimeZone().getID()));
+        DateTime end = new DateTime(ms.getEndTime().getTimeInMillis(), DateTimeZone.forID("UTC"));
 
         return String.format("%sZ Query on %s %06d mini-seed blks %s %s ns=%d",
                 now.toString(nowFormat),

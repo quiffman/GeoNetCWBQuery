@@ -48,7 +48,11 @@ public class SacFileFactory {
         cwbServer.query(begin, duration, nsclSelectString);
         while (cwbServer.hasNext()) {
             SacTimeSeries sac = makeTimeSeries(cwbServer.getNext(), begin, duration, fill, gaps, trim, quakeml);
-            outputFile(sac);
+            if (sac != null) {
+                outputFile(sac);
+            } else {
+                // TODO logger message about null data
+            }
         }
     }
 
@@ -134,10 +138,10 @@ public class SacFileFactory {
             MetaDataQuery mdq = new MetaDataQuery(metaDataServer);
             ChannelMetaData md = mdq.getChannelMetaData(nscl, begin);
             sac = SacHeaders.setChannelHeader(sac, md);
-            }
+        }
 
         if (quakeml != null) {
- //           setEventHeader(sac, quakeml);
+            //           setEventHeader(sac, quakeml);
         }
 
         return sac;

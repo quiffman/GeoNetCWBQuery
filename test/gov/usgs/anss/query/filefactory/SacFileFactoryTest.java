@@ -13,8 +13,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import nz.org.geonet.quakeml.v1_0_1.domain.Quakeml;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;

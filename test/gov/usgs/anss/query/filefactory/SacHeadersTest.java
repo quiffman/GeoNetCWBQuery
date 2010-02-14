@@ -6,6 +6,8 @@ package gov.usgs.anss.query.filefactory;
 
 import edu.sc.seis.TauP.SacTimeSeries;
 import gov.usgs.anss.query.metadata.ChannelMetaData;
+import java.sql.Savepoint;
+import java.util.HashMap;
 import java.util.List;
 import nz.org.geonet.quakeml.v1_0_1.client.QuakemlFactory;
 import nz.org.geonet.quakeml.v1_0_1.client.QuakemlUtils;
@@ -14,6 +16,8 @@ import nz.org.geonet.quakeml.v1_0_1.domain.Magnitude;
 import nz.org.geonet.quakeml.v1_0_1.domain.Origin;
 import nz.org.geonet.quakeml.v1_0_1.domain.Pick;
 import nz.org.geonet.quakeml.v1_0_1.domain.Quakeml;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -38,43 +42,13 @@ public class SacHeadersTest {
 
     // For SAC header refer to http://www.iris.edu/manuals/sac/SAC_Manuals/FileFormatPt2.html
     @Test
-    public void testSetEventHeader() throws Exception {
-        SacTimeSeries sac = new SacTimeSeries();
+    public void testSetEventHeaderEventAfterBegin() throws Exception {
+
 
 // java -jar GeoNetCWBQuery.jar -t sac -b "2007/05/12 07:30:00" -s "NZTHZ..HHZ10" -d 1800 -o %z%y%M%D%h%m.%s.%c.%l.%n.sac
-//  FILE: 200705120730.THZ.HHZ.10.NZ.sac - 1
-// ------------------------------------
-//
-//       NPTS = 180000
-//          B = 0.000000e+00
-//          E = 1.799990e+03
-//     IFTYPE = TIME SERIES FILE
-//      LEVEN = TRUE
-//      DELTA = 1.000000e-02
-//     DEPMIN = -4.432000e+03
-//     DEPMAX = 5.799000e+03
-//     DEPMEN = 3.930014e+02
-//     KZDATE = MAY 12 (132), 2007
-//     KZTIME = 07:29:59.997
-//     IZTYPE = BEGIN TIME
-//      KSTNM = THZ
-//      CMPAZ = 0.000000e+00
-//     CMPINC = 0.000000e+00
-//       STLA = -4.176418e+01
-//       STLO = 1.729051e+02
-//       STEL = 7.470000e+02
-//       STDP = 0.000000e+00
-//      KHOLE = 10
-//     LOVROK = TRUE
-//      NVHDR = 6
-//     LPSPOL = TRUE
-//     LCALDA = TRUE
-//     KCMPNM = HHZ
-//     KNETWK = NZ
-//
+
 //SAC> chnhdr O gmt 2007 132 7 41 4 874
 //SAC> lh o
-//
 //
 //  FILE: 200705120730.THZ.HHZ.10.NZ.sac - 1
 // ------------------------------------
@@ -82,68 +56,262 @@ public class SacHeadersTest {
 //     o = 6.648770e+02
 //SAC> chnhdr allt -6.648770e+02 iztype io
 //
-//        FILE: 200705120730.THZ.HHZ.10.NZ.sac - 1
-// ------------------------------------
-//
-//        NPTS = 180000
-//           B = -6.648770e+02
-//           E = 1.135113e+03
-//      IFTYPE = TIME SERIES FILE
-//       LEVEN = TRUE
-//       DELTA = 1.000000e-02
-//      DEPMIN = -4.432000e+03
-//      DEPMAX = 5.799000e+03
-//      DEPMEN = 3.930014e+02
-//     OMARKER = 0
-//      KZDATE = MAY 12 (132), 2007
-//      KZTIME = 07:41:04.874
-//      IZTYPE = EVENT ORIGIN TIME
-//       KSTNM = THZ
-//       CMPAZ = 0.000000e+00
-//      CMPINC = 0.000000e+00
-//        STLA = -4.176418e+01
-//        STLO = 1.729051e+02
-//        STEL = 7.470000e+02
-//        STDP = 0.000000e+00
-//       KHOLE = 10
-//      LOVROK = TRUE
-//       NVHDR = 6
-//      LPSPOL = TRUE
-//      LCALDA = TRUE
-//      KCMPNM = HHZ
-//      KNETWK = NZ
 
-        sac.evla = -40.60804d;
-        sac.evlo = 176.13933d;
-        sac.evdp = 17946.3d; // meters
-        sac.mag = 4.389d;
-        sac.imagtyp = 54;
+        DateTime eventTime = new DateTime(2007, 5, 12, 7, 41, 4, 874, DateTimeZone.UTC);
+        double eventLat = -40.60804d;
+        double eventLon = 176.13933d;
+        double eventDepth = 17946.3d;  // meters
+        double eventMag = 4.389d;
+        int magType = 54;
+        int evType = 40;
 
-        sac.lcalda = 1; // calculate DIST AZ BAZ and GCARC from station and event coords.
-//       sac.dist = ;
-//       sac.az = ;
-//       sac.baz =;
-//       sac.gcarc = ;
+        SacTimeSeries sac = new SacTimeSeries();
 
-        Quakeml quakeml = new QuakemlFactory().getQuakeml(SacHeadersTest.class.getResourceAsStream("/quakeml-data/test-one/quakeml_2732452.xml"));
+        sac.nzyear = 2007;
+        sac.nzjday = 132;
+        sac.nzhour = 7;
+        sac.nzmin = 29;
+        sac.nzsec = 59;
+        sac.nzmsec = 997;
 
-        Event event = QuakemlUtils.getFirstEvent(quakeml);
-        Origin origin = QuakemlUtils.getPreferredOrigin(event);
-        // Paul will add a getPreferredMag()
-        System.out.println("mags " + " " +
-                event.getMagnitude().get(0).getMag().getValue() + " " +
-                event.getMagnitude().get(0).getType());
+        sac.b = 0.000000e+00d;
+        sac.e = 1.799990e+03;
 
-        //      event.getPick().get(0).getTime().getValue().
+        sac.iztype = SacTimeSeries.IB;
 
-        List<Pick> picks = QuakemlUtils.getPicksAssociatedWithOrigin(event, origin.getPublicID());
+        sac = SacHeaders.setEventHeader(sac, eventTime, eventLat, eventLon, eventDepth, eventMag, magType, evType);
 
-        SacFileFactory instance = new SacFileFactory();
-
-//        SacTimeSeries result = instance.setEventHeader(sac, quakeml);
-//        assertEquals("o", 15.874, result.o);
-//        assertEquals("ko", "2732452g", result.ko);
+        assertEquals("year", sac.nzyear, 2007);
+        assertEquals("month", sac.nzjday, 132);
+        assertEquals("hour", sac.nzhour, 7);
+        assertEquals("minute", sac.nzmin, 41);
+        assertEquals("sec", sac.nzsec, 4);
+        assertEquals("msec", sac.nzmsec, 874);
+        assertEquals("b", sac.b, -6.648770e+02d, 0.0000001);
+        assertEquals("e", sac.e, 1.135113e+03, 0.0000001);
+        assertEquals("iztype", sac.iztype, SacTimeSeries.IO);
+        assertEquals("lat", sac.evla, eventLat, 0.0);
+        assertEquals("lon", sac.evlo, eventLon, 0.0);
+        assertEquals("dep", sac.evdp, eventDepth, 0.0);
+        assertEquals("mag", sac.mag, eventMag, 0.0);
+        assertEquals("imagtyp", sac.imagtyp, 54);
+        assertEquals("ievtyp", sac.ievtyp, 40);
+        assertEquals("lcalda", sac.lcalda, 1);
     }
+
+    @Test
+    public void testSetEventHeaderEventBeforeBegin() throws Exception {
+        DateTime eventTime = new DateTime(2007, 5, 12, 7, 41, 4, 874, DateTimeZone.UTC);
+        double eventLat = -40.60804d;
+        double eventLon = 176.13933d;
+        double eventDepth = 17946.3d;  // meters
+        double eventMag = 4.389d;
+        int magType = 54;
+        int evType = 40;
+
+        SacTimeSeries sac = new SacTimeSeries();
+
+        sac.nzyear = 2007;
+        sac.nzjday = 132;
+        sac.nzhour = 7;
+        sac.nzmin = 49;
+        sac.nzsec = 59;
+        sac.nzmsec = 997;
+
+        sac.b = 0.000000e+00d;
+        sac.e = 1.799990e+03;
+
+        sac.iztype = SacTimeSeries.IB;
+
+        sac = SacHeaders.setEventHeader(sac, eventTime, eventLat, eventLon, eventDepth, eventMag, magType, evType);
+
+        assertEquals("year", sac.nzyear, 2007);
+        assertEquals("month", sac.nzjday, 132);
+        assertEquals("hour", sac.nzhour, 7);
+        assertEquals("minute", sac.nzmin, 41);
+        assertEquals("sec", sac.nzsec, 4);
+        assertEquals("msec", sac.nzmsec, 874);
+        assertEquals("b", sac.b, 5.351230e+02d, 0.0000001);
+        assertEquals("e", sac.e, 2.335113e+03d, 0.0000001);
+        assertEquals("iztype", sac.iztype, SacTimeSeries.IO);
+        assertEquals("lat", sac.evla, eventLat, 0.0);
+        assertEquals("lon", sac.evlo, eventLon, 0.0);
+        assertEquals("dep", sac.evdp, eventDepth, 0.0);
+        assertEquals("mag", sac.mag, eventMag, 0.0);
+        assertEquals("imagtyp", sac.imagtyp, 54);
+        assertEquals("ievtyp", sac.ievtyp, 40);
+        assertEquals("lcalda", sac.lcalda, 1);
+    }
+
+    @Test
+    public void testSetEventHeaderEventSameAsBegin() throws Exception {
+        DateTime eventTime = new DateTime(2007, 5, 12, 7, 41, 4, 874, DateTimeZone.UTC);
+        double eventLat = -40.60804d;
+        double eventLon = 176.13933d;
+        double eventDepth = 17946.3d;  // meters
+        double eventMag = 4.389d;
+        int magType = 54;
+        int evType = 40;
+
+        SacTimeSeries sac = new SacTimeSeries();
+
+        sac.nzyear = 2007;
+        sac.nzjday = 132;
+        sac.nzhour = 7;
+        sac.nzmin = 41;
+        sac.nzsec = 4;
+        sac.nzmsec = 874;
+
+        sac.b = 0.000000e+00d;
+        sac.e = 1.799990e+03;
+
+        sac.iztype = SacTimeSeries.IB;
+
+        sac = SacHeaders.setEventHeader(sac, eventTime, eventLat, eventLon, eventDepth, eventMag, magType, evType);
+
+        assertEquals("year", sac.nzyear, 2007);
+        assertEquals("month", sac.nzjday, 132);
+        assertEquals("hour", sac.nzhour, 7);
+        assertEquals("minute", sac.nzmin, 41);
+        assertEquals("sec", sac.nzsec, 4);
+        assertEquals("msec", sac.nzmsec, 874);
+        assertEquals("b", sac.b, 0.000000e+00d, 0.0000001);
+        assertEquals("e", sac.e, 1.799990e+03, 0.0000001);
+        assertEquals("iztype", sac.iztype, SacTimeSeries.IO);
+        assertEquals("lat", sac.evla, eventLat, 0.0);
+        assertEquals("lon", sac.evlo, eventLon, 0.0);
+        assertEquals("dep", sac.evdp, eventDepth, 0.0);
+        assertEquals("mag", sac.mag, eventMag, 0.0);
+        assertEquals("imagtyp", sac.imagtyp, 54);
+        assertEquals("ievtyp", sac.ievtyp, 40);
+        assertEquals("lcalda", sac.lcalda, 1);
+    }
+
+    @Test
+    public void testSetEventHeaderQuakeMl() throws Exception {
+
+        DateTime eventTime = new DateTime(2007, 5, 12, 7, 41, 4, 874, DateTimeZone.UTC);
+        double eventLat = -40.60804d;
+        double eventLon = 176.13933d;
+        double eventDepth = 17946.3d;  // meters
+        double eventMag = 4.389d;
+        int magType = 54;
+
+        SacTimeSeries sac = new SacTimeSeries();
+
+        sac.nzyear = 2007;
+        sac.nzjday = 132;
+        sac.nzhour = 7;
+        sac.nzmin = 29;
+        sac.nzsec = 59;
+        sac.nzmsec = 997;
+
+        sac.b = 0.000000e+00d;
+        sac.e = 1.799990e+03;
+
+        sac.iztype = SacTimeSeries.IB;
+
+        Quakeml quakeml = new QuakemlFactory().getQuakeml(SacHeadersTest.class.getResourceAsStream("quakeml_2732452.xml"));
+
+        sac = SacHeaders.setEventHeader(sac, quakeml);
+
+        assertEquals("year", sac.nzyear, 2007);
+        assertEquals("month", sac.nzjday, 132);
+        assertEquals("hour", sac.nzhour, 7);
+        assertEquals("minute", sac.nzmin, 41);
+        assertEquals("sec", sac.nzsec, 4);
+        assertEquals("msec", sac.nzmsec, 874);
+        assertEquals("b", sac.b, -6.648770e+02d, 0.0000001);
+        assertEquals("e", sac.e, 1.135113e+03, 0.0000001);
+        assertEquals("iztype", sac.iztype, SacTimeSeries.IO);
+        assertEquals("lat", sac.evla, eventLat, 0.0);
+        assertEquals("lon", sac.evlo, eventLon, 0.0);
+        assertEquals("dep", sac.evdp, eventDepth, 0.0);
+        assertEquals("mag", sac.mag, eventMag, 0.0);
+        assertEquals("imagtyp", sac.imagtyp, 54);
+        assertEquals("ievtyp", sac.ievtyp, 40);
+        assertEquals("lcalda", sac.lcalda, 1);
+    }
+
+    @Test
+    public void testSetPicks() {
+        HashMap<String, Double> phasePicks = new HashMap<String, Double>();
+        phasePicks.put("P0", 100.0d);
+        phasePicks.put("P1", 101.0d);
+        phasePicks.put("P2", 102.0d);
+        phasePicks.put("P3", 103.0d);
+        phasePicks.put("P4", 104.0d);
+        phasePicks.put("P5", 105.0d);
+        phasePicks.put("P6", 106.0d);
+        phasePicks.put("P7", 107.0d);
+        phasePicks.put("P8", 108.0d);
+        phasePicks.put("P9", 109.0d);
+        phasePicks.put("P10", 110.0d);
+
+        SacTimeSeries sac = new SacTimeSeries();
+
+        sac = SacHeaders.setPhasePicks(sac, phasePicks);
+
+        assertEquals("P0", sac.kt0, "P0");
+        assertEquals("P0 t", sac.t0, 100.0d, 0.0);
+        assertEquals("P1", sac.kt1, "P1");
+        assertEquals("P1 t", sac.t1, 101.0d, 0.0);
+        assertEquals("P2", sac.kt2, "P2");
+        assertEquals("P2 t", sac.t2, 102.0d, 0.0);
+        assertEquals("P3", sac.kt3, "P3");
+        assertEquals("P3 t", sac.t3, 103.0d, 0.0);
+        assertEquals("P4", sac.kt4, "P4");
+        assertEquals("P4 t", sac.t4, 104.0d, 0.0);
+        assertEquals("P5", sac.kt5, "P5");
+        assertEquals("P5 t", sac.t5, 105.0d, 0.0);
+        assertEquals("P6", sac.kt6, "P6");
+        assertEquals("P6 t", sac.t6, 106.0d, 0.0);
+        assertEquals("P7", sac.kt7, "P7");
+        assertEquals("P7 t", sac.t7, 107.0d, 0.0);
+        assertEquals("P8", sac.kt8, "P8");
+        assertEquals("P8 t", sac.t8, 108.0d, 0.0);
+        assertEquals("P9", sac.kt9, "P9");
+        assertEquals("P9 t", sac.t9, 109.0d, 0.0);
+    }
+
+    @Test
+    public void testGetPhasePicksFromQuakeml() throws Exception {
+        Quakeml quakeml = new QuakemlFactory().getQuakeml(SacHeadersTest.class.getResourceAsStream("quakeml_2732452.xml"));
+
+        HashMap<String, Double> expected = new HashMap<String, Double>();
+        expected.put("S*", 17.001d);
+
+        HashMap phasePicks = SacHeaders.getPhasePicks(quakeml, "NZ", "TSZ", "HHN");
+
+        assertEquals("picks", phasePicks, expected);
+
+
+        expected = new HashMap<String, Double>();
+        phasePicks = SacHeaders.getPhasePicks(quakeml, "NN", "NNN", "NNN");
+        assertEquals("no picks", phasePicks, expected);
+    }
+
+    
+    @Test
+    public void testSetPhasePicks() throws Exception {
+        Quakeml quakeml = new QuakemlFactory().getQuakeml(SacHeadersTest.class.getResourceAsStream("quakeml_2732452.xml"));
+
+        SacTimeSeries sac = new SacTimeSeries();
+        sac.knetwk = "NZ";
+        sac.kstnm = "TSZ";
+        sac.kcmpnm = "HHN";
+
+        sac = SacHeaders.setPhasePicks(sac, quakeml);
+
+        assertEquals("P", sac.kt0, "S*");
+        assertEquals("P t", sac.t0, 17.001d, 0.0);
+
+        sac = new SacTimeSeries();
+
+        assertEquals("P", sac.kt0, "-12345  ");
+        assertEquals("P t", sac.t0, -12345.0, 0.0);
+    }
+
 
     @Test
     public void testSacEventType() {

@@ -11,12 +11,16 @@ import gov.usgs.anss.query.cwb.data.CWBDataServer;
 import gov.usgs.anss.query.metadata.ChannelMetaData;
 import gov.usgs.anss.query.metadata.MetaDataQuery;
 import gov.usgs.anss.query.metadata.MetaDataServer;
+import gov.usgs.anss.query.outputter.Filename;
 import gov.usgs.anss.seed.MiniSeed;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 import java.util.TreeSet;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import nz.org.geonet.quakeml.v1_0_1.domain.Quakeml;
 import org.joda.time.DateTime;
@@ -44,12 +48,12 @@ public class SacFileFactory {
         this.metaDataServer = metaDataServer;
     }
 
-    public void makeFiles(DateTime begin, double duration, String nsclSelectString, String mask, Integer fill, boolean gaps, boolean trim, Quakeml quakeml) {
+    public void makeFiles(DateTime begin, double duration, String nsclSelectString, String mask, Integer fill, boolean gaps, boolean trim, String pzunit, Quakeml quakeml) {
         cwbServer.query(begin, duration, nsclSelectString);
         while (cwbServer.hasNext()) {
             SacTimeSeries sac = makeTimeSeries(cwbServer.getNext(), begin, duration, fill, gaps, trim, quakeml);
             if (sac != null) {
-                outputFile(sac);
+                outputFile(sac, begin, mask, pzunit);
             } else {
                 // TODO logger message about null data
             }
@@ -152,7 +156,32 @@ public class SacFileFactory {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    protected void outputFile(SacTimeSeries timeSeries) {
-        throw new UnsupportedOperationException("Not supported yet.");
+	// TODO: move the getSACResponse to outputPZ or something.
+    protected void outputFile(SacTimeSeries timeSeries, DateTime begin, String mask, String pzunit) {
+		
+		NSCL nscl = new NSCL(timeSeries.knetwk,
+				timeSeries.kstnm,
+				timeSeries.kcmpnm,
+				timeSeries.khole);
+
+		String filename = Filename.makeFilename(mask, nscl, begin);
+		if (mask.equals("%N")) {
+			filename += ".sac";
+		}
+		filename = filename.replaceAll("[__]", "_");
+
+		try {
+			timeSeries.write(filename);
+			if (pzunit != null && metaDataServer != null) {
+				MetaDataQuery mdq = new MetaDataQuery(metaDataServer);
+				mdq.getSACResponse(nscl, begin, pzunit, filename + ".pz");
+			}
+		} catch (FileNotFoundException ex) {
+			Logger.getLogger(SacFileFactory.class.getName()).log(Level.SEVERE,
+					"File not found writing to SAC", ex);
+		} catch (IOException ex) {
+			Logger.getLogger(SacFileFactory.class.getName()).log(Level.SEVERE,
+					"IO exception writing to SAC", ex);
+		}
     }
 }

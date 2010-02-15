@@ -59,7 +59,7 @@ public class NSCL {
 	 */
 	public void setNetwork(String network) {
 		if (network.length() != 2) {
-			throw new IllegalArgumentException("Network code must be 2 characters long.");
+			network = (network + "  ").substring(0, 2);
 		}
 		this.network = network;
 	}
@@ -77,7 +77,7 @@ public class NSCL {
 	 */
 	public void setStation(String station) {
 		if (station.length() != 5) {
-			throw new IllegalArgumentException("Station code must be 5 characters long.");
+			station = (station + "     ").substring(0, 5);
 		}
 		this.station = station;
 	}
@@ -95,7 +95,7 @@ public class NSCL {
 	 */
 	public void setChannel(String channel) {
 		if (channel.length() != 3) {
-			throw new IllegalArgumentException("Channel code must be 3 characters long.");
+			channel = (channel + "   ").substring(0, 3);
 		}
 		this.channel = channel;
 	}
@@ -113,7 +113,7 @@ public class NSCL {
 	 */
 	public void setLocation(String location) {
 		if (location.length() != 2) {
-			throw new IllegalArgumentException("Location code must be 2 characters long.");
+			location = (location + "  ").substring(0, 2);
 		}
 		this.location = location;
 	}

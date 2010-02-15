@@ -6,6 +6,7 @@ package gov.usgs.anss.query.outputter;
 
 import gov.usgs.anss.query.NSCL;
 import gov.usgs.anss.seed.MiniSeed;
+import gov.usgs.anss.util.SeedUtil;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -42,7 +43,7 @@ public class Filename {
         name = name.replaceAll("%Y", shortYearFormat.print(begin));
 
         name = name.replaceAll("%j", dayOfYearFormat.print(begin));
-        name = name.replaceAll("%J", dayOfYearFormat.print(begin));
+        name = name.replaceAll("%J", Integer.toString(SeedUtil.toJulian(begin.toGregorianCalendar())));
 
         name = name.replaceAll("%M", monthFormat.print(begin));
         name = name.replaceAll("%d", dayOfMonthFormat.print(begin));

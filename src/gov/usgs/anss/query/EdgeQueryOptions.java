@@ -27,6 +27,8 @@ import nz.org.geonet.quakeml.v1_0_1.client.QuakemlUtils;
 import nz.org.geonet.quakeml.v1_0_1.domain.Quakeml;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Duration;
+import org.joda.time.ReadableDuration;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -101,7 +103,7 @@ public class EdgeQueryOptions {
 	public boolean sacpz = false;
 	public String pzunit = "nm";
 	private Quakeml event = null;
-	private long offset = 0;
+	private ReadableDuration offset = Duration.standardSeconds(-60);
 	private static Matcher quakeMlUriMatcher = Pattern.compile("%ref%").matcher(QueryProperties.getGeoNetQuakeMlUri());
 
 	/**
@@ -200,7 +202,7 @@ public class EdgeQueryOptions {
 				setEvent(args[i + 1]);
 				i++;
 			} else if (args[i].equals("-offset")) {
-				setOffset(Long.parseLong(args[i + 1]));
+				setOffset(Double.parseDouble(args[i + 1]));
 				i++;
 			}
 			else {
@@ -531,15 +533,15 @@ public class EdgeQueryOptions {
 	/**
 	 * @return the offset
 	 */
-	public long getOffset() {
+	public ReadableDuration getOffset() {
 		return offset;
 	}
 
 	/**
-	 * @param offset the offset to set
+	 * @param seconds the offset to set
 	 */
-	public void setOffset(long offset) {
-		this.offset = offset;
+	public void setOffset(double seconds) {
+		this.offset = new Duration((long) (seconds * 1000));
 	}
 
 	/**

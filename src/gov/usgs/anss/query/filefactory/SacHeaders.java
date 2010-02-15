@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 import nz.org.geonet.quakeml.v1_0_1.client.QuakemlUtils;
 import nz.org.geonet.quakeml.v1_0_1.domain.Arrival;
 import nz.org.geonet.quakeml.v1_0_1.domain.Event;
@@ -21,6 +22,7 @@ import nz.org.geonet.quakeml.v1_0_1.domain.Magnitude;
 import nz.org.geonet.quakeml.v1_0_1.domain.Origin;
 import nz.org.geonet.quakeml.v1_0_1.domain.Pick;
 import nz.org.geonet.quakeml.v1_0_1.domain.Quakeml;
+import nz.org.geonet.quakeml.v1_0_1.domain.RealQuantity;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -31,6 +33,13 @@ import org.joda.time.format.DateTimeFormatter;
  * @author geoffc
  */
 public class SacHeaders {
+
+    private static final Logger logger = Logger.getLogger(SacHeaders.class.getName());
+
+
+    static {
+        logger.fine("$Id: SacHeaders.java 1995 2010-02-15 01:10:51Z richardg $");
+    }
 
     // QuakeML doens't restrict mag type - these are the
     // values in the GeoNet DB.
@@ -132,18 +141,33 @@ public class SacHeaders {
         Event event = QuakemlUtils.getFirstEvent(quakeml);
         Origin origin = QuakemlUtils.getPreferredOrigin(event);
 
-        DateTime eventTime = new DateTime(origin.getTime().getValue().toGregorianCalendar().getTimeInMillis(),
-                DateTimeZone.forOffsetMillis(origin.getTime().getValue().getTimezone() * 60 * 1000));
+        double magnitude = -12345.0;
+        int magType = sacEventType("MX");
 
         Magnitude mag = QuakemlUtils.getPreferredMagnitude(event);
+        if (mag != null) {
+            magnitude = mag.getMag().getValue();
+            magType = sacEventType(event.getType().value());
+        } else {
+            logger.warning("Found no magnitude definition setting to unknown.");
+        }
 
-        return SacHeaders.setEventHeader(sac, eventTime, // eventLat, eventLon, eventDepth, eventMag, sacMagType)
-                origin.getLatitude().getValue(),
-                origin.getLongitude().getValue(),
-                origin.getDepth().getValue() * 1000.0d, // assume meters.
-                mag.getMag().getValue(),
-                sacMagType(mag.getType()),
-                sacEventType(event.getType().value()));
+        if (origin != null) {
+            DateTime eventTime = new DateTime(origin.getTime().getValue().toGregorianCalendar().getTimeInMillis(),
+                    DateTimeZone.forOffsetMillis(origin.getTime().getValue().getTimezone() * 60 * 1000));
+
+            sac = SacHeaders.setEventHeader(sac, eventTime, // eventLat, eventLon, eventDepth, eventMag, sacMagType)
+                    origin.getLatitude().getValue(),
+                    origin.getLongitude().getValue(),
+                    origin.getDepth().getValue() * 1000.0d, // assume meters.
+                    magnitude,
+                    magType,
+                    sacEventType(event.getType().value()));
+        } else {
+            logger.warning("Found no origin information, unable to set event information.");
+        }
+
+        return sac;
     }
 
     // Would be more useful in JQuakeml?
@@ -153,20 +177,24 @@ public class SacHeaders {
         Event event = QuakemlUtils.getFirstEvent(quakeml);
         Origin origin = QuakemlUtils.getPreferredOrigin(event);
 
-        long eventTime = origin.getTime().getValue().toGregorianCalendar().getTimeInMillis();
-        List<Pick> picks = event.getPick();
+        if (origin != null) {
+            long eventTime = origin.getTime().getValue().toGregorianCalendar().getTimeInMillis();
+            List<Pick> picks = event.getPick();
 
-        List<Arrival> arrivals = origin.getArrival();
+            List<Arrival> arrivals = origin.getArrival();
 
-        for (Arrival arrival : arrivals) {
-            Pick pick = QuakemlUtils.getPickAssociatedWithArrival(picks, arrival);
+            for (Arrival arrival : arrivals) {
+                Pick pick = QuakemlUtils.getPickAssociatedWithArrival(picks, arrival);
 
-            if (pick.getWaveformID().getNetworkCode().equals(networkCode) &&
-                    pick.getWaveformID().getStationCode().equals(stationCode) &&
-                    pick.getWaveformID().getChannelCode().equals(channelCode)) {
-                double arrivalTime = (pick.getTime().getValue().toGregorianCalendar().getTimeInMillis() - eventTime) / 1000.0;
-                phasePicks.put(arrival.getPhase().getValue(), arrivalTime);
+                if (pick.getWaveformID().getNetworkCode().equals(networkCode) &&
+                        pick.getWaveformID().getStationCode().equals(stationCode) &&
+                        pick.getWaveformID().getChannelCode().equals(channelCode)) {
+                    double arrivalTime = (pick.getTime().getValue().toGregorianCalendar().getTimeInMillis() - eventTime) / 1000.0;
+                    phasePicks.put(arrival.getPhase().getValue(), arrivalTime);
+                }
             }
+        } else {
+            logger.warning("Found no origin information, unable to set phase pick information.");
         }
 
         return phasePicks;

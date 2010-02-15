@@ -37,7 +37,7 @@ public class NSCLTest {
 	public void testSetNetworkError() {
 		System.out.println("setNetworkError");
 		NSCL nscl = NSCL.stringToNSCL("NZWEL  HHZ10");
-		nscl.setNetwork("");
+		nscl.setNetwork("NZL");
 	}
 
 	/**
@@ -47,7 +47,7 @@ public class NSCLTest {
 	public void testSetStationError() {
 		System.out.println("setStationError");
 		NSCL nscl = NSCL.stringToNSCL("NZWEL  HHZ10");
-		nscl.setStation("");
+		nscl.setStation("NZWELblah");
 	}
 
 	/**
@@ -57,7 +57,7 @@ public class NSCLTest {
 	public void testSetChannelError() {
 		System.out.println("setChannelError");
 		NSCL nscl = NSCL.stringToNSCL("NZWEL  HHZ10");
-		nscl.setChannel("");
+		nscl.setChannel("HHZ10");
 	}
 
 	/**
@@ -67,7 +67,7 @@ public class NSCLTest {
 	public void testSetLocationError() {
 		System.out.println("setLocationError");
 		NSCL nscl = NSCL.stringToNSCL("NZWEL  HHZ10");
-		nscl.setLocation("");
+		nscl.setLocation("10blah");
 	}
 
 	/**

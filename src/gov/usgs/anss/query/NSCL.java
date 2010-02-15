@@ -12,7 +12,7 @@ import java.util.Comparator;
  * Station Identifier, 5 UN.
  * Channel Identifier, 2 UN.
  * Location Identifier, 2 UN.
- * 
+ *
  * @author richardg
  */
 public class NSCL {
@@ -50,7 +50,7 @@ public class NSCL {
 	 * @return the network
 	 */
 	public String getNetwork() {
-		return network;
+		return (network + "  ").substring(0, 2);
 	}
 
 	/**
@@ -58,8 +58,8 @@ public class NSCL {
 	 * @param network the network to set
 	 */
 	public void setNetwork(String network) {
-		if (network.length() != 2) {
-			network = (network + "  ").substring(0, 2);
+		if (network.length() > 2) {
+			throw new IllegalArgumentException("Network code must be less than or equal to 2 characters in length.");
 		}
 		this.network = network;
 	}
@@ -68,7 +68,7 @@ public class NSCL {
 	 * @return the station
 	 */
 	public String getStation() {
-		return station;
+		return (station + "     ").substring(0, 5);
 	}
 
 	/**
@@ -76,8 +76,8 @@ public class NSCL {
 	 * @param station the station to set
 	 */
 	public void setStation(String station) {
-		if (station.length() != 5) {
-			station = (station + "     ").substring(0, 5);
+		if (station.length() > 5) {
+			throw new IllegalArgumentException("Station code must be less than or equal to 5 characters in length.");
 		}
 		this.station = station;
 	}
@@ -86,7 +86,7 @@ public class NSCL {
 	 * @return the channel
 	 */
 	public String getChannel() {
-		return channel;
+		return (channel + "   ").substring(0, 3);
 	}
 
 	/**
@@ -95,7 +95,7 @@ public class NSCL {
 	 */
 	public void setChannel(String channel) {
 		if (channel.length() != 3) {
-			channel = (channel + "   ").substring(0, 3);
+			throw new IllegalArgumentException("Channel code must be less than or equal to 3 characters in length.");
 		}
 		this.channel = channel;
 	}
@@ -104,7 +104,7 @@ public class NSCL {
 	 * @return the location
 	 */
 	public String getLocation() {
-		return location;
+		return (location + "  ").substring(0, 2);
 	}
 
 	/**
@@ -113,7 +113,7 @@ public class NSCL {
 	 */
 	public void setLocation(String location) {
 		if (location.length() != 2) {
-			location = (location + "  ").substring(0, 2);
+			throw new IllegalArgumentException("Location code must be less than or equal to 2 characters in length.");
 		}
 		this.location = location;
 	}
@@ -140,7 +140,7 @@ public class NSCL {
 
 	@Override
 	public String toString() {
-		return (network + station + channel + location);
+		return (getNetwork() + getStation() + getChannel() + getLocation());
 	}
 
 	public static Comparator NetworkComparator = new Comparator() {

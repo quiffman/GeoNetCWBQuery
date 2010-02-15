@@ -43,7 +43,7 @@ public class FilenameTest {
         assertEquals("%j", "002",
                 Filename.makeFilename("%j", new NSCL("NZ", "WEL  ", "HHZ", "10"), new DateTime(2009, 1, 2, 1, 12, 13, 0, tz)));
 
-        assertEquals("%J", "002",
+        assertEquals("%J", "2454834",
                 Filename.makeFilename("%J", new NSCL("NZ", "WEL  ", "HHZ", "10"), new DateTime(2009, 1, 2, 1, 12, 13, 0, tz)));
 
         assertEquals("%M", "01",

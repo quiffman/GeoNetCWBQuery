@@ -621,7 +621,8 @@ public class EdgeQueryOptions {
 
 	/**
 	 * TODO: throw an exception if the event can't be found...?
-	 * @param event the public ID of an event to set
+	 * @param event the GeoNet public ID, or fully qualified http or file URI of
+	 * an event to use.
 	 */
 	public void setEvent(String event) {
 		URI uri = null;

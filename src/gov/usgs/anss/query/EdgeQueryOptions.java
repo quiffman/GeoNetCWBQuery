@@ -4,18 +4,24 @@
  */
 package gov.usgs.anss.query;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.xml.bind.JAXBException;
 import nz.org.geonet.quakeml.v1_0_1.client.QuakemlFactory;
 import nz.org.geonet.quakeml.v1_0_1.client.QuakemlUtils;
 import nz.org.geonet.quakeml.v1_0_1.domain.Quakeml;
@@ -615,12 +621,52 @@ public class EdgeQueryOptions {
 	 * TODO: throw an exception if the event can't be found...?
 	 * @param event the public ID of an event to set
 	 */
-	public void setEvent(String publicId) {
-		this.event = new QuakemlFactory().getQuakeml(
-				quakeMlUriMatcher.replaceAll(publicId),
-				null, null);
-		if (event == null) {
-			logger.severe("failed to retrieve details for event ID " + publicId);
+	public void setEvent(String event) {
+		URI uri = null;
+		try {
+			uri = new URI(event);
+		} catch (URISyntaxException ex) {
+			Logger.getLogger(EdgeQueryOptions.class.getName()).log(
+					Level.INFO,
+					"Event parameter was not opaque URI, assuming it's GeoNet ID.",
+					ex);
+		}
+		
+		if (uri != null) {
+			if (uri.isAbsolute()) {
+				if (uri.getScheme().startsWith("http")) {
+					String username = uri.getUserInfo();
+					String password = null;
+					if (username != null) {
+						int split = username.indexOf(":");
+						if (split != -1) {
+							password = username.substring(split);
+							username = username.substring(0, split);
+						}
+					}
+					this.event = new QuakemlFactory().getQuakeml(
+							event,
+							username,
+							password);
+				} else if (uri.getScheme().equals("file")) {
+					try {
+						this.event = new QuakemlFactory().getQuakeml(new FileInputStream(new File(uri)));
+					} catch (FileNotFoundException ex) {
+						Logger.getLogger(EdgeQueryOptions.class.getName()).log(Level.SEVERE, null, ex);
+					} catch (JAXBException ex) {
+						Logger.getLogger(EdgeQueryOptions.class.getName()).log(Level.SEVERE, null, ex);
+					}
+				}
+			} else {
+				// Not an absolute URI so assume it's the GeoNet public ID.
+				this.event = new QuakemlFactory().getQuakeml(
+						quakeMlUriMatcher.replaceAll(event),
+						null, null);
+			}
+		}
+
+		if (this.event == null) {
+			logger.severe("failed to retrieve details for event string " + event);
 		}
 	}
 }

@@ -272,7 +272,7 @@ public class SacHeadersTest {
         Quakeml quakeml = new QuakemlFactory().getQuakeml(SacHeadersTest.class.getResourceAsStream("quakeml_2732452.xml"));
 
         HashMap<String, Double> expected = new HashMap<String, Double>();
-        expected.put("S*  mc", 17.001d);
+        expected.put("S*    mc", 17.001d);
 
         HashMap phasePicks = SacHeaders.getPhasePicks(quakeml, "NZ", "TSZ", "HHN");
 
@@ -296,7 +296,7 @@ public class SacHeadersTest {
 
         sac = SacHeaders.setPhasePicks(sac, quakeml);
 
-        assertEquals("P", sac.kt0, "S*  mc");
+        assertEquals("P", sac.kt0, "S*    mc");
         assertEquals("P t", sac.t0, 17.001d, 0.0);
 
         sac = new SacTimeSeries();

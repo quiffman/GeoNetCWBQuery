@@ -186,7 +186,7 @@ public class SacHeaders {
                         pick.getWaveformID().getStationCode().equals(stationCode) &&
                         pick.getWaveformID().getChannelCode().equals(channelCode)) {
                     double arrivalTime = (pick.getTime().getValue().toGregorianCalendar().getTimeInMillis() - eventTime) / 1000.0;
-                    String phaseName = (arrival.getPhase().getValue() + "    ").substring(0, 4) +
+                    String phaseName = (arrival.getPhase().getValue() + "      ").substring(0, 6) +
                             pick.getEvaluationMode().value().substring(0, 1) + pick.getEvaluationStatus().value().substring(0, 1);
                     phasePicks.put(phaseName, arrivalTime);
                 }

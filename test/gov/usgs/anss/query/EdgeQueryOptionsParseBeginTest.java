@@ -36,20 +36,22 @@ public class EdgeQueryOptionsParseBeginTest {
                     {"2009,095-23:59:12", 0, new DateTime(2009, 04, 05, 23, 59, 12, 0, tz)},
                     {"2008,095-23:59:12", 0, new DateTime(2008, 04, 04, 23, 59, 12, 0, tz)},
 
-                    {"2009/12/31 23:59:12", 48000, new DateTime(2010, 01, 01, 0, 0, 0, 0, tz)},
-                    {"1970/12/31 03:59:12", 1000, new DateTime(1970, 12, 31, 03, 59, 13, 0, tz)},
-                    {"2009/12/31 03:59:12", -4000, new DateTime(2009, 12, 31, 03, 59, 8, 0, tz)},
+                    {"2009/12/31 23:59:12", 48.0, new DateTime(2010, 01, 01, 0, 0, 0, 0, tz)},
+                    {"1970/12/31 03:59:12", 1.0, new DateTime(1970, 12, 31, 03, 59, 13, 0, tz)},
+                    {"2009/12/31 03:59:12", -4.0, new DateTime(2009, 12, 31, 03, 59, 8, 0, tz)},
+
+                    {"2009/12/31 23:59:12", 48.555, new DateTime(2010, 01, 01, 0, 0, 0, 555, tz)},
 		});
     }
     private String beginTime;
-	private long offset;
+	private double offset;
 	private DateTime begin;
 
     private static DateTimeZone tz = DateTimeZone.forID("UTC");
 
 	private EdgeQueryOptions options = new EdgeQueryOptions();
 
-    public EdgeQueryOptionsParseBeginTest(String beginTime, long offset, DateTime begin) {
+    public EdgeQueryOptionsParseBeginTest(String beginTime, double offset, DateTime begin) {
         this.beginTime = beginTime;
 		this.offset = offset;
         this.begin = begin;
@@ -60,7 +62,7 @@ public class EdgeQueryOptionsParseBeginTest {
 		options.setBegin(beginTime);
 		options.setOffset(offset);
 
-        assertEquals(options.getBeginWithOffset(), begin);
+        assertEquals(begin, options.getBeginWithOffset());
     }
 
     @Test(expected=IllegalArgumentException.class)

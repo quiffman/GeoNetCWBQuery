@@ -44,7 +44,7 @@
 
         <dependency org="joda-time" name="joda-time" rev="1.6" conf="compile->default;foride->sources" />
 
-        <dependency org="nz.org.geonet" name="jquakemlv1_0_1" rev="1.0.1-SNAPSHOT" conf="compile->default;foride->sources" />
+        <dependency org="nz.org.geonet" name="jquakeml-1.0.1" rev="latest." conf="compile->default;foride->sources" />
 
         <dependency org="nz.org.geonet" name="GeoNetCWBQuery" rev="2.0.0-RC1" conf="external->master"/>
 

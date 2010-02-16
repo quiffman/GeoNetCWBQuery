@@ -4,6 +4,7 @@
  */
 package gov.usgs.anss.query;
 
+import gov.usgs.anss.query.cwb.formatter.CWBQueryFormatter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -103,7 +104,7 @@ public class EdgeQueryOptions {
 	public boolean sacpz = false;
 	public String pzunit = "nm";
 	private Quakeml event = null;
-	private ReadableDuration offset = Duration.standardSeconds(-60);
+	private ReadableDuration offset = null;
 	private static Matcher quakeMlUriMatcher = Pattern.compile("%ref%").matcher(QueryProperties.getGeoNetQuakeMlUri());
 
 	/**
@@ -418,13 +419,7 @@ public class EdgeQueryOptions {
 	 */
 	public String getSingleQuotedCommand() {
 		// put command line in single quotes.
-		String line = "";
-		for (int i = 0; i < this.args.length; i++) {
-			if (!this.args[i].equals("")) {
-				line += "'" + this.args[i].replaceAll("@", " ") + "' ";
-			}
-		}
-		return line.trim() + "\t";
+		return CWBQueryFormatter.miniSEED(getBeginWithOffset(), duration, seedname);
 	}
 
     /**

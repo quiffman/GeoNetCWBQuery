@@ -6,15 +6,8 @@ package gov.usgs.anss.query.filefactory;
 
 import edu.sc.seis.TauP.SacTimeSeries;
 import gov.usgs.anss.query.metadata.ChannelMetaData;
-import java.sql.Savepoint;
 import java.util.HashMap;
-import java.util.List;
 import nz.org.geonet.quakeml.v1_0_1.client.QuakemlFactory;
-import nz.org.geonet.quakeml.v1_0_1.client.QuakemlUtils;
-import nz.org.geonet.quakeml.v1_0_1.domain.Event;
-import nz.org.geonet.quakeml.v1_0_1.domain.Magnitude;
-import nz.org.geonet.quakeml.v1_0_1.domain.Origin;
-import nz.org.geonet.quakeml.v1_0_1.domain.Pick;
 import nz.org.geonet.quakeml.v1_0_1.domain.Quakeml;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -279,7 +272,7 @@ public class SacHeadersTest {
         Quakeml quakeml = new QuakemlFactory().getQuakeml(SacHeadersTest.class.getResourceAsStream("quakeml_2732452.xml"));
 
         HashMap<String, Double> expected = new HashMap<String, Double>();
-        expected.put("S*", 17.001d);
+        expected.put("S*  mc", 17.001d);
 
         HashMap phasePicks = SacHeaders.getPhasePicks(quakeml, "NZ", "TSZ", "HHN");
 
@@ -303,7 +296,7 @@ public class SacHeadersTest {
 
         sac = SacHeaders.setPhasePicks(sac, quakeml);
 
-        assertEquals("P", sac.kt0, "S*");
+        assertEquals("P", sac.kt0, "S*  mc");
         assertEquals("P t", sac.t0, 17.001d, 0.0);
 
         sac = new SacTimeSeries();

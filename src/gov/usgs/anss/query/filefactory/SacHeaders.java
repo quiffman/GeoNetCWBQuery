@@ -13,7 +13,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 import nz.org.geonet.quakeml.v1_0_1.client.QuakemlUtils;
 import nz.org.geonet.quakeml.v1_0_1.domain.Arrival;
@@ -22,11 +21,8 @@ import nz.org.geonet.quakeml.v1_0_1.domain.Magnitude;
 import nz.org.geonet.quakeml.v1_0_1.domain.Origin;
 import nz.org.geonet.quakeml.v1_0_1.domain.Pick;
 import nz.org.geonet.quakeml.v1_0_1.domain.Quakeml;
-import nz.org.geonet.quakeml.v1_0_1.domain.RealQuantity;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 /**
  *
@@ -142,12 +138,12 @@ public class SacHeaders {
         Origin origin = QuakemlUtils.getPreferredOrigin(event);
 
         double magnitude = -12345.0;
-        int magType = sacEventType("MX");
+        int magType = sacMagType("MX");
 
         Magnitude mag = QuakemlUtils.getPreferredMagnitude(event);
         if (mag != null) {
             magnitude = mag.getMag().getValue();
-            magType = sacEventType(event.getType().value());
+            magType = sacMagType(mag.getType());
         } else {
             logger.warning("Found no magnitude definition setting to unknown.");
         }
@@ -190,7 +186,9 @@ public class SacHeaders {
                         pick.getWaveformID().getStationCode().equals(stationCode) &&
                         pick.getWaveformID().getChannelCode().equals(channelCode)) {
                     double arrivalTime = (pick.getTime().getValue().toGregorianCalendar().getTimeInMillis() - eventTime) / 1000.0;
-                    phasePicks.put(arrival.getPhase().getValue(), arrivalTime);
+                    String phaseName = (arrival.getPhase().getValue() + "    ").substring(0, 4) +
+                            pick.getEvaluationMode().value().substring(0, 1) + pick.getEvaluationStatus().value().substring(0, 1);
+                    phasePicks.put(phaseName, arrivalTime);
                 }
             }
         } else {

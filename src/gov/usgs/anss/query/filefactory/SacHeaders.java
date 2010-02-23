@@ -13,7 +13,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import nz.org.geonet.quakeml.exception.InvalidQuakemlException;
 import nz.org.geonet.quakeml.v1_0_1.client.QuakemlUtils;
 import nz.org.geonet.quakeml.v1_0_1.domain.Arrival;
 import nz.org.geonet.quakeml.v1_0_1.domain.Event;
@@ -95,12 +97,28 @@ public class SacHeaders {
     public static SacTimeSeries setEventHeader(
             SacTimeSeries sac,
             DateTime eventOrigin,
-            double eventLat,
-            double eventLon,
-            double eventDepth,
-            double eventMag,
+            Double eventLat,
+            Double eventLon,
+            Double eventDepth,
+            Double eventMag,
             int sacMagType,
             int sacEventType) {
+
+        if (eventLat == null) {
+            eventLat = -12345.0;
+        }
+
+        if (eventLon == null) {
+            eventLon = -12345.0;
+        }
+
+        if (eventDepth == null) {
+            eventDepth = -12345.0;
+        }
+
+        if (eventMag == null) {
+            eventMag = -12345.0;
+        }
 
         // SAC stores year day (nzjday) but not month and day.  
         DateTime start = new DateTime(sac.nzyear, 1, 1, sac.nzhour, sac.nzmin, sac.nzsec, sac.nzmsec, DateTimeZone.UTC);
@@ -134,13 +152,27 @@ public class SacHeaders {
 
     public static SacTimeSeries setEventHeader(SacTimeSeries sac, Quakeml quakeml) {
 
-        Event event = QuakemlUtils.getFirstEvent(quakeml);
-        Origin origin = QuakemlUtils.getPreferredOrigin(event);
-
-        double magnitude = -12345.0;
+        Origin origin = null;
+        Double magnitude = null;
+        Double latitude = null;
+        Double longitude = null;
+        Double depth = null;
         int magType = sacMagType("MX");
+        int eventType = sacMagType("NULL");
+        Magnitude mag = null;
 
-        Magnitude mag = QuakemlUtils.getPreferredMagnitude(event);
+        Event event = QuakemlUtils.getFirstEvent(quakeml);
+        try {
+            origin = QuakemlUtils.getPreferredOrigin(event);
+        } catch (InvalidQuakemlException ex) {
+            logger.warning("found no origin information in the QuakeML, will not be able to set event headers");
+        }
+
+        try {
+            mag = QuakemlUtils.getPreferredMagnitude(event);
+        } catch (Exception ex) {
+            logger.warning("Found no magnitude definition setting to unknown.");
+        }
         if (mag != null) {
             magnitude = mag.getMag().getValue();
             magType = sacMagType(mag.getType());
@@ -148,20 +180,53 @@ public class SacHeaders {
             logger.warning("Found no magnitude definition setting to unknown.");
         }
 
-        if (origin != null) {
-            DateTime eventTime = new DateTime(origin.getTime().getValue().toGregorianCalendar().getTimeInMillis(),
-                    DateTimeZone.forOffsetMillis(origin.getTime().getValue().getTimezone() * 60 * 1000));
+        try {
+            latitude = origin.getLatitude().getValue();
+        } catch (Exception ex) {
+            logger.warning("Found no latitude definition setting to unknown.");
+        }
 
+        try {
+            longitude = origin.getLongitude().getValue();
+        } catch (Exception ex) {
+            logger.warning("Found no longitude definition setting to unknown.");
+        }
+
+        try {
+            depth = origin.getDepth().getValue();
+        } catch (Exception ex) {
+            logger.warning("Found no depth definition setting to unknown.");
+        }
+
+        if (depth != null) {
+            depth = depth * 1000.0d;
+        }
+
+        try {
+            eventType = sacEventType(event.getType().value());
+        } catch (Exception ex) {
+            logger.warning("Found no event type definition setting to unknown.");
+        }
+
+        DateTime eventTime = null;
+
+        if (origin != null) {
+            try {
+                eventTime = QuakemlUtils.getOriginTime(origin);
+            } catch (InvalidQuakemlException ex) {
+                logger.warning("Found no event time definition, not updating header.");
+            }
+        }
+
+        if (eventTime != null) {
             sac = SacHeaders.setEventHeader(sac, eventTime, // eventLat, eventLon, eventDepth, eventMag, sacMagType)
-                    origin.getLatitude().getValue(),
-                    origin.getLongitude().getValue(),
-                    origin.getDepth().getValue() * 1000.0d, // assume meters.
+                    latitude,
+                    longitude,
+                    depth, // assume meters.
                     magnitude,
                     magType,
-                    sacEventType(event.getType().value()));
-        } else {
-            logger.warning("Found no origin information, unable to set event information.");
-        }
+                    eventType);
+        } 
 
         return sac;
     }
@@ -171,8 +236,8 @@ public class SacHeaders {
         HashMap<String, Double> phasePicks = new HashMap();
 
         Event event = QuakemlUtils.getFirstEvent(quakeml);
-        Origin origin = QuakemlUtils.getPreferredOrigin(event);
-
+//        Origin origin = QuakemlUtils.getPreferredOrigin(event);
+        Origin origin = null;
         if (origin != null) {
             long eventTime = origin.getTime().getValue().toGregorianCalendar().getTimeInMillis();
             List<Pick> picks = event.getPick();
@@ -180,7 +245,9 @@ public class SacHeaders {
             List<Arrival> arrivals = origin.getArrival();
 
             for (Arrival arrival : arrivals) {
-                Pick pick = QuakemlUtils.getPickAssociatedWithArrival(picks, arrival);
+                //               Pick pick = QuakemlUtils.getPickAssociatedWithArrival(picks, arrival);
+
+                Pick pick = null;
 
                 if (pick.getWaveformID().getNetworkCode().equals(networkCode) &&
                         pick.getWaveformID().getStationCode().equals(stationCode) &&

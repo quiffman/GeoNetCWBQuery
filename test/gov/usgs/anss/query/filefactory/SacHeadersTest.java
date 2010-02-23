@@ -6,7 +6,9 @@ package gov.usgs.anss.query.filefactory;
 
 import edu.sc.seis.TauP.SacTimeSeries;
 import gov.usgs.anss.query.metadata.ChannelMetaData;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import nz.org.geonet.quakeml.v1_0_1.client.QuakemlFactory;
 import nz.org.geonet.quakeml.v1_0_1.domain.Quakeml;
 import org.joda.time.DateTime;
@@ -218,6 +220,7 @@ public class SacHeadersTest {
         assertEquals("e", sac.e, 1.135113e+03, 0.0000001);
         assertEquals("iztype", sac.iztype, SacTimeSeries.IO);
         assertEquals("lat", sac.evla, eventLat, 0.0);
+        
         assertEquals("lon", sac.evlo, eventLon, 0.0);
         assertEquals("dep", sac.evdp, eventDepth, 0.0);
         assertEquals("mag", sac.mag, eventMag, 0.0);
@@ -228,18 +231,19 @@ public class SacHeadersTest {
 
     @Test
     public void testSetPicks() {
-        HashMap<String, Double> phasePicks = new HashMap<String, Double>();
-        phasePicks.put("P0", 100.0d);
-        phasePicks.put("P1", 101.0d);
-        phasePicks.put("P2", 102.0d);
-        phasePicks.put("P3", 103.0d);
-        phasePicks.put("P4", 104.0d);
-        phasePicks.put("P5", 105.0d);
-        phasePicks.put("P6", 106.0d);
-        phasePicks.put("P7", 107.0d);
-        phasePicks.put("P8", 108.0d);
-        phasePicks.put("P9", 109.0d);
-        phasePicks.put("P10", 110.0d);
+        List<SacPhasePick> phasePicks = new ArrayList<SacPhasePick>();
+
+        phasePicks.add(new SacPhasePick("P3", 103.0d));
+        phasePicks.add(new SacPhasePick("P4", 104.0));
+        phasePicks.add(new SacPhasePick("P5", 105.0));
+        phasePicks.add(new SacPhasePick("P6", 106.0));
+        phasePicks.add(new SacPhasePick("P0", 100.0));
+        phasePicks.add(new SacPhasePick("P1", 101.0));
+        phasePicks.add(new SacPhasePick("P2", 102.0));
+        phasePicks.add(new SacPhasePick("P7", 107.0));
+        phasePicks.add(new SacPhasePick("P8", 108.0));
+        phasePicks.add(new SacPhasePick("P9", 109.0));
+        phasePicks.add(new SacPhasePick("P10", 110.0));
 
         SacTimeSeries sac = new SacTimeSeries();
 
@@ -268,24 +272,6 @@ public class SacHeadersTest {
     }
 
     @Test
-    public void testGetPhasePicksFromQuakeml() throws Exception {
-        Quakeml quakeml = new QuakemlFactory().getQuakeml(SacHeadersTest.class.getResourceAsStream("quakeml_2732452.xml"));
-
-        HashMap<String, Double> expected = new HashMap<String, Double>();
-        expected.put("S*    mc", 17.001d);
-
-        HashMap phasePicks = SacHeaders.getPhasePicks(quakeml, "NZ", "TSZ", "HHN");
-
-        assertEquals("picks", phasePicks, expected);
-
-
-        expected = new HashMap<String, Double>();
-        phasePicks = SacHeaders.getPhasePicks(quakeml, "NN", "NNN", "NNN");
-        assertEquals("no picks", phasePicks, expected);
-    }
-
-    
-    @Test
     public void testSetPhasePicks() throws Exception {
         Quakeml quakeml = new QuakemlFactory().getQuakeml(SacHeadersTest.class.getResourceAsStream("quakeml_2732452.xml"));
 
@@ -304,7 +290,6 @@ public class SacHeadersTest {
         assertEquals("P", sac.kt0, "-12345  ");
         assertEquals("P t", sac.t0, -12345.0, 0.0);
     }
-
 
     @Test
     public void testSacEventType() {

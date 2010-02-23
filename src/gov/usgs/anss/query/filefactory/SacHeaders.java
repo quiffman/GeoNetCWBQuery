@@ -6,23 +6,18 @@ package gov.usgs.anss.query.filefactory;
 
 import edu.sc.seis.TauP.SacTimeSeries;
 import gov.usgs.anss.query.metadata.ChannelMetaData;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import nz.org.geonet.quakeml.exception.InvalidQuakemlException;
 import nz.org.geonet.quakeml.v1_0_1.client.QuakemlUtils;
-import nz.org.geonet.quakeml.v1_0_1.domain.Arrival;
 import nz.org.geonet.quakeml.v1_0_1.domain.Event;
 import nz.org.geonet.quakeml.v1_0_1.domain.Magnitude;
 import nz.org.geonet.quakeml.v1_0_1.domain.Origin;
-import nz.org.geonet.quakeml.v1_0_1.domain.Pick;
 import nz.org.geonet.quakeml.v1_0_1.domain.Quakeml;
+import nz.org.geonet.quakeml.v1_0_1.report.ArrivalPick;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -226,114 +221,122 @@ public class SacHeaders {
                     magnitude,
                     magType,
                     eventType);
-        } 
+        }
 
         return sac;
     }
 
-    // Would be more useful in JQuakeml?
-    public static HashMap<String, Double> getPhasePicks(Quakeml quakeml, String networkCode, String stationCode, String channelCode) {
-        HashMap<String, Double> phasePicks = new HashMap();
+    
+    public static SacTimeSeries setPhasePicks(SacTimeSeries sac, Quakeml quakeml) {
 
-        Event event = QuakemlUtils.getFirstEvent(quakeml);
-//        Origin origin = QuakemlUtils.getPreferredOrigin(event);
         Origin origin = null;
-        if (origin != null) {
-            long eventTime = origin.getTime().getValue().toGregorianCalendar().getTimeInMillis();
-            List<Pick> picks = event.getPick();
-
-            List<Arrival> arrivals = origin.getArrival();
-
-            for (Arrival arrival : arrivals) {
-                //               Pick pick = QuakemlUtils.getPickAssociatedWithArrival(picks, arrival);
-
-                Pick pick = null;
-
-                if (pick.getWaveformID().getNetworkCode().equals(networkCode) &&
-                        pick.getWaveformID().getStationCode().equals(stationCode) &&
-                        pick.getWaveformID().getChannelCode().equals(channelCode)) {
-                    double arrivalTime = (pick.getTime().getValue().toGregorianCalendar().getTimeInMillis() - eventTime) / 1000.0;
-                    String phaseName = (arrival.getPhase().getValue() + "      ").substring(0, 6) +
-                            pick.getEvaluationMode().value().substring(0, 1) + pick.getEvaluationStatus().value().substring(0, 1);
-                    phasePicks.put(phaseName, arrivalTime);
-                }
-            }
-        } else {
-            logger.warning("Found no origin information, unable to set phase pick information.");
+        Event event = QuakemlUtils.getFirstEvent(quakeml);
+        try {
+            origin = QuakemlUtils.getPreferredOrigin(event);
+        } catch (InvalidQuakemlException ex) {
+            logger.warning("found no origin information in the QuakeML, will not be able to set picks");
         }
 
-        return phasePicks;
-    }
+        List<ArrivalPick> picks = null;
+        if (origin != null) {
+            try {
+                picks = QuakemlUtils.getArrivalPicksByStationChannel(event, origin, sac.knetwk.trim(), sac.kstnm.trim(), sac.kcmpnm);
+            } catch (Exception ex) {
+                logger.warning("unable to read phase picks.");
+            }
+        }
 
-    public static SacTimeSeries setPhasePicks(SacTimeSeries sac, Quakeml quakeml) {
-        HashMap<String, Double> phasePicks = SacHeaders.getPhasePicks(quakeml, sac.knetwk.trim(), sac.kstnm.trim(), sac.kcmpnm);
+        List<SacPhasePick> phasePicks = new ArrayList<SacPhasePick>();
+
+        for (ArrivalPick pick : picks) {
+            String phaseName = (pick.getArrival().getPhase().getValue() + "      ").substring(0, 6);
+
+            try {
+                phaseName += (pick.getPick().getEvaluationMode().value().substring(0, 1) + pick.getPick().getEvaluationStatus().value().substring(0, 1));
+            } catch (Exception ex) {
+                logger.warning("Found no pick evaluation mode in the quakeml.  Still able to set picks.");
+            }
+
+            double arrivalTime = pick.getTimeAfterOriginInMillis() / 1000.0d;
+
+            phasePicks.add(new SacPhasePick(phaseName, arrivalTime));
+        }
+
         return SacHeaders.setPhasePicks(sac, phasePicks);
     }
 
-    public static SacTimeSeries setPhasePicks(SacTimeSeries sac, HashMap<String, Double> phasePicks) {
+    
+    /**
+     * Sets the phase pick fields in the SAC header.  There are ten fields
+     * available for picks in the SAC header so the list of SacPhasePick is
+     * sorted and the first ten written into the header.
+     *
+     * For more details on the SAC header see:
+     * http://www.iris.edu/manuals/sac/SAC_Manuals/FileFormatPt2.html
+     *
+     * @param sac
+     * @param phasePicks
+     * @return
+     */
+    public static SacTimeSeries setPhasePicks(SacTimeSeries sac, List<SacPhasePick> phasePicks) {
 
-        // Sort the picks by time so that if there are more than 10
-        // (very unlikey) we plot the 'first' 10 first.
-        List list = new LinkedList(phasePicks.entrySet());
-        Collections.sort(list, new Comparator() {
+        Collections.sort(phasePicks);
 
-            public int compare(Object o1, Object o2) {
-                return ((Comparable) ((Map.Entry) (o1)).getValue()).compareTo(((Map.Entry) (o2)).getValue());
-            }
-        });
+        Iterator<SacPhasePick> iter = phasePicks.iterator();
 
-        Iterator<Map.Entry<String, Double>> iter = list.iterator();
-
-        // There has to be a better way?
+        // The SAC header has fields kt[0-9] and t[0-9]
+        // There is no way to iterate them - they are all
+        //  explictly named so see if we have enough data
+        // to set each one.
         if (iter.hasNext()) {
-            Map.Entry phase = iter.next();
-            sac.kt0 = (String) phase.getKey();
-            sac.t0 = (Double) phase.getValue();
+            SacPhasePick pick = iter.next();
+            sac.kt0 = pick.getPhaseName();
+            sac.t0 = pick.getTimeAfterOriginInSeconds();
         }
         if (iter.hasNext()) {
-            Map.Entry phase = iter.next();
-            sac.kt1 = (String) phase.getKey();
-            sac.t1 = (Double) phase.getValue();
+            SacPhasePick pick = iter.next();
+            sac.kt1 = pick.getPhaseName();
+            sac.t1 = pick.getTimeAfterOriginInSeconds();
         }
         if (iter.hasNext()) {
-            Map.Entry phase = iter.next();
-            sac.kt2 = (String) phase.getKey();
-            sac.t2 = (Double) phase.getValue();
+            SacPhasePick pick = iter.next();
+            sac.kt2 = pick.getPhaseName();
+            sac.t2 = pick.getTimeAfterOriginInSeconds();
         }
         if (iter.hasNext()) {
-            Map.Entry phase = iter.next();
-            sac.kt3 = (String) phase.getKey();
-            sac.t3 = (Double) phase.getValue();
+            SacPhasePick pick = iter.next();
+            sac.kt3 = pick.getPhaseName();
+            sac.t3 = pick.getTimeAfterOriginInSeconds();
         }
         if (iter.hasNext()) {
-            Map.Entry phase = iter.next();
-            sac.kt4 = (String) phase.getKey();
-            sac.t4 = (Double) phase.getValue();
+            SacPhasePick pick = iter.next();
+            sac.kt4 = pick.getPhaseName();
+            sac.t4 = pick.getTimeAfterOriginInSeconds();
         }
         if (iter.hasNext()) {
-            Map.Entry phase = iter.next();
-            sac.kt5 = (String) phase.getKey();
-            sac.t5 = (Double) phase.getValue();
+            SacPhasePick pick = iter.next();
+            sac.kt5 = pick.getPhaseName();
+            sac.t5 = pick.getTimeAfterOriginInSeconds();
         }
         if (iter.hasNext()) {
-            Map.Entry phase = iter.next();
-            sac.kt6 = (String) phase.getKey();
-            sac.t6 = (Double) phase.getValue();
+            SacPhasePick pick = iter.next();
+            sac.kt6 = pick.getPhaseName();
+            sac.t6 = pick.getTimeAfterOriginInSeconds();
         }
         if (iter.hasNext()) {
-            Map.Entry phase = iter.next();
-            sac.kt7 = (String) phase.getKey();
-            sac.t7 = (Double) phase.getValue();
+            SacPhasePick pick = iter.next();
+            sac.kt7 = pick.getPhaseName();
+            sac.t7 = pick.getTimeAfterOriginInSeconds();
         }
         if (iter.hasNext()) {
-            Map.Entry phase = iter.next();
-            sac.kt8 = (String) phase.getKey();
-            sac.t8 = (Double) phase.getValue();
+            SacPhasePick pick = iter.next();
+            sac.kt8 = pick.getPhaseName();
+            sac.t8 = pick.getTimeAfterOriginInSeconds();
         }
         if (iter.hasNext()) {
-            Map.Entry phase = iter.next();
-            sac.kt9 = (String) phase.getKey();
-            sac.t9 = (Double) phase.getValue();
+            SacPhasePick pick = iter.next();
+            sac.kt9 = pick.getPhaseName();
+            sac.t9 = pick.getTimeAfterOriginInSeconds();
         }
 
         return sac;

@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.TreeSet;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
@@ -77,28 +78,32 @@ public class CWBDataServerMSEED implements CWBDataServer {
     public void query(DateTime begin, Double duration, String nsclSelectString) {
 
         while (ds == null) {
+
             try {
                 ds = new Socket(this.host, this.port);
-            } catch (IOException e) {
+            } catch (UnknownHostException ex) {
                 ds = null;
-                if (e != null) {
-                    if (e.getMessage() != null) {
-                        if (e.getMessage().indexOf("Connection refused") >= 0) {
-                            logger.warning("Got a connection refused. " + this.host + "/" + this.port + "  Is the server up?  Wait 20 and try again");
-                        }
-                    } else {
-                        logger.warning("Got IOError opening socket to server e=" + e);
+                logger.warning("Cannot resolve the host: " + this.host);
+            } catch (IOException ex) {
+                ds = null;
+                if (ex.getMessage() != null) {
+                    if (ex.getMessage().indexOf("Connection refused") >= 0) {
+                        logger.warning("Problem connecting to " + this.host + ":" + this.port + "  Either the server is down or there is an internet connection problem. " + "Will try again in 20 seconds.");
                     }
                 } else {
-                    logger.warning("Got IOError opening socket to server e=" + e);
+                    logger.warning("Got IOError opening socket to server e=" + ex);
                 }
+            }
+
+            if (ds == null) {
                 try {
                     Thread.sleep(20000);
                 } catch (InterruptedException ex) {
-                    logger.log(Level.FINE, "sleep interrupted.", ex);
+                    // Presumably only if we get sigtermed etc.
                 }
             }
         }
+
         try {
             inStream = ds.getInputStream();
             outStream = ds.getOutputStream();
@@ -124,7 +129,6 @@ public class CWBDataServerMSEED implements CWBDataServer {
             read:
             while (read(inStream, b, 0, 512)) {
                 MiniSeed ms = null;
-                // It doens't look like the GeoNet CWB server actually returns this.
                 if (b[0] == '<' && b[1] == 'E' && b[2] == 'O' && b[3] == 'R' && b[4] == '>') {
                     logger.fine("EOR found");
                     break read;
@@ -227,10 +231,10 @@ public class CWBDataServerMSEED implements CWBDataServer {
     protected void finalize() throws Throwable {
         super.finalize();
         try {
-			outStream.write(("\n").getBytes());
+            outStream.write(("\n").getBytes());
         } catch (IOException ex) {
             Logger.getLogger(CWBDataServerMSEED.class.getName()).log(Level.FINE,
-					"Failed when attempting to close connection.", ex);
+                    "Failed when attempting to close connection.", ex);
         }
         ds.close();
     }

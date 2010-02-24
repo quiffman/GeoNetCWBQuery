@@ -32,7 +32,6 @@ public class CWBQueryFormatterTest {
 
     @Test
     public void testListQuery() {
-        System.out.println("listQuery");
         DateTime begin = new DateTime(2009, 1, 1, 11, 11, 11, 0, tz);
         Double duration = 1800d;
         String result = CWBQueryFormatter.listChannels(begin, duration);

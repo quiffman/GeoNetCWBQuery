@@ -52,6 +52,20 @@ public class SacFileFactoryIntegrationTest {
                         true, //trim
                         null //quakml
                     },
+                    { // No meta-data
+                        new CWBDataServerMSEED("cwb.geonet.org.nz", 80),
+                        null,
+                        "NZMRZ..HH.10",
+                        "%N.sac",
+                        true, // output expected
+                        new String[]{"/test-data/gov/usgs/anss/query/filefactory/no-meta/NZMRZ__HHZ10.sac", "/test-data/gov/usgs/anss/query/filefactory/no-meta/NZMRZ__HHN10.sac", "/test-data/gov/usgs/anss/query/filefactory/no-meta/NZMRZ__HHE10.sac"},
+                        new DateTime(2009, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC),
+                        1800d, //duration
+                        new Integer(-12345), //fill
+                        true, //gaps
+                        true, //trim
+                        null //quakml
+                    },
                     { // No sac if gaps - shouldn't be any
                         new CWBDataServerMSEED("cwb.geonet.org.nz", 80),
                         new MetaDataServerImpl("cwb-pub.cr.usgs.gov", 2052),

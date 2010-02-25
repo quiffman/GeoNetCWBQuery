@@ -47,12 +47,32 @@ public class SacFileFactoryTest {
                         true, //trim
                         null //quakml
                     },
+                    { // No meta-data
+                        new CWBDataServerMSEEDMock("dummy", 666),
+                        null,
+                        new String[]{"/test-data/gov/usgs/anss/query/filefactory/no-meta/NZMRZ__HHZ10.ms", "/test-data/gov/usgs/anss/query/filefactory/no-meta/NZMRZ__HHN10.ms", "/test-data/gov/usgs/anss/query/filefactory/no-meta/NZMRZ__HHE10.ms"},
+                        new String[]{"null"},
+                        new String[]{"/test-data/gov/usgs/anss/query/filefactory/no-meta/NZMRZ__HHZ10.sac", "/test-data/gov/usgs/anss/query/filefactory/no-meta/NZMRZ__HHN10.sac", "/test-data/gov/usgs/anss/query/filefactory/no-meta/NZMRZ__HHE10.sac"},
+                        new DateTime(2009, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC),
+                        1800d, //duration
+                        new Integer(-12345), //fill
+                        true, //gaps
+                        true, //trim
+                        null //quakml
+                    },
                     { // No sac if gaps - shouldn't be any
+
                         new CWBDataServerMSEEDMock("dummy", 666),
                         new MetaDataServerMock("dummy", 666),
-                        new String[]{"/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHZ10.ms", "/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHN10.ms", "/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHE10.ms"},
-                        new String[]{"/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHZ10.sac.pz", "/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHN10.sac.pz", "/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHE10.sac.pz"},
-                        new String[]{"/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHZ10.sac", "/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHN10.sac", "/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHE10.sac"},
+                        new String[]{
+                            "/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHZ10.ms",
+                            "/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHN10.ms", "/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHE10.ms"},
+                        new String[]{
+                            "/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHZ10.sac.pz",
+                            "/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHN10.sac.pz", "/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHE10.sac.pz"},
+                        new String[]{
+                            "/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHZ10.sac",
+                            "/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHN10.sac", "/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHE10.sac"},
                         new DateTime(2009, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC),
                         1800d, //duration
                         new Integer(-12345), //fill
@@ -63,9 +83,12 @@ public class SacFileFactoryTest {
                     { // MS has gaps should produce null sac.
                         new CWBDataServerMSEEDMock("dummy", 666),
                         new MetaDataServerMock("dummy", 666),
-                        new String[]{"/test-data/gov/usgs/anss/query/filefactory/gaps/NZBFZ__HHE10.ms",},
-                        new String[]{"/test-data/gov/usgs/anss/query/filefactory/gaps/NZBFZ__HHE10.sac.pz",},
-                        new String[]{"null",},
+                        new String[]{
+                            "/test-data/gov/usgs/anss/query/filefactory/gaps/NZBFZ__HHE10.ms",},
+                        new String[]{
+                            "/test-data/gov/usgs/anss/query/filefactory/gaps/NZBFZ__HHE10.sac.pz",},
+                        new String[]{
+                            "null",},
                         new DateTime(2009, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC),
                         1800d, //duration
                         new Integer(-12345), //fill
@@ -76,9 +99,12 @@ public class SacFileFactoryTest {
                     { // MS has gaps but we allow them in the sac.
                         new CWBDataServerMSEEDMock("dummy", 666),
                         new MetaDataServerMock("dummy", 666),
-                        new String[]{"/test-data/gov/usgs/anss/query/filefactory/gaps/NZBFZ__HHE10.ms",},
-                        new String[]{"/test-data/gov/usgs/anss/query/filefactory/gaps/NZBFZ__HHE10.sac.pz",},
-                        new String[]{"/test-data/gov/usgs/anss/query/filefactory/gaps/NZBFZ__HHE10.sac",},
+                        new String[]{
+                            "/test-data/gov/usgs/anss/query/filefactory/gaps/NZBFZ__HHE10.ms",},
+                        new String[]{
+                            "/test-data/gov/usgs/anss/query/filefactory/gaps/NZBFZ__HHE10.sac.pz",},
+                        new String[]{
+                            "/test-data/gov/usgs/anss/query/filefactory/gaps/NZBFZ__HHE10.sac",},
                         new DateTime(2009, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC),
                         1800d, //duration
                         new Integer(-12345), //fill
@@ -89,16 +115,21 @@ public class SacFileFactoryTest {
                     { // Event data.
                         new CWBDataServerMSEEDMock("dummy", 666),
                         new MetaDataServerMock("dummy", 666),
-                        new String[]{"/test-data/gov/usgs/anss/query/filefactory/event/NZTSZ__HHN10.ms",},
-                        new String[]{"/test-data/gov/usgs/anss/query/filefactory/event/NZTSZ__HHN10.sac.pz",},
-                        new String[]{"/gov/usgs/anss/query/filefactory/event/200705120730.TSZ.HHN.10.NZ.sac",},
+                        new String[]{
+                            "/test-data/gov/usgs/anss/query/filefactory/event/NZTSZ__HHN10.ms",},
+                        new String[]{
+                            "/test-data/gov/usgs/anss/query/filefactory/event/NZTSZ__HHN10.sac.pz",},
+                        new String[]{
+                            "/gov/usgs/anss/query/filefactory/event/200705120730.TSZ.HHN.10.NZ.sac",},
                         new DateTime(2007, 5, 12, 7, 30, 0, 0, DateTimeZone.UTC),
                         1800d, //duration
                         new Integer(-12345), //fill
                         true, //gaps
                         true, //trim
                         new QuakemlFactory().getQuakeml(SacFileFactoryTest.class.getResourceAsStream("/gov/usgs/anss/query/filefactory/quakeml_2732452.xml")) //quakml
-                    },});
+                    },
+                });
+
     }
     private CWBDataServerMSEEDMock cwbServer;
     private MetaDataServerMock mdServer;
@@ -127,13 +158,15 @@ public class SacFileFactoryTest {
         this.quakeml = quakeml;
         this.gaps = gaps;
 
-        expectedSac = new ArrayList<SacTimeSeries>();
+        expectedSac =
+                new ArrayList<SacTimeSeries>();
         for (String filename : expectedSacFiles) {
             if (filename.matches("null")) {
                 expectedSac.add(null);
             } else {
                 expectedSac.add(SacTimeSeriesTestUtil.loadSacTimeSeriesFromClasspath(filename));
             }
+
         }
 
         expectedSacIter = expectedSac.iterator();
@@ -182,7 +215,8 @@ public class SacFileFactoryTest {
 
                 assertEquals("length ", result.y.length, expResult.y.length);
 
-                for (int i = 0; i < result.y.length; i++) {
+                for (int i = 0; i <
+                        result.y.length; i++) {
                     assertEquals("data " + i, result.y[i], expResult.y[i], 0.0);
                 }
 
@@ -234,7 +268,6 @@ public class SacFileFactoryTest {
                     assertEquals("Phase ", result.kt0, expResult.kt0.trim());
                     assertEquals("Phase t", result.t0, expResult.t0, 0.001);
                 }
-
             }
         }
     }

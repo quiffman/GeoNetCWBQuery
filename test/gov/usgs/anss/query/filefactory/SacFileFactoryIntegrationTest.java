@@ -50,6 +50,26 @@ public class SacFileFactoryIntegrationTest {
                         new Integer(-12345), //fill
                         true, //gaps
                         true, //trim
+                        "nm",
+                        true, // paz files expected
+                        new String[]{"/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHZ10.sac.pz", "/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHN10.sac.pz", "/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHE10.sac.pz"},
+                        null //quakml
+                    },
+                    { // Will have metadata but no paz files due to null unit.
+                        new CWBDataServerMSEED("cwb.geonet.org.nz", 80),
+                        new MetaDataServerImpl("cwb-pub.cr.usgs.gov", 2052),
+                        "NZMRZ..HH.10",
+                        "%N.sac",
+                        true, // output expected
+                        new String[]{"/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHZ10.sac", "/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHN10.sac", "/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHE10.sac"},
+                        new DateTime(2009, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC),
+                        1800d, //duration
+                        new Integer(-12345), //fill
+                        true, //gaps
+                        true, //trim
+                        null,
+                        false, // paz files expected
+                        new String[]{"/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHZ10.sac.pz", "/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHN10.sac.pz", "/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHE10.sac.pz"},
                         null //quakml
                     },
                     { // No meta-data
@@ -64,6 +84,9 @@ public class SacFileFactoryIntegrationTest {
                         new Integer(-12345), //fill
                         true, //gaps
                         true, //trim
+                        "nm",
+                        false, // paz files expected
+                        new String[]{"null"},
                         null //quakml
                     },
                     { // No sac if gaps - shouldn't be any
@@ -78,6 +101,11 @@ public class SacFileFactoryIntegrationTest {
                         new Integer(-12345), //fill
                         false, //gaps
                         true, //trim
+                        "nm",
+                        true, // paz files expected
+                        new String[]{
+                            "/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHZ10.sac.pz",
+                            "/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHN10.sac.pz", "/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHE10.sac.pz"},
                         null //quakml
                     },
                     { // MS has gaps should produce null sac.
@@ -92,6 +120,10 @@ public class SacFileFactoryIntegrationTest {
                         new Integer(-12345), //fill
                         false, //gaps
                         true, //trim
+                        "nm",
+                        false, // paz files expected
+                        new String[]{
+                            "/test-data/gov/usgs/anss/query/filefactory/gaps/NZBFZ__HHE10.sac.pz",},
                         null //quakml
                     },
                     { // MS has gaps but we allow them in the sac.
@@ -106,6 +138,10 @@ public class SacFileFactoryIntegrationTest {
                         new Integer(-12345), //fill
                         true, //gaps
                         true, //trim
+                        "nm",
+                        true, // paz files expected
+                        new String[]{
+                            "/test-data/gov/usgs/anss/query/filefactory/gaps/NZBFZ__HHE10.sac.pz",},
                         null //quakml
                     },
                     { // Event data.
@@ -120,6 +156,10 @@ public class SacFileFactoryIntegrationTest {
                         new Integer(-12345), //fill
                         true, //gaps
                         true, //trim
+                        "nm",
+                        true, // paz files expected
+                        new String[]{
+                            "/test-data/gov/usgs/anss/query/filefactory/event/NZTSZ__HHN10.sac.pz",},
                         new QuakemlFactory().getQuakeml(SacFileFactoryIntegrationTest.class.getResourceAsStream("/gov/usgs/anss/query/filefactory/quakeml_2732452.xml")) //quakml
                     },});
     }
@@ -127,28 +167,34 @@ public class SacFileFactoryIntegrationTest {
     private MetaDataServer mdServer;
     private String nsclSelectString;
     private String fileMask;
-    private boolean outputExpected;
+    private boolean sacFilesExpected;
     private String[] expectedSacFiles;
     private DateTime begin;
     private double duration;
     private Integer fill;
     private boolean trim;
+    private String pazUnits;
+    private boolean pazFilesExpected;
+    String[] expectedPazFiles;
     private Quakeml quakeml;
     private boolean gaps;
     private ArrayList<SacTimeSeries> expectedSac;
     private Iterator<SacTimeSeries> expectedSacIter;
 
-    public SacFileFactoryIntegrationTest(CWBDataServerMSEED cwbServer, MetaDataServer mdServer, String nsclSelectString, String fileMask, boolean outputExpected, String[] expectedSacFiles, DateTime begin, double duration, Integer fill, boolean gaps, boolean trim, Quakeml quakeml) throws Exception {
+    public SacFileFactoryIntegrationTest(CWBDataServerMSEED cwbServer, MetaDataServer mdServer, String nsclSelectString, String fileMask, boolean outputExpected, String[] expectedSacFiles, DateTime begin, double duration, Integer fill, boolean gaps, boolean trim, String pazUnits, boolean pazFilesExpected, String[] expectedPazFiles, Quakeml quakeml) throws Exception {
         this.cwbServer = cwbServer;
         this.mdServer = mdServer;
         this.nsclSelectString = nsclSelectString;
         this.fileMask = fileMask;
-        this.outputExpected = outputExpected;
+        this.sacFilesExpected = outputExpected;
         this.expectedSacFiles = expectedSacFiles;
         this.begin = begin;
         this.duration = duration;
         this.fill = fill;
         this.trim = trim;
+        this.pazUnits = pazUnits;
+        this.pazFilesExpected = pazFilesExpected;
+        this.expectedPazFiles = expectedPazFiles;
         this.quakeml = quakeml;
         this.gaps = gaps;
     }
@@ -177,27 +223,42 @@ public class SacFileFactoryIntegrationTest {
         sacFileFactory.setCWBDataServer(cwbServer);
         sacFileFactory.setMetaDataServer(mdServer);
 
-        sacFileFactory.makeFiles(begin, duration, nsclSelectString, folder.getRoot().getAbsolutePath() + File.separator + fileMask, fill, gaps, trim, null, quakeml);
+        sacFileFactory.makeFiles(begin, duration, nsclSelectString, folder.getRoot().getAbsolutePath() + File.separator + fileMask, fill, gaps, trim, pazUnits, quakeml);
 
         for (String filename : expectedSacFiles) {
             SacTimeSeries expResult = null;
             SacTimeSeries result = null;
 
-            if (outputExpected) {
+            String[] tmp = filename.split("\\/");
+            File expectedSacFileName = new File(folder.getRoot().getAbsolutePath() + File.separator + tmp[tmp.length - 1]);
+            File expectedPazFileName = new File(folder.getRoot().getAbsolutePath() + File.separator + tmp[tmp.length - 1] + ".pz");
+
+            if (sacFilesExpected) {
+            }
+
+            if (!sacFilesExpected) {
+                assertFalse("Found unexpected SAC file.", expectedSacFileName.exists());
+            }
+
+            if (!pazFilesExpected) {
+                assertFalse("Found unexpected PAZ file.", expectedPazFileName.exists());
+            }
+
+            if (pazFilesExpected) {
+                assertTrue("Didn't find expected PAZ file.", expectedPazFileName.exists());
+                assertTrue("Didn't find a file at expected PAZ file.", expectedPazFileName.isFile());
+                assertTrue("Found empty PAZ file.", expectedPazFileName.length() > 0l);
+            // Will not compare the contents of the response file.
+            // This could change over time and break the test (which would break
+            // other tests here as well).
+            }
+
+
+            if (sacFilesExpected) {
+
                 expResult = SacTimeSeriesTestUtil.loadSacTimeSeriesFromClasspath(filename);
-                String[] tmp = filename.split("\\/");
                 result = new SacTimeSeries();
-                result.read(folder.getRoot().getAbsolutePath() + File.separator + tmp[tmp.length - 1]);
-            }
-
-            if (expResult == null) {
-                String[] tmp = filename.split("\\/");
-                File file = new File(folder.getRoot().getAbsolutePath() + File.separator + tmp[tmp.length - 1]);
-
-                assertFalse("expected null", file.exists());
-            }
-
-            if (expResult != null && result != null) {
+                result.read(expectedSacFileName);
 
                 assertEquals("length ", result.y.length, expResult.y.length);
 

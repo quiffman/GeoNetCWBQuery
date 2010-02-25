@@ -152,11 +152,8 @@ public class SacFileFactory {
         return sac;
     }
 
-    protected SacTimeSeries setEventHeader(SacTimeSeries timeSeries, Quakeml quakeml) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 
-	// TODO: move the getSACResponse to outputPZ or something.
+    // TODO: move the getSACResponse to outputPZ or something.
     protected void outputFile(SacTimeSeries timeSeries, DateTime begin, String mask, String pzunit) {
 		
 		NSCL nscl = new NSCL(timeSeries.knetwk,

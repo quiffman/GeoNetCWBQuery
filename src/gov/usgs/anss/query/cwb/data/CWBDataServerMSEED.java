@@ -18,6 +18,7 @@ import java.util.TreeSet;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import nz.org.geonet.HashCodeUtil;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
@@ -68,6 +69,34 @@ public class CWBDataServerMSEED implements CWBDataServer {
 
     }
 
+	/**
+	 * @return the host
+	 */
+	public String getHost() {
+		return host;
+	}
+
+	/**
+	 * @param host the host to set
+	 */
+	public void setHost(String host) {
+		this.host = host;
+	}
+
+	/**
+	 * @return the port
+	 */
+	public int getPort() {
+		return port;
+	}
+
+	/**
+	 * @param port the port to set
+	 */
+	public void setPort(int port) {
+		this.port = port;
+	}
+
     /**
      * Runs a query against the server.
      *
@@ -80,16 +109,16 @@ public class CWBDataServerMSEED implements CWBDataServer {
         while (ds == null) {
 
             try {
-                ds = new Socket(this.host, this.port);
+                ds = new Socket(this.getHost(), this.getPort());
             } catch (UnknownHostException ex) {
                 ds = null;
-                logger.warning("Cannot resolve the host: " + this.host);
+                logger.warning("Cannot resolve the host: " + this.getHost());
             } catch (IOException ex) {
                 ds = null;
                 if (ex.getMessage() != null) {
                     if (ex.getMessage().indexOf("Connection refused") >= 0) {
-                        logger.warning("Problem connecting to " + this.host + ":" + this.port + "  Either the server is down or there is an internet connection problem. " + "Will try again in 20 seconds.");
-                    }
+                        logger.warning("Problem connecting to " + this.getHost() + ":" + this.getPort() + "  Either the server is down or there is an internet connection problem. " + "Will try again in 20 seconds.");
+            }
                 } else {
                     logger.warning("Got IOError opening socket to server e=" + ex);
                 }
@@ -199,10 +228,10 @@ public class CWBDataServerMSEED implements CWBDataServer {
      */
     public boolean hasNext() {
         if (lastNSCL == null) {
-            return true;
-        }
-        return !incomingMiniSEED.isEmpty();
-    }
+			return true;
+		}
+		return !incomingMiniSEED.isEmpty();
+	}
 
     public static boolean read(InputStream in, byte[] b, int off, int l)
             throws IOException {
@@ -238,4 +267,30 @@ public class CWBDataServerMSEED implements CWBDataServer {
         }
         ds.close();
     }
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (obj.getClass() == this.getClass()) {
+			final CWBDataServerMSEED other = (CWBDataServerMSEED) obj;
+			if (getHost().equals(other.getHost()) &&
+					getPort() == other.getPort()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = HashCodeUtil.SEED;
+		result = HashCodeUtil.hash(result, getHost());
+		result = HashCodeUtil.hash(result, getPort());
+		return result;
+	}
 }

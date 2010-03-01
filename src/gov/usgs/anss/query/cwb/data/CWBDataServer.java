@@ -14,12 +14,17 @@ import org.joda.time.DateTime;
  */
 public interface CWBDataServer {
 
-    void query(DateTime begin, Double duration, String nsclSelectString);
+	void query(DateTime begin, Double duration, String nsclSelectString);
 
-    TreeSet<MiniSeed> getNext();
+	TreeSet<MiniSeed> getNext();
 
-    boolean hasNext();
+	boolean hasNext();
 
-    void quiet();
-    
+	void quiet();
+
+	@Override
+	boolean equals(Object o);
+
+	@Override
+	int hashCode();
 }

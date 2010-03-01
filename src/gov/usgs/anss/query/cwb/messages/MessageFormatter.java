@@ -26,6 +26,13 @@ public class MessageFormatter {
         // 02:07:45.992Z Query on NZAPZ  HHZ10 000431 mini-seed blks 2009 001:00:00:00.0083 2009 001:00:30:00.438  ns=180044
 
         Iterator<MiniSeed> iter = miniSeed.iterator();
+
+		if (!iter.hasNext()) {
+			return String.format("%sZ No mini-seed blocks returned.",
+					now.toString(nowFormat));
+		}
+
+
         MiniSeed ms = iter.next();
         int numSamples = ms.getNsamp();
 

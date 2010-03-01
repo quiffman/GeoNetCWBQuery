@@ -61,5 +61,9 @@ public class MessageFormatterTest {
         String expResult = "02:07:45.992Z Query on NZAPZ  HHZ10 000423 mini-seed blks 2009 001:00:00:00.008 2009 001:00:29:59.998 ns=180000";
         String result = MessageFormatter.miniSeedSummary(now, miniSeed);
          assertEquals(expResult, result);
+
+		expResult = "02:07:45.992Z No mini-seed blocks returned.";
+		result = MessageFormatter.miniSeedSummary(now, new TreeSet<MiniSeed>());
+        assertEquals(expResult, result);
     }
 }

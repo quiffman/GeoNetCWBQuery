@@ -2,8 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package gov.usgs.anss.query.filefactory;
+
+import nz.org.geonet.HashCodeUtil;
 
 /**
  *
@@ -50,14 +51,46 @@ public class SacPhasePick implements Comparable<SacPhasePick> {
         this.timeAfterOriginInSeconds = timeAfterOriginInSeconds;
     }
 
+    public SacPhasePick() {
+        
+    }
 
     public SacPhasePick(String phaseName, double timeAfterOriginInSeconds) {
         this.phaseName = phaseName;
         this.timeAfterOriginInSeconds = timeAfterOriginInSeconds;
     }
 
-
     public int compareTo(SacPhasePick o) {
         return (int) (this.timeAfterOriginInSeconds - o.getTimeAfterOriginInSeconds());
+    }
+
+    @Override
+    public boolean equals(
+            Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null) {
+            return false;
+        }
+
+        if (obj.getClass() == this.getClass()) {
+            final SacPhasePick other = (SacPhasePick) obj;
+
+            if (getPhaseName().equals(other.getPhaseName()) && getTimeAfterOriginInSeconds() == (other.getTimeAfterOriginInSeconds())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = HashCodeUtil.SEED;
+        result = HashCodeUtil.hash(result, getPhaseName());
+        result = HashCodeUtil.hash(result, getTimeAfterOriginInSeconds());
+        return result;
     }
 }

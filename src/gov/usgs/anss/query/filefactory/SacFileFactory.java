@@ -66,8 +66,6 @@ public class SacFileFactory {
             fill = 2147000000;
         }
 
-        NSCL nscl = NSCL.stringToNSCL(miniSeed.first().getSeedName());
-
         // Use the span to populate a sac file
 
         TimeZone tz = TimeZone.getTimeZone("GMT+0");
@@ -81,6 +79,7 @@ public class SacFileFactory {
             return null;         // There is no real data to put in SAC
         }
 
+        NSCL nscl = NSCL.stringToNSCL(miniSeed.first().getSeedName());
 
         logger.fine("ZeroSpan=" + span.toString());
 

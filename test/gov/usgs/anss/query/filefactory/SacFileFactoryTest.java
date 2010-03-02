@@ -220,7 +220,7 @@ public class SacFileFactoryTest {
                     assertEquals("data " + i, result.y[i], expResult.y[i], 0.0);
                 }
 
-                assertEquals("nvhdr", result.nvhdr, expResult.nvhdr);
+                 assertEquals("nvhdr", result.nvhdr, expResult.nvhdr);
                 assertEquals("b", result.b, expResult.b, 0.01);
                 assertEquals("e", result.e, expResult.e, 0.01);
                 assertEquals("iftype", result.iftype, expResult.iftype);

@@ -61,7 +61,7 @@ public class SacPhasePick implements Comparable<SacPhasePick> {
     }
 
     public int compareTo(SacPhasePick o) {
-        return (int) (this.timeAfterOriginInSeconds - o.getTimeAfterOriginInSeconds());
+        return (int) ((this.timeAfterOriginInSeconds * 10000.0d) - (o.getTimeAfterOriginInSeconds() * 10000.0d));
     }
 
     @Override

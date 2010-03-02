@@ -4,12 +4,20 @@
  */
 package gov.usgs.anss.query.filefactory;
 
+import edu.sc.seis.TauP.Arrival;
 import edu.sc.seis.TauP.SacTimeSeries;
+import edu.sc.seis.TauP.SphericalCoords;
+import edu.sc.seis.TauP.TauModelException;
+import edu.sc.seis.TauP.TauP_Time;
 import gov.usgs.anss.query.metadata.ChannelMetaData;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import nz.org.geonet.quakeml.exception.InvalidQuakemlException;
 import nz.org.geonet.quakeml.v1_0_1.client.QuakemlUtils;
@@ -32,6 +40,41 @@ public class SacHeaders {
 
     static {
         logger.fine("$Id: SacHeaders.java 1995 2010-02-15 01:10:51Z richardg $");
+    }
+
+    /**
+     * Triplicated phases may have mulitple arrivals for the same phase type.  This
+     * method removes the later arrivals for phases of the same type in the list.
+     * <p>
+     * See books like http://books.google.co.nz/books?id=CSCuMPt5CTcC&lpg=PT217&ots=CWmdxYPEJz&dq=seismology%20triplicated%20phases&pg=PA1#v=onepage&q=&f=false
+     * for more information.
+     *
+     * @param phases
+     * @return list with later arrivals for phases of the same type in the list removed.
+     */
+    public static List<SacPhasePick> reduceTriplicatedPhases(List<SacPhasePick> phases) {
+
+        // Go through the phases backwards and use a
+        // map to make the phases unique.  This will
+        // preserve the first arrival for a phase type
+        // which we are assuming is the most important.
+        Map<String, Double> map = new HashMap<String, Double>();
+
+        Collections.reverse(phases);
+
+        for (SacPhasePick phase : phases) {
+            map.put(phase.getPhaseName(), phase.getTimeAfterOriginInSeconds());
+        }
+
+        List<SacPhasePick> reducedPhases = new LinkedList<SacPhasePick>();
+
+        for (String phaseName : map.keySet()) {
+            reducedPhases.add(new SacPhasePick(phaseName, map.get(phaseName)));
+        }
+
+        Collections.sort(reducedPhases);
+
+        return reducedPhases;
     }
 
     // QuakeML doens't restrict mag type - these are the
@@ -226,7 +269,6 @@ public class SacHeaders {
         return sac;
     }
 
-    
     public static SacTimeSeries setPhasePicks(SacTimeSeries sac, Quakeml quakeml) {
 
         Origin origin = null;
@@ -265,12 +307,11 @@ public class SacHeaders {
         return SacHeaders.setPhasePicks(sac, phasePicks);
     }
 
-    
     /**
      * Sets the phase pick fields in the SAC header.  There are ten fields
      * available for picks in the SAC header so the list of SacPhasePick is
      * sorted and the first ten written into the header.
-     *
+     *<p>
      * For more details on the SAC header see:
      * http://www.iris.edu/manuals/sac/SAC_Manuals/FileFormatPt2.html
      *
@@ -386,5 +427,146 @@ public class SacHeaders {
         }
 
         return num;
+    }
+
+    /**
+     * Returns TauP phase classes based on the sac.cmpinc - P phase
+     * groups for verticals and S phase groups for horizontals.
+     * If the component isn't vertical or horizontal a basic group of
+     * P and S picks is returned.
+     *
+     * @param sac
+     * @param extendedPhaseGroups set true for extended phase groups (additional phases).
+     * @return string suitable for passing to TauP_Time.getPhaseNames().
+     */
+    public static String componentOrientationToPhaseGroup(SacTimeSeries sac, boolean extendedPhaseGroups) {
+        String phaseGroup = "ttbasic";
+
+        // Vertical
+        if (sac.cmpinc == 0.0d) {
+            if (extendedPhaseGroups) {
+                phaseGroup = "ttp+";
+            } else {
+                phaseGroup = "ttp";
+            }
+        }
+
+        // Horizontal
+        if (sac.cmpinc == 90.0d) {
+            if (extendedPhaseGroups) {
+                phaseGroup = "tts+";
+            } else {
+                phaseGroup = "tts";
+            }
+        }
+
+        return phaseGroup;
+    }
+
+    /**
+     * Uses TauP (http://www.seis.sc.edu/taup/) to calculate synthetic arrival times
+     * for goups of phases on standard velocity models.  The following SAC headers must
+     * be set for any phases to be calculated: sac.evdp, sac.evla, sac.evlo, sac.stla,
+     * sac.stlo
+     *<p>
+     * If sac.cmpinc is set for a vertical component then P phases will be returned;<p>
+     * for extendedPhaseGroups == false: p, P, Pn, Pdiff, PKP, PKiKP, PKIKP<p>
+     * for extendedPhaseGroups == true: p, P, Pn, Pdiff, PKP, PKiKP, PKIKP, PcP, pP, pPdiff, pPKP, pPKIKP, pPKiKP, sP, sPdiff, sPKP, sPKIKP, sPKiKP<p>
+     *<p>
+     * If sac.cmpinc is set for a horizontal component then S phases will be returned.<p>
+     * for extendedPhaseGroups == false: s, S, Sn, Sdiff, SKS, SKIKS<p>
+     * for extendedPhaseGroups == true: s, S, Sn, Sdiff, SKS, SKIKS, sS, sSdiff, sSKS, sSKIKS, ScS, pS, pSdiff, pSKS, pSKIKS
+     *<p>
+     * Otherwise, if it is not possible to determine if a component is horizontal or vertical
+     * a basic set of P and S phases is returned.
+     *<p>
+     * For details about the standard velocity models see:
+     * http://rses.anu.edu.au/seismology/ak135/ak135f.html http://www.iaspei.org/projects/0903srl_iasp91_Arthur_Snoke.pdf http://books.google.co.nz/books?id=J-TObT4IEiUC&lpg=PA228&ots=PmOxLjcZqi&dq=prem%20seismic%20velocity%20model&pg=PA228#v=onepage&q=prem%20seismic%20velocity%20model&f=false
+     *
+     * @param sac
+     * @param extendedPhaseGroups set true for extended phase groups (additional phases).
+     * @param velocityModel either "iasp91" (default), "ak135", or "prem".
+     * @return
+     */
+    public static List<SacPhasePick> getSyntheticPhases(SacTimeSeries sac, boolean extendedPhaseGroups, String velocityModel) {
+
+        List<SacPhasePick> sacPhasePicks = new ArrayList<SacPhasePick>();
+
+        String model = velocityModel == null ? "iasp91" : velocityModel;
+
+        // Checks that we have all the values we need set in the header.
+        boolean requiredValues = true;
+
+        if (sac.evdp == -12345.0d) {
+            logger.warning("Event depth not set, will not be able to calculate phases.");
+            requiredValues = false;
+        }
+        if (sac.stla == -12345.0d) {
+            logger.warning("Station latitude not set, will not be able to calculate phases.");
+            requiredValues = false;
+        }
+        if (sac.stlo == -12345.0d) {
+            logger.warning("Station longitude not set, will not be able to calculate phases.");
+            requiredValues = false;
+        }
+        if (sac.evla == -12345.0d) {
+            logger.warning("Event latitude not set, will not be able to calculate phases.");
+            requiredValues = false;
+        }
+        if (sac.evlo == -12345.0d) {
+            logger.warning("Event longitude not set, will not be able to calculate phases.");
+            requiredValues = false;
+        }
+
+        if (requiredValues) {
+            double deg = SphericalCoords.distance(sac.stla, sac.stlo, sac.evla, sac.evlo);
+
+            TauP_Time taup = null;
+
+            try {
+                taup = new TauP_Time(model);
+            } catch (Exception ex) {
+                logger.warning("Problem loading velocity model, will not be able to calculate phases.");
+            }
+
+            if (taup != null) {
+
+                String phaseGroup = SacHeaders.componentOrientationToPhaseGroup(sac, extendedPhaseGroups);
+
+                if (phaseGroup.equals("ttbasic")) {
+                    logger.warning("Problem determining if component is horizontal or vertical will use a basic phase group with P and S phases.");
+                }
+
+                // TODO
+                // Get some standard lists of phases from Taup.  There
+                // doesn't seem to be a clean way in Taup to add them as
+                // the phases of interest without iterating the list.
+                // Did I miss something?
+                List phaseNames = TauP_Time.getPhaseNames(phaseGroup);
+                Iterator phaseIter = phaseNames.iterator();
+                while (phaseIter.hasNext()) {
+                    taup.appendPhaseName((String) phaseIter.next());
+                }
+
+                try {
+                    taup.depthCorrect(sac.evdp / 1000.0d);  // SAC header is in m and _looks_ like this requires km.
+                } catch (TauModelException ex) {
+                    Logger.getLogger(SacHeaders.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                try {
+                    taup.calculate(deg);
+                } catch (TauModelException ex) {
+                    Logger.getLogger(SacHeaders.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                Arrival[] arrivals = taup.getArrivals();
+
+                for (int i = 0; i < arrivals.length; i++) {
+                    sacPhasePicks.add(new SacPhasePick(arrivals[i].getName() + " " + model, arrivals[i].getTime()));
+                }
+            }
+        }
+
+        return sacPhasePicks;
     }
 }

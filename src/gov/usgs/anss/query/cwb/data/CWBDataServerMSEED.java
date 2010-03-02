@@ -46,6 +46,7 @@ public class CWBDataServerMSEED implements CWBDataServer {
     private NSCL newNSCL = null;
     private NSCL lastNSCL = null;
     private boolean quiet = false;
+	private boolean inStreamOk = false;
 
     /**
      * Provides methods for running queries against a CWB server.
@@ -142,7 +143,68 @@ public class CWBDataServerMSEED implements CWBDataServer {
         }
 
         incomingMiniSEED = new LinkedBlockingQueue<MiniSeed>();
+		
+		// Get the first block
+		try {
+			MiniSeed ms = null;
+			if ((ms = read(inStream)) != null) {
+				// The logical inversion of the test to continue read in getNext.
+				if (ms.getIndicator().compareTo("D ") >= 0) {
+					newNSCL = NSCL.stringToNSCL(ms.getSeedName());
+					lastNSCL = newNSCL;
+					incomingMiniSEED.add(ms);
+				}
+			}
+		} catch (IOException ex) {
+			Logger.getLogger(CWBDataServerMSEED.class.getName()).log(Level.SEVERE, null, ex);
+		}
     }
+	
+	/**
+	 * Attempts to read a MiniSeed object from a given input stream setting the
+	 * subsequent StreamStatus.
+	 * @param inStream
+	 * @return the MiniSeed object to read in to.
+	 * @throws IOException
+	 */
+	public MiniSeed read(InputStream inStream) throws IOException {
+		byte[] b = new byte[4096];
+		MiniSeed ms = null;
+
+		if (!read(inStream, b, 0, 512)) {
+			logger.fine("Failed to read block from input stream - connection lost?");
+			inStreamOk = false;
+			return null;
+		}
+		
+		if (b[0] == '<' && b[1] == 'E' && b[2] == 'O' && b[3] == 'R' && b[4] == '>') {
+			logger.fine("EOR found");
+			inStreamOk = false;
+			return null;
+		} else {
+
+			try {
+				ms = new MiniSeed(b);
+			} catch (IllegalSeednameException ex) {
+				Logger.getLogger(CWBDataServerMSEED.class.getName()).log(Level.SEVERE, null, ex);
+			}
+
+			if (ms.getBlockSize() != 512) {
+				read(inStream, b, 512, ms.getBlockSize() - 512);
+
+				try {
+					ms = new MiniSeed(b);
+				} catch (IllegalSeednameException ex) {
+					Logger.getLogger(CWBDataServerMSEED.class.getName()).log(Level.SEVERE, null, ex);
+				}
+
+			}
+		}
+		
+
+		inStreamOk = true;
+		return ms;
+	}
 
     /**
      * Returns the next data record.  This is equivalent to the data for a fully qualified NSCL.
@@ -153,61 +215,42 @@ public class CWBDataServerMSEED implements CWBDataServer {
 
         TreeSet<MiniSeed> blks = new TreeSet<MiniSeed>();
 
-        byte[] b = new byte[4096];
-        try {
-            read:
-            while (read(inStream, b, 0, 512)) {
-                MiniSeed ms = null;
-                if (b[0] == '<' && b[1] == 'E' && b[2] == 'O' && b[3] == 'R' && b[4] == '>') {
-                    logger.fine("EOR found");
-                    break read;
-                } else {
+		if (inStreamOk) {
+			try {
+				MiniSeed ms;
+				read:
+				while ((ms = read(inStream)) != null) {
+					if (ms != null) {
 
-                    try {
-                        ms = new MiniSeed(b);
-                    } catch (IllegalSeednameException ex) {
-                        Logger.getLogger(CWBDataServerMSEED.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+						if (ms.getIndicator().compareTo("D ") < 0) {
+							continue read;
+						}
 
-                    if (ms.getBlockSize() != 512) {
-                        read(inStream, b, 512, ms.getBlockSize() - 512);
+						// This sets up the NSCL on the very first miniSEED block
+						if (lastNSCL == null) {
+							lastNSCL = NSCL.stringToNSCL(ms.getSeedName());
+						}
 
-                        try {
-                            ms = new MiniSeed(b);
-                        } catch (IllegalSeednameException ex) {
-                            Logger.getLogger(CWBDataServerMSEED.class.getName()).log(Level.SEVERE, null, ex);
-                        }
+						newNSCL = NSCL.stringToNSCL(ms.getSeedName());
 
-                    }
-                }
-
-                if (ms != null) {
-
-                    if (ms.getIndicator().compareTo("D ") < 0) {
-                        continue read;
-                    }
-
-                    // This sets up the NSCL on the very first miniSEED block
-                    if (lastNSCL == null) {
-                        lastNSCL = NSCL.stringToNSCL(ms.getSeedName());
-                    }
-
-                    newNSCL = NSCL.stringToNSCL(ms.getSeedName());
-
-                    if (newNSCL.equals(lastNSCL)) {
-                        incomingMiniSEED.add(ms);
-                        lastNSCL = newNSCL;
-                    } else {
-                        incomingMiniSEED.drainTo(blks);
-                        incomingMiniSEED.add(ms);
-                        lastNSCL = newNSCL;
-                        break read;
-                    }
-                }
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(CWBDataServerMSEED.class.getName()).log(Level.SEVERE, null, ex);
-        }
+						if (newNSCL.equals(lastNSCL)) {
+							incomingMiniSEED.add(ms);
+							lastNSCL = newNSCL;
+						} else {
+							incomingMiniSEED.drainTo(blks);
+							incomingMiniSEED.add(ms);
+							lastNSCL = newNSCL;
+							break read;
+						}
+					}
+					else {
+						logger.fine("Failed to read MiniSeed.");
+					}
+				}
+			} catch (IOException ex) {
+				logger.log(Level.SEVERE, null, ex);
+			}
+		}
 
         // This is triggered for the last channel off the stream.
         if (blks.isEmpty()) {
@@ -227,9 +270,9 @@ public class CWBDataServerMSEED implements CWBDataServer {
      * @return
      */
     public boolean hasNext() {
-        if (lastNSCL == null) {
+		if (inStreamOk)
 			return true;
-		}
+
 		return !incomingMiniSEED.isEmpty();
 	}
 

@@ -63,7 +63,7 @@ public class SacFileFactory {
 		else {
 			logger.info(
 					String.format(
-					"No matching data for \"%s\", at %s + %.2d, on %s:%i",
+					"No matching data for \"%s\", at begin time %s, duration %.2fs, on %s:%d",
 					nsclSelectString,
 					begin.toString("YYYY/MM/DD HH:mm:ss"), duration,
 					cwbServer.getHost(), cwbServer.getPort())

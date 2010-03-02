@@ -22,6 +22,10 @@ public interface CWBDataServer {
 
 	void quiet();
 
+	String getHost();
+
+	int getPort();
+
 	@Override
 	boolean equals(Object o);
 

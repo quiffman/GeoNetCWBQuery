@@ -448,7 +448,7 @@ public class EdgeQueryClient {
             } catch (IOException ex) {
                 logger.severe("Failed to open configuration file, logging not configured.");
             }
-            logger.config("Using default logging confiuration.");
+            logger.config("Using default logging configuration.");
         } else {
             logger.config("Using custom logging config file: " + customLogConfigFile);
         }

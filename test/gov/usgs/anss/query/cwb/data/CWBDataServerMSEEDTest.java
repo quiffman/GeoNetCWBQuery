@@ -60,6 +60,12 @@ public class CWBDataServerMSEEDTest {
                         1800d,
                         "NZMRZ..HHZ10",
                         new String[]{"build/NZMRZ__HHZ10-2009-01-01-00-00-00.ms"}
+                    },
+                    {"-b \"2009/01/01 00:00:00\" -s \"XXARSE\"",
+                        new DateTime(2009, 1, 1, 0, 0, 0, 0, tz),
+                        300d,
+                        "XXARSE",
+                        new String[]{}
                     }
                 });
     }

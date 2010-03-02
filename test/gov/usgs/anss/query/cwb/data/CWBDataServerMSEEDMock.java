@@ -72,4 +72,12 @@ public class CWBDataServerMSEEDMock implements CWBDataServer {
     public void quiet() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
+	public String getHost() {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	public int getPort() {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 }

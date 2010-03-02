@@ -101,6 +101,11 @@ public class SacHeadersSyntheticPhasesTest {
     }
 
     @Test
+    public void testGetSyntheticPhasesVerticalComponentBadModel() {
+        assertTrue("Didn't get exptect picks.", SacHeaders.getSyntheticPhases(sac, false, "not-a-model").isEmpty());
+    }
+
+    @Test
     public void testGetSyntheticPhasesExtendedVerticalComponent() {
         List<SacPhasePick> expected = new ArrayList<SacPhasePick>();
 

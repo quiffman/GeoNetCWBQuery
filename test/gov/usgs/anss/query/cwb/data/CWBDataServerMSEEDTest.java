@@ -66,7 +66,13 @@ public class CWBDataServerMSEEDTest {
                         300d,
                         "XXARSE",
                         new String[]{}
-                    }
+                    },
+					{"-b \"2009/01/01 00:00:00\" -s \"NZWEL..HH[ENZ]..|NZBFZ..HHZ..|.*WAZ.*20\" -d 300",
+						new DateTime(2009, 1, 1, 0, 0, 0, 0, tz),
+						300d,
+						"NZWEL..HH[ENZ]..|NZBFZ..HHZ..|.*WAZ.*20",
+						new String[]{"build/NZBFZ__HHZ10-2009-01-01-00-00-00.ms", "build/NZWAZ__LNE20-2009-01-01-00-00-00.ms", "build/NZWAZ__LNZ20-2009-01-01-00-00-00.ms", "build/NZWEL__HHE10-2009-01-01-00-00-00.ms", "build/NZWEL__HHN10-2009-01-01-00-00-00.ms", "build/NZWEL__HHZ10-2009-01-01-00-00-00.ms"}
+					},
                 });
     }
     private String queryLine;
@@ -166,7 +172,10 @@ public class CWBDataServerMSEEDTest {
         Iterator<? extends Comparable> i2 = c2.iterator();
 
         while (i1.hasNext() && i2.hasNext()) {
-            assertEquals(message + ": comparison inequality", 0, i1.next().compareTo(i2.next()));
+			Comparable o1 = i1.next();
+			Comparable o2 = i2.next();
+            assertEquals(message + ": comparison inequality (" + o1.toString() +
+					"," + o2.toString() + ")", 0, o1.compareTo(o2));
         }
 
     }

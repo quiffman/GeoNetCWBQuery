@@ -184,7 +184,10 @@ public class CWBDataServerMSEED implements CWBDataServer {
 		} else {
 
 			try {
-				ms = new MiniSeed(b);
+				// If we don't specify the offset and length it allocates the same
+				// size as b for the MiniSeed buf, which is particularly wasteful
+				// given most blocks are only 512 (not 4096).
+				ms = new MiniSeed(b, 0, 512);
 			} catch (IllegalSeednameException ex) {
 				Logger.getLogger(CWBDataServerMSEED.class.getName()).log(Level.SEVERE, null, ex);
 			}
@@ -193,7 +196,7 @@ public class CWBDataServerMSEED implements CWBDataServer {
 				read(inStream, b, 512, ms.getBlockSize() - 512);
 
 				try {
-					ms = new MiniSeed(b);
+					ms = new MiniSeed(b, 0, ms.getBlockSize());
 				} catch (IllegalSeednameException ex) {
 					Logger.getLogger(CWBDataServerMSEED.class.getName()).log(Level.SEVERE, null, ex);
 				}

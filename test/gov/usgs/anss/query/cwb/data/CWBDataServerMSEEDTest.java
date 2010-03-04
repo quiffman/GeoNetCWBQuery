@@ -152,7 +152,26 @@ public class CWBDataServerMSEEDTest {
         assertEquals("collection lengths", expResult.size(), result.size());
 
         for (int i = 0; i < result.size(); i++) {
-            assertCollectionEquals("entire collection", expResult.get(i), result.get(i));
+            assertMiniSeedCollectionEquals("entire collection", expResult.get(i), result.get(i));
+        }
+    }
+
+    private static void assertMiniSeedCollectionEquals(String message,
+            Collection<MiniSeed> c1,
+            Collection<MiniSeed> c2) {
+
+        assertEquals(message + ": size mismatch", c1.size(), c2.size());
+
+        Iterator<MiniSeed> i1 = c1.iterator();
+        Iterator<MiniSeed> i2 = c2.iterator();
+
+        while (i1.hasNext() && i2.hasNext()) {
+			MiniSeed o1 = i1.next();
+			MiniSeed o2 = i2.next();
+            assertEquals(message + ": comparison inequality (" + o1.toString() +
+					"," + o2.toString() + ")", 0, o1.compareTo(o2));
+
+			assertArrayEquals("MiniSeed not byte matched", o1.getBuf(), o2.getBuf());
         }
     }
 

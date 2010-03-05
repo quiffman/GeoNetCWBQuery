@@ -64,8 +64,6 @@ public class SacOutputer extends Outputer {
 	}
 	
 	public void doQuery() {
-		cwbServer.query(
-				options.getBeginWithOffset(), options.getDuration(), options.getSeedname());
 		sacFF.makeFiles(
 				options.getBeginWithOffset(), options.getDuration(), options.getSeedname(), options.filemask, this.fill, this.gaps, this.trim, (options.sacpz ? options.pzunit : null), options.getEvent());
 	}

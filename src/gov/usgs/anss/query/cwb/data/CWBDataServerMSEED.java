@@ -154,7 +154,13 @@ public class CWBDataServerMSEED implements CWBDataServer {
 					lastNSCL = newNSCL;
 					incomingMiniSEED.add(ms);
 				}
+				else {
+					logger.info("First block in query not data: " + ms);
+				}
 			}
+				else {
+					logger.info("Failed to read irst block in query.");
+				}
 		} catch (IOException ex) {
 			logger.log(Level.SEVERE, null, ex);
 		}
@@ -220,41 +226,38 @@ public class CWBDataServerMSEED implements CWBDataServer {
 
         TreeSet<MiniSeed> blks = new TreeSet<MiniSeed>();
 
-		if (inStreamOk) {
-			try {
-				MiniSeed ms;
-				read:
-				while ((ms = read(inStream)) != null) {
-					if (ms != null) {
+		try {
+			MiniSeed ms;
+			read:
+			while (inStreamOk) {
+				if ((ms = read(inStream)) != null) {
 
-						if (ms.getIndicator().compareTo("D ") < 0) {
-							continue read;
-						}
-
-						// This sets up the NSCL on the very first miniSEED block
-						if (lastNSCL == null) {
-							lastNSCL = NSCL.stringToNSCL(ms.getSeedName());
-						}
-
-						newNSCL = NSCL.stringToNSCL(ms.getSeedName());
-
-						if (newNSCL.equals(lastNSCL)) {
-							incomingMiniSEED.add(ms);
-							lastNSCL = newNSCL;
-						} else {
-							incomingMiniSEED.drainTo(blks);
-							incomingMiniSEED.add(ms);
-							lastNSCL = newNSCL;
-							break read;
-						}
+					if (ms.getIndicator().compareTo("D ") < 0) {
+						continue read;
 					}
-					else {
-						logger.fine("Failed to read MiniSeed.");
+
+					// This sets up the NSCL on the very first miniSEED block
+					if (lastNSCL == null) {
+						lastNSCL = NSCL.stringToNSCL(ms.getSeedName());
 					}
+
+					newNSCL = NSCL.stringToNSCL(ms.getSeedName());
+
+					if (newNSCL.equals(lastNSCL)) {
+						incomingMiniSEED.add(ms);
+						lastNSCL = newNSCL;
+					} else {
+						incomingMiniSEED.drainTo(blks);
+						incomingMiniSEED.add(ms);
+						lastNSCL = newNSCL;
+						break read;
+					}
+				} else {
+					logger.fine("Failed to read MiniSeed.");
 				}
-			} catch (IOException ex) {
-				logger.log(Level.SEVERE, null, ex);
 			}
+		} catch (IOException ex) {
+			logger.log(Level.SEVERE, null, ex);
 		}
 
         // This is triggered for the last channel off the stream.

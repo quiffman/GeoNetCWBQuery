@@ -139,7 +139,7 @@ public class CWBDataServerMSEED implements CWBDataServer {
             outStream = ds.getOutputStream();
             outStream.write(CWBQueryFormatter.miniSEED(begin, duration, nsclSelectString).getBytes());
         } catch (IOException ex) {
-            Logger.getLogger(CWBDataServerMSEED.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
         incomingMiniSEED = new LinkedBlockingQueue<MiniSeed>();
@@ -156,7 +156,7 @@ public class CWBDataServerMSEED implements CWBDataServer {
 				}
 			}
 		} catch (IOException ex) {
-			Logger.getLogger(CWBDataServerMSEED.class.getName()).log(Level.SEVERE, null, ex);
+			logger.log(Level.SEVERE, null, ex);
 		}
     }
 	
@@ -189,16 +189,18 @@ public class CWBDataServerMSEED implements CWBDataServer {
 				// given most blocks are only 512 (not 4096).
 				ms = new MiniSeed(b, 0, 512);
 			} catch (IllegalSeednameException ex) {
-				Logger.getLogger(CWBDataServerMSEED.class.getName()).log(Level.SEVERE, null, ex);
+				logger.log(Level.SEVERE, null, ex);
 			}
 
+			// This happens when the incoming blocks are bigger than 512, so we
+			// have to "re-read" them at the correct size.
 			if (ms.getBlockSize() != 512) {
 				read(inStream, b, 512, ms.getBlockSize() - 512);
 
 				try {
 					ms = new MiniSeed(b, 0, ms.getBlockSize());
 				} catch (IllegalSeednameException ex) {
-					Logger.getLogger(CWBDataServerMSEED.class.getName()).log(Level.SEVERE, null, ex);
+					logger.log(Level.SEVERE, null, ex);
 				}
 
 			}
@@ -308,7 +310,7 @@ public class CWBDataServerMSEED implements CWBDataServer {
         try {
             outStream.write(("\n").getBytes());
         } catch (IOException ex) {
-            Logger.getLogger(CWBDataServerMSEED.class.getName()).log(Level.FINE,
+            logger.log(Level.FINE,
                     "Failed when attempting to close connection.", ex);
         }
         ds.close();

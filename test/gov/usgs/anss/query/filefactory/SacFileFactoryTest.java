@@ -111,8 +111,7 @@ public class SacFileFactoryTest {
                         true, //gaps
                         true, //trim
                         null //quakml
-                    },
-                    { // Event data.
+                    }, { // Event data.
                         new CWBDataServerMSEEDMock("dummy", 666),
                         new MetaDataServerMock("dummy", 666),
                         new String[]{
@@ -127,8 +126,7 @@ public class SacFileFactoryTest {
                         true, //gaps
                         true, //trim
                         new QuakemlFactory().getQuakeml(SacFileFactoryTest.class.getResourceAsStream("/gov/usgs/anss/query/filefactory/quakeml_2732452.xml")) //quakml
-                    },
-                });
+                    },});
 
     }
     private CWBDataServerMSEEDMock cwbServer;
@@ -220,24 +218,15 @@ public class SacFileFactoryTest {
                     assertEquals("data " + i, result.y[i], expResult.y[i], 0.0);
                 }
 
-				if (this.quakeml != null) {
-					System.out.println("exp b " + expResult.b + " ± " + Math.ulp((float) expResult.b));
-					System.out.println("res b " + result.b + " ± " + Math.ulp((float) result.b));
-					System.out.println("exp e " + expResult.e + " ± " + Math.ulp((float) expResult.e));
-					System.out.println("res e " + result.e + " ± " + Math.ulp((float) result.e));
-					System.out.println("exp delta " + expResult.delta + " ± " + Math.ulp((float) expResult.delta));
-					System.out.println("res delta " + result.delta + " ± " + Math.ulp((float) result.delta));
-				}
-
-                 assertEquals("nvhdr", result.nvhdr, expResult.nvhdr);
+                assertEquals("nvhdr", result.nvhdr, expResult.nvhdr);
                 assertEquals("b ± " + Math.ulp((float) expResult.b),
-						(float) result.b, expResult.b, Math.ulp((float) expResult.b));
+                        (float) result.b, expResult.b, Math.ulp((float) expResult.b));
                 assertEquals("e ± " + Math.ulp((float) expResult.e),
-						result.e, expResult.e, Math.ulp((float) expResult.e));
+                        result.e, expResult.e, Math.ulp((float) expResult.e));
                 assertEquals("iftype", result.iftype, expResult.iftype);
                 assertEquals("leven", result.leven, expResult.leven);
-			    assertEquals("delta ± " + Math.ulp((float) expResult.delta),
-						result.delta, expResult.delta, Math.ulp((float) expResult.delta));  // Slight discrepancy
+                assertEquals("delta ± " + Math.ulp((float) expResult.delta),
+                        result.delta, expResult.delta, Math.ulp((float) expResult.delta));
                 assertEquals("depmin", result.depmin, expResult.depmin, 0.0);
                 assertEquals("depmax", result.depmax, expResult.depmax, 0.0);
 
@@ -250,35 +239,30 @@ public class SacFileFactoryTest {
 
                 assertEquals("iztype", result.iztype, expResult.iztype);
 
-                // TODO - I'm not sure why these have white space.
-                // The orig outputter doesn't add it.  Maybe reading
-                // in SacTimeSeries does.  The spec implies it should
-                // be there (K should be 8 or 16 char)
-                // but I haven't seen an issue with reading into SAC.
-                // Also stla and stlo.
+                // Some white space padding gets added when writing header.
                 assertEquals("knetwk", result.knetwk, expResult.knetwk.trim());
                 assertEquals("kstnm", result.kstnm, expResult.kstnm.trim());
                 assertEquals("kcmpn", result.kcmpnm, expResult.kcmpnm.trim());
                 assertEquals("khole", result.khole, expResult.khole.trim());
 
-                assertEquals("Lat", result.stla, expResult.stla, 0.00001);
-                assertEquals("Lon", result.stlo, expResult.stlo, 0.00001);
+                assertEquals("Lat", result.stla, expResult.stla, Math.ulp((float) expResult.stla));
+                assertEquals("Lon", result.stlo, expResult.stlo, Math.ulp((float) expResult.stlo));
                 assertEquals("Elev", result.stel, expResult.stel, 0.0);
                 assertEquals("Depth", result.stdp, expResult.stdp, 0.0);
                 assertEquals("Azimuth", result.cmpaz, expResult.cmpaz, 0.0);
                 assertEquals("Inc", result.cmpinc, expResult.cmpinc, 0.0);
 
                 if (quakeml != null) {
-                    assertEquals("lat", result.evla, expResult.evla, 0.00001);
-                    assertEquals("lon", result.evlo, expResult.evlo, 0.00001);
-                    assertEquals("dep", result.evdp, expResult.evdp, 0.1);
-                    assertEquals("mag", result.mag, expResult.mag, 0.001);
+                    assertEquals("event lat", result.evla, expResult.evla, Math.ulp((float) expResult.evla));
+                    assertEquals("event lon", result.evlo, expResult.evlo, Math.ulp((float) expResult.evlo));
+                    assertEquals("event dep", result.evdp, expResult.evdp, Math.ulp((float) expResult.evdp));
+                    assertEquals("event mag", result.mag, expResult.mag, Math.ulp((float) expResult.mag));
                     assertEquals("imagtyp", result.imagtyp, expResult.imagtyp);
                     assertEquals("ievtyp", result.ievtyp, expResult.ievtyp);
                     assertEquals("lcalda", result.lcalda, expResult.lcalda);
 
                     assertEquals("Phase ", result.kt0, expResult.kt0.trim());
-                    assertEquals("Phase t", result.t0, expResult.t0, 0.001);
+                    assertEquals("Phase t", result.t0, expResult.t0, Math.ulp((float) expResult.t0));
                 }
             }
         }

@@ -109,7 +109,7 @@ public class SacFileFactory {
         // Set the byteOrder based on native architecture and sac statics
         sac.nvhdr = 6;                // Only format supported
         sac.b = 0.;           // beginning time offsed
-        sac.e = (span.getNsamp() / span.getRate());
+        sac.e = ((span.getNsamp() - 1 ) / span.getRate());
         sac.iftype = SacTimeSeries.ITIME;
         sac.leven = SacTimeSeries.TRUE;
         sac.delta = (1. / span.getRate());
@@ -165,7 +165,7 @@ public class SacFileFactory {
 
     // TODO: move the getSACResponse to outputPZ or something.
     protected void outputFile(SacTimeSeries timeSeries, DateTime begin, String mask, String pzunit) {
-		
+
 		NSCL nscl = new NSCL(timeSeries.knetwk,
 				timeSeries.kstnm,
 				timeSeries.kcmpnm,

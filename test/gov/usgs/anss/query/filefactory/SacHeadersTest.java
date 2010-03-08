@@ -216,8 +216,8 @@ public class SacHeadersTest {
         assertEquals("minute", sac.nzmin, 41);
         assertEquals("sec", sac.nzsec, 4);
         assertEquals("msec", sac.nzmsec, 874);
-        assertEquals("b", sac.b, -6.648770e+02d, 0.0000001);
-        assertEquals("e", sac.e, 1.135113e+03, 0.0000001);
+        assertEquals("b", sac.b, -6.648770e+02d, 0.0);
+        assertEquals("e", sac.e, 1.135113e+03, 0.0);
         assertEquals("iztype", sac.iztype, SacTimeSeries.IO);
         assertEquals("lat", sac.evla, eventLat, 0.0);
         

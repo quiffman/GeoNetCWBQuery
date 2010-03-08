@@ -78,7 +78,10 @@ public class SacPhasePick implements Comparable<SacPhasePick> {
         if (obj.getClass() == this.getClass()) {
             final SacPhasePick other = (SacPhasePick) obj;
 
-            if (getPhaseName().equals(other.getPhaseName()) && getTimeAfterOriginInSeconds() == (other.getTimeAfterOriginInSeconds())) {
+            // Only compare picks to millisecond for equals.
+            if (getPhaseName().equals(other.getPhaseName()) && 
+                    (int) (getTimeAfterOriginInSeconds() * 1000) == (int) (other.getTimeAfterOriginInSeconds() * 1000)
+                    ) {
                 return true;
             }
         }

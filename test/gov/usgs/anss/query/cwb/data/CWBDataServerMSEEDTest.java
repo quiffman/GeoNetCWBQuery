@@ -108,7 +108,7 @@ public class CWBDataServerMSEEDTest {
         try {
             Process getMS =
                     Runtime.getRuntime().exec(
-                    "java -jar lib-ivy/external/GeoNetCWBQuery-2.0.0-RC1.jar " + queryLine + " -t ms -o build/%N-%y-%M-%D-%h-%m-%S.ms");
+                    "java -jar lib-ivy/external/GeoNetCWBQuery-2.0.0.jar " + queryLine + " -t ms -o build/%N-%y-%M-%D-%h-%m-%S.ms");
             getMS.waitFor();
         } catch (IOException ex) {
             Logger.getLogger(CWBDataServerMSEEDTest.class.getName()).log(Level.SEVERE, null, ex);

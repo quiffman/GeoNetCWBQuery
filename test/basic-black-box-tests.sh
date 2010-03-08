@@ -51,21 +51,21 @@ java -jar *CWBQuery*.jar -f $tmpdir/CWB.batch $silence
 sed -i -e 's/^\(\* CREATED\s\+\).*$/\1<SCRUBBED>/' $tmpdir/*-cwb-batch-test-3.out.pz
 
 cat > $tmpdir/CWB.md5 <<EOF
-9f7555de4d8f89a6f1c9fc8d05e19c51  $tmpdir/cwb-test-1.out
+49d2825a2bfd257465e6a92f665a82ab  $tmpdir/cwb-test-1.out
 50ae2628ee1a65d553a46a4bce70d0ef  $tmpdir/cwb-test-2.out
-cb20eb719832db4910a4d830f69c7a38  $tmpdir/cwb-batch-test-1.out
-47a7f0f4f157710697c8430f9b1eae29  $tmpdir/NZWLGTLTZ40-NZ-WLGT-LTZ-40-09-2009-001-2454833-01-01-00-00-00-cwb-batch-test-2.out
-72d35048a4ee43e91cf99857342478b1  $tmpdir/NZBFZ__HHZ10-cwb-batch-test-3.out
+0a57cd3bc953208614c7357d80ab7080  $tmpdir/cwb-batch-test-1.out
+493780556e7808a6c270ea416b693115  $tmpdir/NZWLGTLTZ40-NZ-WLGT-LTZ-40-09-2009-001-2454833-01-01-00-00-00-cwb-batch-test-2.out
+e3040fdd0f38b46c31e79dd99b42b1b2  $tmpdir/NZBFZ__HHZ10-cwb-batch-test-3.out
 8924ad0693db4220d213be69201971b9  $tmpdir/NZBFZ__HHZ10-cwb-batch-test-3.out.pz
-9408af0c4071ad8cda3366df2245b6b2  $tmpdir/NZWAZ__LNE20-cwb-batch-test-3.out
+9dd8e5d9dcb427f0b4e992301f13f48b  $tmpdir/NZWAZ__LNE20-cwb-batch-test-3.out
 44acfaa18e0b04337a83d3774352ea5e  $tmpdir/NZWAZ__LNE20-cwb-batch-test-3.out.pz
-2557642ab3ab099c2c94de239f608025  $tmpdir/NZWAZ__LNZ20-cwb-batch-test-3.out
+07d9b9d763cf96da4013388c6ec452cb  $tmpdir/NZWAZ__LNZ20-cwb-batch-test-3.out
 e8b63d76a386cf34af723e6cb442ee7f  $tmpdir/NZWAZ__LNZ20-cwb-batch-test-3.out.pz
-20ed04531f27198dc6c99401c1dea2f6  $tmpdir/NZWEL__HHE10-cwb-batch-test-3.out
+82d7a91ecff7b37faf344c6f22062878  $tmpdir/NZWEL__HHE10-cwb-batch-test-3.out
 9867ce0ba334c484de5fbd4ed5d3e243  $tmpdir/NZWEL__HHE10-cwb-batch-test-3.out.pz
-a074d2af7a574f226e87789ab39eadaf  $tmpdir/NZWEL__HHN10-cwb-batch-test-3.out
+576b136c952fb21e0e8c2868534aac3a  $tmpdir/NZWEL__HHN10-cwb-batch-test-3.out
 8cde9e5a2de663cc3fcc1edb6b067cb9  $tmpdir/NZWEL__HHN10-cwb-batch-test-3.out.pz
-20e616630aca460a026d5d3ad7722a44  $tmpdir/NZWEL__HHZ10-cwb-batch-test-3.out
+363a1bb1e897df9d444f9439133cde75  $tmpdir/NZWEL__HHZ10-cwb-batch-test-3.out
 9e04667a31aa72c40b886093a343910e  $tmpdir/NZWEL__HHZ10-cwb-batch-test-3.out.pz
 3b103d7bcbb9ac99d6de26026fc93cf9  $tmpdir/cwb-batch-test-4.out
 2c5ae4cc1bf1de7208ff62e65fa5b468  $tmpdir/cwb-batch-test-5.out

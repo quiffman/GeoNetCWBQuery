@@ -220,12 +220,24 @@ public class SacFileFactoryTest {
                     assertEquals("data " + i, result.y[i], expResult.y[i], 0.0);
                 }
 
+				if (this.quakeml != null) {
+					System.out.println("exp b " + expResult.b + " ± " + Math.ulp((float) expResult.b));
+					System.out.println("res b " + result.b + " ± " + Math.ulp((float) result.b));
+					System.out.println("exp e " + expResult.e + " ± " + Math.ulp((float) expResult.e));
+					System.out.println("res e " + result.e + " ± " + Math.ulp((float) result.e));
+					System.out.println("exp delta " + expResult.delta + " ± " + Math.ulp((float) expResult.delta));
+					System.out.println("res delta " + result.delta + " ± " + Math.ulp((float) result.delta));
+				}
+
                  assertEquals("nvhdr", result.nvhdr, expResult.nvhdr);
-                assertEquals("b", result.b, expResult.b, 0.01);
-                assertEquals("e", result.e, expResult.e, 0.01);
+                assertEquals("b ± " + Math.ulp((float) expResult.b),
+						(float) result.b, expResult.b, Math.ulp((float) expResult.b));
+                assertEquals("e ± " + Math.ulp((float) expResult.e),
+						result.e, expResult.e, Math.ulp((float) expResult.e));
                 assertEquals("iftype", result.iftype, expResult.iftype);
                 assertEquals("leven", result.leven, expResult.leven);
-                assertEquals("delta", result.delta, expResult.delta, 0.001);  // Slight discrepancy
+			    assertEquals("delta ± " + Math.ulp((float) expResult.delta),
+						result.delta, expResult.delta, Math.ulp((float) expResult.delta));  // Slight discrepancy
                 assertEquals("depmin", result.depmin, expResult.depmin, 0.0);
                 assertEquals("depmax", result.depmax, expResult.depmax, 0.0);
 
@@ -234,7 +246,7 @@ public class SacFileFactoryTest {
                 assertEquals("nzhour", result.nzhour, expResult.nzhour);
                 assertEquals("nzmin", result.nzmin, expResult.nzmin);
                 assertEquals("nzsec", result.nzsec, expResult.nzsec);
-                assertEquals("nzmsec", result.nzmsec, expResult.nzmsec, 2);
+                assertEquals("nzmsec", result.nzmsec, expResult.nzmsec);
 
                 assertEquals("iztype", result.iztype, expResult.iztype);
 

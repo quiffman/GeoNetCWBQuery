@@ -35,7 +35,7 @@ public class CWBQueryFormatterTest {
         DateTime begin = new DateTime(2009, 1, 1, 11, 11, 11, 0, tz);
         Double duration = 1800d;
         String result = CWBQueryFormatter.listChannels(begin, duration);
-        assertEquals("list query 1", "'-b' '2009/01/01 11:11:11' '-d' '1800.0' '-lsc'\n", result);
+        assertEquals("list query 1", "'-b' '2009/01/01 11:11:11.000' '-d' '1800.0' '-lsc'\n", result);
 
     }
 
@@ -45,8 +45,10 @@ public class CWBQueryFormatterTest {
         DateTime begin = new DateTime(2009, 1, 1, 0, 0, 0, 0, tz);
         Double duration = 1800d;
         String result = CWBQueryFormatter.miniSEED(begin, duration, nscl);
-        assertEquals("data query 1", "'-b' '2009/01/01 00:00:00' '-s' 'NZMRZ..HHZ10' '-d' '1800.0'\t", result);
+        assertEquals("data query 1", "'-b' '2009/01/01 00:00:00.000' '-s' 'NZMRZ..HHZ10' '-d' '1800.0'\t", result);
         result = CWBQueryFormatter.miniSEED(begin, duration, "NZMRZ..HHZ10");
-        assertEquals("data query 1", "'-b' '2009/01/01 00:00:00' '-s' 'NZMRZ..HHZ10' '-d' '1800.0'\t", result);
+        assertEquals("data query 1", "'-b' '2009/01/01 00:00:00.000' '-s' 'NZMRZ..HHZ10' '-d' '1800.0'\t", result);
+        result = CWBQueryFormatter.miniSEED(begin.withMillisOfSecond(799), 300d, "NZMRZ..HHZ10");
+        assertEquals("data query 1", "'-b' '2009/01/01 00:00:00.799' '-s' 'NZMRZ..HHZ10' '-d' '300.0'\t", result);
     }
 }

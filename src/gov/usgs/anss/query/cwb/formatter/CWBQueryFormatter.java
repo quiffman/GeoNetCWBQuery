@@ -18,7 +18,7 @@ import org.joda.time.format.DateTimeFormatter;
  */
 public class CWBQueryFormatter {
 
-    private static String beginFormat = "YYYY/MM/dd HH:mm:ss";
+    private static String beginFormat = "YYYY/MM/dd HH:mm:ss.SSS";
     private static DateTimeFormatter parseBeginFormat = DateTimeFormat.forPattern(beginFormat).withZone(DateTimeZone.forID("UTC"));
 
     /**

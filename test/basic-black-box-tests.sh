@@ -34,6 +34,7 @@ java -jar *CWBQuery*.jar -lsc -b "2009/01/01 00:00:00" -d 100.0 2>$tmpdir/cwb-te
 # Scrub the output of inconsequential potential changes - i.e. today and the command line
 sed -i -e 's/today=.*$//' $tmpdir/cwb-test-2.out
 sed -i -e 's/configuration/confiuration/' $tmpdir/cwb-test-2.out
+sed -i -e 's/00:00:00.000/00:00:00/' $tmpdir/cwb-test-2.out
 
 cat > $tmpdir/CWB.batch <<EOF
 -b "2009/01/01 00:00:00" -s "NZWLGT.LTZ40" -t sac -o $tmpdir/cwb-batch-test-1.out

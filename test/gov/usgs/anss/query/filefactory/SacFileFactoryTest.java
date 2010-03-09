@@ -125,7 +125,7 @@ public class SacFileFactoryTest {
                         new Integer(-12345), //fill
                         true, //gaps
                         true, //trim
-                        new QuakemlFactory().getQuakeml(SacFileFactoryTest.class.getResourceAsStream("/gov/usgs/anss/query/filefactory/quakeml_2732452.xml")) //quakml
+                        new QuakemlFactory().getQuakeml(SacFileFactoryTest.class.getResourceAsStream("/gov/usgs/anss/query/filefactory/quakeml_2732452.xml"), null) //quakml
                     },});
 
     }

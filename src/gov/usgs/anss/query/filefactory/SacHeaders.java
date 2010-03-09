@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import nz.org.geonet.quakeml.exception.InvalidQuakemlException;
 import nz.org.geonet.quakeml.v1_0_1.client.QuakemlUtils;
 import nz.org.geonet.quakeml.v1_0_1.domain.Event;
 import nz.org.geonet.quakeml.v1_0_1.domain.Magnitude;
@@ -36,7 +35,6 @@ import org.joda.time.DateTimeZone;
 public class SacHeaders {
 
     private static final Logger logger = Logger.getLogger(SacHeaders.class.getName());
-
 
     static {
         logger.fine("$Id: SacHeaders.java 1995 2010-02-15 01:10:51Z richardg $");
@@ -200,11 +198,7 @@ public class SacHeaders {
         Magnitude mag = null;
 
         Event event = QuakemlUtils.getFirstEvent(quakeml);
-        try {
-            origin = QuakemlUtils.getPreferredOrigin(event);
-        } catch (InvalidQuakemlException ex) {
-            logger.warning("found no origin information in the QuakeML, will not be able to set event headers");
-        }
+        origin = QuakemlUtils.getPreferredOrigin(event);
 
         try {
             mag = QuakemlUtils.getPreferredMagnitude(event);
@@ -249,11 +243,7 @@ public class SacHeaders {
         DateTime eventTime = null;
 
         if (origin != null) {
-            try {
-                eventTime = QuakemlUtils.getOriginTime(origin);
-            } catch (InvalidQuakemlException ex) {
-                logger.warning("Found no event time definition, not updating header.");
-            }
+            eventTime = QuakemlUtils.getOriginTime(origin);
         }
 
         if (eventTime != null) {
@@ -264,6 +254,8 @@ public class SacHeaders {
                     magnitude,
                     magType,
                     eventType);
+        } else {
+            logger.warning("found no event time definition in the QUakeML.  Not updating header.");
         }
 
         return sac;
@@ -273,11 +265,7 @@ public class SacHeaders {
 
         Origin origin = null;
         Event event = QuakemlUtils.getFirstEvent(quakeml);
-        try {
-            origin = QuakemlUtils.getPreferredOrigin(event);
-        } catch (InvalidQuakemlException ex) {
-            logger.warning("found no origin information in the QuakeML, will not be able to set picks");
-        }
+        origin = QuakemlUtils.getPreferredOrigin(event);
 
         List<ArrivalPick> picks = null;
         if (origin != null) {
@@ -286,6 +274,8 @@ public class SacHeaders {
             } catch (Exception ex) {
                 logger.warning("unable to read phase picks.");
             }
+        } else {
+            logger.warning("found no origin information in the QuakeML, will not be able to set picks");
         }
 
         List<SacPhasePick> phasePicks = new ArrayList<SacPhasePick>();
@@ -299,7 +289,7 @@ public class SacHeaders {
                 logger.warning("Found no pick evaluation mode in the quakeml.  Still able to set picks.");
             }
 
-            double arrivalTime = pick.getTimeAfterOriginInMillis() / 1000.0d;
+            double arrivalTime = pick.getMillisAfterOrigin() / 1000.0d;
 
             phasePicks.add(new SacPhasePick(phaseName, arrivalTime));
         }

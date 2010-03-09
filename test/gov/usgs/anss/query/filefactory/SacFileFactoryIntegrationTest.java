@@ -160,7 +160,7 @@ public class SacFileFactoryIntegrationTest {
                         true, // paz files expected
                         new String[]{
                             "/test-data/gov/usgs/anss/query/filefactory/event/NZTSZ__HHN10.sac.pz",},
-                        new QuakemlFactory().getQuakeml(SacFileFactoryIntegrationTest.class.getResourceAsStream("/gov/usgs/anss/query/filefactory/quakeml_2732452.xml")) //quakml
+                        new QuakemlFactory().getQuakeml(SacFileFactoryIntegrationTest.class.getResourceAsStream("/gov/usgs/anss/query/filefactory/quakeml_2732452.xml"), null) //quakml
                     },});
     }
     private CWBDataServerMSEED cwbServer;

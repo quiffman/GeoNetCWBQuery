@@ -206,7 +206,7 @@ public class SacHeadersTest {
 
         sac.iztype = SacTimeSeries.IB;
 
-        Quakeml quakeml = new QuakemlFactory().getQuakeml(SacHeadersTest.class.getResourceAsStream("quakeml_2732452.xml"));
+        Quakeml quakeml = new QuakemlFactory().getQuakeml(SacHeadersTest.class.getResourceAsStream("quakeml_2732452.xml"), null);
 
         sac = SacHeaders.setEventHeader(sac, quakeml);
 
@@ -273,7 +273,7 @@ public class SacHeadersTest {
 
     @Test
     public void testSetPhasePicks() throws Exception {
-        Quakeml quakeml = new QuakemlFactory().getQuakeml(SacHeadersTest.class.getResourceAsStream("quakeml_2732452.xml"));
+        Quakeml quakeml = new QuakemlFactory().getQuakeml(SacHeadersTest.class.getResourceAsStream("quakeml_2732452.xml"), null);
 
         SacTimeSeries sac = new SacTimeSeries();
         sac.knetwk = "NZ";

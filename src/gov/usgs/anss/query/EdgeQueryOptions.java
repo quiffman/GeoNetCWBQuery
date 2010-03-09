@@ -103,7 +103,6 @@ public class EdgeQueryOptions {
     public String pzunit = "nm";
     private Quakeml event = null;
     private ReadableDuration offset = null;
-    private static Matcher quakeMlUriMatcher = Pattern.compile("%ref%").matcher(QueryProperties.getGeoNetQuakeMlUri());
 
     /**
      * Parses known args into object fields. Does some argument validation and
@@ -658,9 +657,18 @@ public class EdgeQueryOptions {
                     } catch (JAXBException ex) {
                         Logger.getLogger(EdgeQueryOptions.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                }
+                } else {
+					// Assume it's a flagged authority's public ID.
+					Matcher quakeMlUriMatcher = Pattern.compile("%ref%").matcher(
+							QueryProperties.getQuakeMlUri(uri.getScheme()));
+					this.event = new QuakemlFactory().getQuakeml(
+							quakeMlUriMatcher.replaceAll(uri.getSchemeSpecificPart()),
+							null, null);
+				}
             } else {
-                // Not an absolute URI so assume it's the GeoNet public ID.
+                // Not an absolute URI so assume it's the default Authority's public ID.
+				Matcher quakeMlUriMatcher = Pattern.compile("%ref%").matcher(
+						QueryProperties.getQuakeMlUri("default"));
                 this.event = new QuakemlFactory().getQuakeml(
                         quakeMlUriMatcher.replaceAll(event),
                         null, null);

@@ -42,7 +42,7 @@ public class QueryProperties {
         return props.getString("usage");
     }
 
-    public static String getGeoNetQuakeMlUri() {
-        return props.getString("geonet-quakeml-uri");
+    public static String getQuakeMlUri(String authority) {
+        return props.getString(authority + ".quakeml-uri");
     }
 }

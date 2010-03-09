@@ -17,7 +17,7 @@ import nz.org.geonet.quakeml.v1_0_1.report.ArrivalPick;
  *
  * @author geoffc
  */
-class QuakeMLQuery {
+public class QuakeMLQuery {
 
     private static final Logger logger = Logger.getLogger(QuakeMLQuery.class.getName());
 

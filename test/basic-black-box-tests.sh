@@ -17,8 +17,6 @@ while getopts "hfqt:" opt; do
 	esac
 done
 
-echo "s$silence t$tmpdir f$force"
-
 test -d "$tmpdir" && test -z "$force" && read -p "Removing $tmpdir [y/N]: " confirm
 test -z "$force" && test "$confirm" = "y" && rm -rf $tmpdir
 
@@ -45,6 +43,7 @@ cat > $tmpdir/CWB.batch <<EOF
 -b "2009/01/01 00:00:00" -s "NZWLGT.BTZ40" -d 600 -t dcc -o $tmpdir/cwb-batch-test-6.out
 -b "2009/01/01 00:00:00" -s "NZWLGT.BTZ40" -d 600 -t dcc512 -o $tmpdir/cwb-batch-test-7.out
 -b "2009/01/01 00:00:00" -s "NZWLGT.BTZ40" -d 600 -t text -o $tmpdir/cwb-batch-test-8.out
+-event geonet:3266622 -s "NZAPZ..HHZ" -o $tmpdir/cwb-batch-test-9.out
 EOF
 
 # Test the rest via a batch file
@@ -74,6 +73,7 @@ e8b63d76a386cf34af723e6cb442ee7f  $tmpdir/NZWAZ__LNZ20-cwb-batch-test-3.out.pz
 757476816a0da1ec5922385a4b18987e  $tmpdir/cwb-batch-test-6.out
 3b103d7bcbb9ac99d6de26026fc93cf9  $tmpdir/cwb-batch-test-7.out
 a85e23dcf59c9426e58bf57e4022cc86  $tmpdir/cwb-batch-test-8.out
+c732f41bfb663286e9268e2107f89b64  $tmpdir/cwb-batch-test-9.out
 EOF
 
 md5sum -c $tmpdir/CWB.md5

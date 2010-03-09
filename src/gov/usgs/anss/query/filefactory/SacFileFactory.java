@@ -50,25 +50,23 @@ public class SacFileFactory {
 
     public void makeFiles(DateTime begin, double duration, String nsclSelectString, String mask, Integer fill, boolean gaps, boolean trim, String pzunit, Quakeml quakeml) {
         cwbServer.query(begin, duration, nsclSelectString);
-		if (cwbServer.hasNext()) {
-			do {
-				SacTimeSeries sac = makeTimeSeries(cwbServer.getNext(), begin, duration, fill, gaps, trim, quakeml);
-				if (sac != null) {
-					outputFile(sac, begin, mask, pzunit);
-				} else {
-					// TODO logger message about null data
-				}
-			} while (cwbServer.hasNext());
-		}
-		else {
-			logger.info(
-					String.format(
-					"No matching data for \"%s\", at begin time %s, duration %.2fs, on %s:%d",
-					nsclSelectString,
-					begin.toString("YYYY/MM/DD HH:mm:ss"), duration,
-					cwbServer.getHost(), cwbServer.getPort())
-					);
-		}
+        if (cwbServer.hasNext()) {
+            do {
+                SacTimeSeries sac = makeTimeSeries(cwbServer.getNext(), begin, duration, fill, gaps, trim, quakeml);
+                if (sac != null) {
+                    outputFile(sac, begin, mask, pzunit);
+                } else {
+                    // TODO logger message about null data
+                }
+            } while (cwbServer.hasNext());
+        } else {
+            logger.info(
+                    String.format(
+                    "No matching data for \"%s\", at begin time %s, duration %.2fs, on %s:%d",
+                    nsclSelectString,
+                    begin.toString("YYYY/MM/DD HH:mm:ss"), duration,
+                    cwbServer.getHost(), cwbServer.getPort()));
+        }
     }
 
     public SacTimeSeries makeTimeSeries(TreeSet<MiniSeed> miniSeed, DateTime begin, double duration, Integer fill, boolean gaps, boolean trim, Quakeml quakeml) {

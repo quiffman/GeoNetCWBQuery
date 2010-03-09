@@ -119,7 +119,7 @@ public class CWBDataServerMSEED implements CWBDataServer {
                 if (ex.getMessage() != null) {
                     if (ex.getMessage().indexOf("Connection refused") >= 0) {
                         logger.warning("Problem connecting to " + this.getHost() + ":" + this.getPort() + "  Either the server is down or there is an internet connection problem. " + "Will try again in 20 seconds.");
-            }
+                    }
                 } else {
                     logger.warning("Got IOError opening socket to server e=" + ex);
                 }
@@ -143,27 +143,25 @@ public class CWBDataServerMSEED implements CWBDataServer {
         }
 
         incomingMiniSEED = new LinkedBlockingQueue<MiniSeed>();
-		
-		// Get the first block
-		try {
-			MiniSeed ms = null;
-			if ((ms = read(inStream)) != null) {
-				// The logical inversion of the test to continue read in getNext.
-				if (ms.getIndicator().compareTo("D ") >= 0) {
-					newNSCL = NSCL.stringToNSCL(ms.getSeedName());
-					lastNSCL = newNSCL;
-					incomingMiniSEED.add(ms);
-				}
-				else {
-					logger.info("First block in query not data: " + ms);
-				}
-			}
-				else {
-					logger.info("Failed to read irst block in query.");
-				}
-		} catch (IOException ex) {
-			logger.log(Level.SEVERE, null, ex);
-		}
+
+        // Get the first block
+        try {
+            MiniSeed ms = null;
+            if ((ms = read(inStream)) != null) {
+                // The logical inversion of the test to continue read in getNext.
+                if (ms.getIndicator().compareTo("D ") >= 0) {
+                    newNSCL = NSCL.stringToNSCL(ms.getSeedName());
+                    lastNSCL = newNSCL;
+                    incomingMiniSEED.add(ms);
+                } else {
+                    logger.info("First block in query not data: " + ms);
+                }
+            } else {
+                logger.warning("Failed to read first block in query.");
+            }
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
     }
 	
 	/**

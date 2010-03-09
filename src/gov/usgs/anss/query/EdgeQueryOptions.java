@@ -18,12 +18,11 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.MissingResourceException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.xml.bind.JAXBException;
-import nz.org.geonet.quakeml.exception.InvalidQuakemlException;
 import nz.org.geonet.quakeml.v1_0_1.client.QuakemlFactory;
 import nz.org.geonet.quakeml.v1_0_1.client.QuakemlUtils;
 import nz.org.geonet.quakeml.v1_0_1.domain.Quakeml;
@@ -543,19 +542,9 @@ public class EdgeQueryOptions {
 
         if (begin != null) {
             return begin;
-        } else if (getEvent() != null) {
-            try {
-                quakeMLBegin = QuakemlUtils.getOriginTime(QuakemlUtils.getPreferredOrigin(QuakemlUtils.getFirstEvent(event)));
-            } catch (InvalidQuakemlException ex) {
-                Logger.getLogger(EdgeQueryOptions.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-            return quakeMLBegin;
-
-        // TODO: Fix this when fixing the command line single quotes.
-//				args = Arrays.copyOf(args, args.length + 2);
-//				args[args.length - 2] = "-b";
-//				args[args.length - 1] = begin;
+		} else if (getEvent() != null) {
+			quakeMLBegin = QuakemlUtils.getOriginTime(QuakemlUtils.getPreferredOrigin(QuakemlUtils.getFirstEvent(event)));
+			return quakeMLBegin;
         }
 
         return null;
@@ -623,7 +612,8 @@ public class EdgeQueryOptions {
      * an event to use.
      */
     public void setEvent(String event) {
-        URI uri = null;
+        String quakeMlSchemaUrl = null;
+		URI uri = null;
         try {
             uri = new URI(event);
         } catch (URISyntaxException ex) {
@@ -647,31 +637,38 @@ public class EdgeQueryOptions {
                     }
                     this.event = new QuakemlFactory().getQuakeml(
                             event,
+							quakeMlSchemaUrl,
                             username,
                             password);
                 } else if (uri.getScheme().equals("file")) {
                     try {
-                        this.event = new QuakemlFactory().getQuakeml(new FileInputStream(new File(uri)));
+                        this.event = new QuakemlFactory().getQuakeml(
+								new FileInputStream(new File(uri)),
+								quakeMlSchemaUrl);
                     } catch (FileNotFoundException ex) {
                         Logger.getLogger(EdgeQueryOptions.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (JAXBException ex) {
+                    } catch (Exception ex) {
                         Logger.getLogger(EdgeQueryOptions.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+					}
                 } else {
-					// Assume it's a flagged authority's public ID.
-					Matcher quakeMlUriMatcher = Pattern.compile("%ref%").matcher(
-							QueryProperties.getQuakeMlUri(uri.getScheme()));
-					this.event = new QuakemlFactory().getQuakeml(
-							quakeMlUriMatcher.replaceAll(uri.getSchemeSpecificPart()),
-							null, null);
+					String quakeMlUri = null;
+					try{
+						quakeMlUri = QueryProperties.getQuakeMlUri(uri.getScheme());
+					} catch (MissingResourceException ex) {
+						logger.warning("Couldn't find quakeML URI pattern for " + uri.getScheme());
+						// TODO: list available patterns?
+						logger.info("Known QuakeML authorities are: " +
+								QueryProperties.getQuakeMlAuthorities().toString());
+					}
+
+					if (quakeMlUri != null) {
+						// Assume it's a flagged authority's public ID.
+						Matcher quakeMlUriMatcher = Pattern.compile("%ref%").matcher(quakeMlUri);
+						this.event = new QuakemlFactory().getQuakeml(
+								quakeMlUriMatcher.replaceAll(uri.getSchemeSpecificPart()),
+								quakeMlSchemaUrl, null, null);
+					}
 				}
-            } else {
-                // Not an absolute URI so assume it's the default Authority's public ID.
-				Matcher quakeMlUriMatcher = Pattern.compile("%ref%").matcher(
-						QueryProperties.getQuakeMlUri("default"));
-                this.event = new QuakemlFactory().getQuakeml(
-                        quakeMlUriMatcher.replaceAll(event),
-                        null, null);
             }
         }
 

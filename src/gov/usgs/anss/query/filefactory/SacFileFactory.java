@@ -64,7 +64,7 @@ public class SacFileFactory {
                     String.format(
                     "No matching data for \"%s\", at begin time %s, duration %.2fs, on %s:%d",
                     nsclSelectString,
-                    begin.toString("YYYY/MM/DD HH:mm:ss"), duration,
+                    begin.toString("YYYY/MM/dd HH:mm:ss"), duration,
                     cwbServer.getHost(), cwbServer.getPort()));
         }
     }

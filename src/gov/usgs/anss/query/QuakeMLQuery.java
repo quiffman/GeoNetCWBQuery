@@ -78,7 +78,7 @@ public class QuakeMLQuery {
                         location = (pick.getPick().getWaveformID().getLocationCode().trim() + "  ").substring(0, 2);
                     }
 
-                    logger.info(String.format("Pick:%s,%s,%s,%s,%s,%s.", phaseName, arrivalTime, network, station, channel, location));
+                    logger.fine(String.format("Pick:%s,%s,%s,%s,%s,%s.", phaseName, arrivalTime, network, station, channel, location));
 
                     nscls.add(new NSCL(network, station, channel, location));
 

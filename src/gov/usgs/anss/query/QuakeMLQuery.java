@@ -50,7 +50,7 @@ public class QuakeMLQuery {
         List<NSCL> nscls = new ArrayList<NSCL>();
 
         if (picks != null && !picks.isEmpty()) {
-            logger.info("Found picks in the quakeml.");
+            logger.fine("Found picks in the quakeml.");
 
             for (ArrivalPick pick : picks) {
 

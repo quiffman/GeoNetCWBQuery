@@ -483,7 +483,20 @@ public class EdgeQueryOptions {
      * @return the seedname
      */
     public String getSeedname() {
-        return seedname;
+        if (seedname == null) {
+			if (getEvent() != null) {
+				List<NSCL> nscls = QuakeMLQuery.getPhases(getEvent());
+				if (!nscls.isEmpty()) {
+					StringBuffer sb = new StringBuffer(nscls.size() * 13);
+					for (NSCL nscl : nscls) {
+						sb.append(nscl.toString()).append('|');
+					}
+					sb.setLength(sb.length() - 1);
+					return sb.toString();
+				}
+			}
+		}
+		return seedname;
     }
 
     /**
@@ -544,10 +557,9 @@ public class EdgeQueryOptions {
             return begin;
 		} else if (getEvent() != null) {
 			quakeMLBegin = QuakemlUtils.getOriginTime(QuakemlUtils.getPreferredOrigin(QuakemlUtils.getFirstEvent(event)));
-			return quakeMLBegin;
         }
 
-        return null;
+        return quakeMLBegin;
     }
 
     /**

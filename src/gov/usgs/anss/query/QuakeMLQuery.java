@@ -73,7 +73,7 @@ public class QuakeMLQuery {
                     String station = (pick.getPick().getWaveformID().getStationCode() + "     ").substring(0, 5);
                     String channel = (pick.getPick().getWaveformID().getChannelCode() + "   ").substring(0, 3);
 
-                    String location = "  ";
+                    String location = "..";
                     if (pick.getPick().getWaveformID().getLocationCode() != null) {
                         location = (pick.getPick().getWaveformID().getLocationCode() + "  ").substring(0, 2);
                     }

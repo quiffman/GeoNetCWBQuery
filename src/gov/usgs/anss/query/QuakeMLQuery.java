@@ -69,13 +69,13 @@ public class QuakeMLQuery {
                         pick.getPick().getWaveformID().getStationCode() != null &&
                         pick.getPick().getWaveformID().getChannelCode() != null) {
 
-                    String network = (pick.getPick().getWaveformID().getNetworkCode() + "  ").substring(0, 2);
-                    String station = (pick.getPick().getWaveformID().getStationCode() + "     ").substring(0, 5);
-                    String channel = (pick.getPick().getWaveformID().getChannelCode() + "   ").substring(0, 3);
+                    String network = (pick.getPick().getWaveformID().getNetworkCode().trim() + "  ").substring(0, 2);
+                    String station = (pick.getPick().getWaveformID().getStationCode().trim() + "     ").substring(0, 5);
+                    String channel = (pick.getPick().getWaveformID().getChannelCode().trim() + "   ").substring(0, 3);
 
                     String location = "..";
                     if (pick.getPick().getWaveformID().getLocationCode() != null) {
-                        location = (pick.getPick().getWaveformID().getLocationCode() + "  ").substring(0, 2);
+                        location = (pick.getPick().getWaveformID().getLocationCode().trim() + "  ").substring(0, 2);
                     }
 
                     logger.info(String.format("Pick:%s,%s,%s,%s,%s,%s.", phaseName, arrivalTime, network, station, channel, location));

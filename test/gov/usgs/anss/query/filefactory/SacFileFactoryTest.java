@@ -7,6 +7,7 @@ package gov.usgs.anss.query.filefactory;
 import gov.usgs.anss.query.cwb.data.CWBDataServerMSEEDMock;
 import edu.sc.seis.TauP.SacTimeSeries;
 import edu.sc.seis.TauP.SacTimeSeriesTestUtil;
+import gov.usgs.anss.query.EdgeQueryOptions.CustomEvent;
 import gov.usgs.anss.query.metadata.MetaDataServerMock;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,7 +46,11 @@ public class SacFileFactoryTest {
                         new Integer(-12345), //fill
                         true, //gaps
                         true, //trim
-                        null //quakml
+                        null, //quakml
+						false, //picks
+						null, //customEvent
+						null, //synthetic
+						false //extendedPhases
                     },
                     { // No meta-data
                         new CWBDataServerMSEEDMock("dummy", 666),
@@ -58,7 +63,11 @@ public class SacFileFactoryTest {
                         new Integer(-12345), //fill
                         true, //gaps
                         true, //trim
-                        null //quakml
+                        null, //quakml
+						false, //picks
+						null, //customEvent
+						null, //synthetic
+						false //extendedPhases
                     },
                     { // No sac if gaps - shouldn't be any
 
@@ -78,7 +87,11 @@ public class SacFileFactoryTest {
                         new Integer(-12345), //fill
                         false, //gaps
                         true, //trim
-                        null //quakml
+                        null, //quakml
+						false, //picks
+						null, //customEvent
+						null, //synthetic
+						false //extendedPhases
                     },
                     { // MS has gaps should produce null sac.
                         new CWBDataServerMSEEDMock("dummy", 666),
@@ -94,7 +107,11 @@ public class SacFileFactoryTest {
                         new Integer(-12345), //fill
                         false, //gaps
                         true, //trim
-                        null //quakml
+                        null, //quakml
+						false, //picks
+						null, //customEvent
+						null, //synthetic
+						false //extendedPhases
                     },
                     { // MS has gaps but we allow them in the sac.
                         new CWBDataServerMSEEDMock("dummy", 666),
@@ -110,7 +127,11 @@ public class SacFileFactoryTest {
                         new Integer(-12345), //fill
                         true, //gaps
                         true, //trim
-                        null //quakml
+                        null, //quakml
+						false, //picks
+						null, //customEvent
+						null, //synthetic
+						false //extendedPhases
                     }, { // Event data.
                         new CWBDataServerMSEEDMock("dummy", 666),
                         new MetaDataServerMock("dummy", 666),
@@ -125,7 +146,11 @@ public class SacFileFactoryTest {
                         new Integer(-12345), //fill
                         true, //gaps
                         true, //trim
-                        new QuakemlFactory().getQuakeml(SacFileFactoryTest.class.getResourceAsStream("/gov/usgs/anss/query/filefactory/quakeml_2732452.xml"), null) //quakml
+                        new QuakemlFactory().getQuakeml(SacFileFactoryTest.class.getResourceAsStream("/gov/usgs/anss/query/filefactory/quakeml_2732452.xml"), null), //quakml
+						true, //picks
+						null, //customEvent
+						null, //synthetic
+						false //extendedPhases
                     },});
 
     }
@@ -140,10 +165,15 @@ public class SacFileFactoryTest {
     private boolean trim;
     private Quakeml quakeml;
     private boolean gaps;
+	private boolean picks;
+	private CustomEvent customEvent;
+	private String synthetic;
+	private boolean extendedPhases;
+
     private ArrayList<SacTimeSeries> expectedSac;
     private Iterator<SacTimeSeries> expectedSacIter;
 
-    public SacFileFactoryTest(CWBDataServerMSEEDMock cwbServer, MetaDataServerMock mdServer, String[] mseedFiles, String[] pazFiles, String[] expectedSacFiles, DateTime begin, double duration, Integer fill, boolean gaps, boolean trim, Quakeml quakeml) throws Exception {
+    public SacFileFactoryTest(CWBDataServerMSEEDMock cwbServer, MetaDataServerMock mdServer, String[] mseedFiles, String[] pazFiles, String[] expectedSacFiles, DateTime begin, double duration, Integer fill, boolean gaps, boolean trim, Quakeml quakeml, boolean picks, CustomEvent customEvent, String synthetic, boolean extendedPhases) throws Exception {
         this.cwbServer = cwbServer;
         this.mdServer = mdServer;
         this.mseedFiles = mseedFiles;
@@ -155,6 +185,10 @@ public class SacFileFactoryTest {
         this.trim = trim;
         this.quakeml = quakeml;
         this.gaps = gaps;
+		this.picks = picks;
+		this.customEvent = customEvent;
+		this.synthetic = synthetic;
+		this.extendedPhases = extendedPhases;
 
         expectedSac =
                 new ArrayList<SacTimeSeries>();
@@ -203,7 +237,26 @@ public class SacFileFactoryTest {
         while (expectedSacIter.hasNext()) {
 
             SacTimeSeries expResult = expectedSacIter.next();
-            SacTimeSeries result = sacFileFactory.makeTimeSeries(cwbServer.getNext(), begin, duration, fill, gaps, trim, quakeml);
+            SacTimeSeries result = sacFileFactory.makeTimeSeries(cwbServer.getNext(), begin, duration, fill, gaps, trim);
+			
+			if (quakeml != null) {
+				SacHeaders.setEventHeader(result, quakeml);
+				if (picks) {
+					SacHeaders.setPhasePicks(result, quakeml);
+				}
+			}
+			if (customEvent != null) {
+				SacHeaders.setEventHeader(
+						result,
+						customEvent.getEventTime(),
+						customEvent.getEventLat(),
+						customEvent.getEventLon(),
+						customEvent.getEventDepth(),
+						customEvent.getEventMag(),
+						customEvent.getEventMagType().magNum(),
+						customEvent.getEventType().eventTypeNum());
+			}
+
 
             if (expResult == null) {
                 assertEquals("expected null", result, null);

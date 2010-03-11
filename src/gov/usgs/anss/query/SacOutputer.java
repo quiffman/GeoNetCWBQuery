@@ -55,6 +55,9 @@ public class SacOutputer extends Outputer {
 				this.gaps = false;
 			}
 			if (options.extraArgs.get(i).equals("-nometa")) {
+				if (options.getSynthetic() != null) {
+					logger.severe("Synthetic phase calculations require the use of a MetaData server.");
+				}
 				this.sacFF.setMetaDataServer(null);
 			}
 			if (options.extraArgs.get(i).equals("-sactrim")) {
@@ -73,7 +76,11 @@ public class SacOutputer extends Outputer {
 				this.gaps,
 				this.trim,
 				(options.sacpz ? options.pzunit : null),
-				options.getEvent());
+				options.getEvent(),
+				options.picks,
+				options.getCustomEvent(),
+				options.getSynthetic(),
+				options.extendedPhases);
 	}
 
 	public void makeFile(NSCL nscl, String filename,

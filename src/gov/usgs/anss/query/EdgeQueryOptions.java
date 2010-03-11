@@ -5,6 +5,8 @@
 package gov.usgs.anss.query;
 
 import gov.usgs.anss.query.cwb.formatter.CWBQueryFormatter;
+import gov.usgs.anss.query.filefactory.SacHeaders.SacEventType;
+import gov.usgs.anss.query.filefactory.SacHeaders.SacMagType;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -102,6 +104,13 @@ public class EdgeQueryOptions {
     public String pzunit = "nm";
     private Quakeml event = null;
     private ReadableDuration offset = null;
+	
+	public boolean picks = true;
+	
+	private String synthetic = null;
+	public boolean extendedPhases = false;
+	
+	private CustomEvent customEvent = null;
 
     /**
      * Parses known args into object fields. Does some argument validation and
@@ -201,6 +210,38 @@ public class EdgeQueryOptions {
             } else if (args[i].equals("-offset")) {
                 setOffset(Double.parseDouble(args[i + 1]));
                 i++;
+			} else if (args[i].equals("-nopicks")) {
+				picks = false;
+				i++;
+			} else if (args[i].startsWith("-synthetic")) {
+                String[] a = args[i].split(":");
+				if (a.length == 2) {
+					setSynthetic(a[1]);
+				} else {
+					setSynthetic("iasp91");
+				}
+				i++;
+			} else if (args[i].equals("-extended-phases")) {
+				extendedPhases = true;
+				i++;
+			} else if (args[i].startsWith("-event:")) {
+				if (getCustomEvent() == null) {
+					setCustomEvent(new CustomEvent());
+				}
+			} else if (args[i].equals("-event:time")) {
+				getCustomEvent().setEventTime(args[++i]);
+			} else if (args[i].equals("-event:lat")) {
+				getCustomEvent().setEventLat(args[++i]);
+			} else if (args[i].equals("-event:lon")) {
+				getCustomEvent().setEventLon(args[++i]);
+			} else if (args[i].equals("-event:depth")) {
+				getCustomEvent().setEventDepth(args[++i]);
+			} else if (args[i].equals("-event:mag")) {
+				getCustomEvent().setEventMag(args[++i]);
+			} else if (args[i].equals("-event:magtype")) {
+				getCustomEvent().setEventMagType(args[++i]);
+			} else if (args[i].equals("-event:type")) {
+				getCustomEvent().setEventType(args[++i]);
             } else {
                 logger.info("Unknown CWB Query argument=" + args[i]);
                 extraArgsList.add(args[i]);
@@ -209,6 +250,34 @@ public class EdgeQueryOptions {
         }
         return extraArgsList;
     }
+
+	/**
+	 * @return the synthetic
+	 */
+	public String getSynthetic() {
+		return synthetic;
+	}
+
+	/**
+	 * @param synthetic the synthetic to set
+	 */
+	public void setSynthetic(String synthetic) {
+		this.synthetic = synthetic;
+	}
+
+	/**
+	 * @return the customEvent
+	 */
+	public CustomEvent getCustomEvent() {
+		return customEvent;
+	}
+
+	/**
+	 * @param customEvent the customEvent to set
+	 */
+	public void setCustomEvent(CustomEvent customEvent) {
+		this.customEvent = customEvent;
+	}
 
     /**
      * Return true if the arguments specified a batch file.
@@ -246,6 +315,11 @@ public class EdgeQueryOptions {
             logger.severe("-msb must be 512 or 4096 and is only meaningful for msz type");
             return false;
         }
+
+		if (getEvent() != null && getCustomEvent() != null) {
+			logger.severe("quakeML event cannot be used in conjunction with custom event parameters.");
+			return false;
+		}
 
         if (getBegin() == null) {
             logger.severe("You must enter a beginning time");
@@ -688,4 +762,181 @@ public class EdgeQueryOptions {
             logger.severe("failed to retrieve details for event string " + event);
         }
     }
+
+	public class CustomEvent {
+
+		private DateTime eventTime = null;
+		private Double eventLat = null;
+		private Double eventLon = null;
+		private Double eventDepth = null;
+		private Double eventMag = null;
+		private SacMagType eventMagType = null;
+		private SacEventType eventType = null;
+
+		/**
+		 * @return the eventTime
+		 */
+		public DateTime getEventTime() {
+			return eventTime;
+		}
+
+		/**
+		 * @param eventTime the eventTime to set
+		 */
+		public void setEventTime(DateTime eventTime) {
+			this.eventTime = eventTime;
+		}
+
+		/**
+		 * @param eventTime the eventTime to set
+		 */
+		public void setEventTime(String eventTime) throws IllegalArgumentException {
+			this.eventTime = null;
+
+			try {
+				this.eventTime = parseBeginFormat.parseDateTime(eventTime);
+			} catch (Exception e) {
+			}
+
+			if (eventTime == null) {
+				try {
+					this.eventTime = parseBeginFormatDoy.parseDateTime(eventTime);
+				} catch (Exception e) {
+				}
+			}
+
+			// TODO Would be ideal if this error contained any range errors from
+			// parseDateTime but this is hard with the two attempts at parsing.
+			if (eventTime == null) {
+				throw new IllegalArgumentException("Error parsing begin time.  Allowable formats " +
+						"are: " + beginFormat + " or " + beginFormatDoy);
+			}
+		}
+
+		/**
+		 * @return the eventLat
+		 */
+		public Double getEventLat() {
+			return eventLat;
+		}
+
+		/**
+		 * @param eventLat the eventLat to set
+		 */
+		public void setEventLat(Double eventLat) {
+			this.eventLat = eventLat;
+		}
+
+		/**
+		 * @param eventLat the eventLat to set
+		 */
+		public void setEventLat(String eventLat) {
+			setEventLat(Double.parseDouble(eventLat));
+		}
+
+		/**
+		 * @return the eventLon
+		 */
+		public Double getEventLon() {
+			return eventLon;
+		}
+
+		/**
+		 * @param eventLon the eventLon to set
+		 */
+		public void setEventLon(Double eventLon) {
+			this.eventLon = eventLon;
+		}
+
+		/**
+		 * @param eventLat the eventLat to set
+		 */
+		public void setEventLon(String eventLon) {
+			setEventLon(Double.parseDouble(eventLon));
+		}
+
+		/**
+		 * @return the eventDepth
+		 */
+		public Double getEventDepth() {
+			return eventDepth;
+		}
+
+		/**
+		 * @param eventDepth the eventDepth to set
+		 */
+		public void setEventDepth(Double eventDepth) {
+			this.eventDepth = eventDepth;
+		}
+
+		/**
+		 * @param eventDepth the eventDepth to set
+		 */
+		public void setEventDepth(String eventDepth) {
+			setEventDepth(Double.parseDouble(eventDepth));
+		}
+
+		/**
+		 * @return the eventMag
+		 */
+		public Double getEventMag() {
+			return eventMag;
+		}
+
+		/**
+		 * @param eventMag the eventMag to set
+		 */
+		public void setEventMag(Double eventMag) {
+			this.eventMag = eventMag;
+		}
+
+		/**
+		 * @param eventMag the eventMag to set
+		 */
+		public void setEventMag(String eventMag) {
+			setEventMag(Double.parseDouble(eventMag));
+		}
+
+		/**
+		 * @return the eventMagType
+		 */
+		public SacMagType getEventMagType() {
+			return eventMagType;
+		}
+
+		/**
+		 * @param eventMagType the eventMagType to set
+		 */
+		public void setEventMagType(SacMagType eventMagType) {
+			this.eventMagType = eventMagType;
+		}
+
+		/**
+		 * @param eventMagType the eventMagType to set
+		 */
+		public void setEventMagType(String eventMagType) {
+			setEventMagType(SacMagType.valueOf(eventMagType));
+		}
+
+		/**
+		 * @return the eventType
+		 */
+		public SacEventType getEventType() {
+			return eventType;
+		}
+
+		/**
+		 * @param eventType the eventType to set
+		 */
+		public void setEventType(SacEventType eventType) {
+			this.eventType = eventType;
+		}
+
+		/**
+		 * @param eventType the eventType to set
+		 */
+		public void setEventType(String eventType) {
+			setEventType(SacEventType.valueOf(eventType));
+		}
+	}
 }

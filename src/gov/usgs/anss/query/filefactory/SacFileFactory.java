@@ -5,6 +5,7 @@
 package gov.usgs.anss.query.filefactory;
 
 import edu.sc.seis.TauP.SacTimeSeries;
+import gov.usgs.anss.query.EdgeQueryOptions.CustomEvent;
 import gov.usgs.anss.query.NSCL;
 import gov.usgs.anss.query.ZeroFilledSpan;
 import gov.usgs.anss.query.cwb.data.CWBDataServer;
@@ -57,7 +58,11 @@ public class SacFileFactory {
 			boolean gaps,
 			boolean trim,
 			String pzunit,
-			Quakeml quakeml) {
+			Quakeml quakeml,
+			boolean picks,
+			CustomEvent customEvent,
+			String synthetic,
+			boolean extendedPhases) {
         cwbServer.query(begin, duration, nsclSelectString);
         if (cwbServer.hasNext()) {
             do {

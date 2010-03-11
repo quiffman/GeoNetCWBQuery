@@ -72,9 +72,38 @@ public class SacFileFactory {
 						duration,
 						fill,
 						gaps,
-						trim,
-						quakeml);
+						trim);
                 if (sac != null) {
+					if (quakeml != null) {
+						SacHeaders.setEventHeader(sac, quakeml);
+						if (picks) {
+							if (synthetic == null) {
+								SacHeaders.setPhasePicks(sac, quakeml);
+							} else {
+								SacHeaders.setPhasePicks(sac, quakeml, extendedPhases, synthetic);
+							}
+						} else {
+							if (synthetic != null) {
+								SacHeaders.setPhasePicks(sac, extendedPhases, synthetic);
+							}
+						}
+					} else {
+						if (customEvent != null) {
+							SacHeaders.setEventHeader(
+									sac,
+									customEvent.getEventTime(),
+									customEvent.getEventLat(),
+									customEvent.getEventLon(),
+									customEvent.getEventDepth(),
+									customEvent.getEventMag(),
+									customEvent.getEventMagType().magNum(),
+									customEvent.getEventType().eventTypeNum());
+						}
+						if (synthetic != null) {
+							SacHeaders.setPhasePicks(sac, extendedPhases, synthetic);
+						}
+					}
+
                     outputFile(sac, begin, mask, pzunit);
                 } else {
                     // TODO logger message about null data
@@ -96,8 +125,7 @@ public class SacFileFactory {
 			double duration,
 			Integer fill,
 			boolean gaps,
-			boolean trim,
-			Quakeml quakeml) {
+			boolean trim) {
         // This logic isn't strictly the same as SacOutputter.
         if (!gaps && fill == null) {
             fill = 2147000000;
@@ -174,16 +202,11 @@ public class SacFileFactory {
             }
         }
 
-        if (metaDataServer != null) {
-            MetaDataQuery mdq = new MetaDataQuery(metaDataServer);
-            ChannelMetaData md = mdq.getChannelMetaData(nscl, begin);
-            sac = SacHeaders.setChannelHeader(sac, md);
-        }
-
-        if (quakeml != null) {
-            SacHeaders.setEventHeader(sac, quakeml);
-            SacHeaders.setPhasePicks(sac, quakeml);
-        }
+		if (metaDataServer != null) {
+			MetaDataQuery mdq = new MetaDataQuery(metaDataServer);
+			ChannelMetaData md = mdq.getChannelMetaData(nscl, begin);
+			sac = SacHeaders.setChannelHeader(sac, md);
+		}
 
         return sac;
     }

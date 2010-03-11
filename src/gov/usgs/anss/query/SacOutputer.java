@@ -65,7 +65,15 @@ public class SacOutputer extends Outputer {
 	
 	public void doQuery() {
 		sacFF.makeFiles(
-				options.getBeginWithOffset(), options.getDuration(), options.getSeedname(), options.filemask, this.fill, this.gaps, this.trim, (options.sacpz ? options.pzunit : null), options.getEvent());
+				options.getBeginWithOffset(),
+				options.getDuration(),
+				options.getSeedname(),
+				options.filemask,
+				this.fill,
+				this.gaps,
+				this.trim,
+				(options.sacpz ? options.pzunit : null),
+				options.getEvent());
 	}
 
 	public void makeFile(NSCL nscl, String filename,

@@ -48,7 +48,16 @@ public class SacFileFactory {
         this.metaDataServer = metaDataServer;
     }
 
-    public void makeFiles(DateTime begin, double duration, String nsclSelectString, String mask, Integer fill, boolean gaps, boolean trim, String pzunit, Quakeml quakeml) {
+    public void makeFiles(
+			DateTime begin,
+			double duration,
+			String nsclSelectString,
+			String mask,
+			Integer fill,
+			boolean gaps,
+			boolean trim,
+			String pzunit,
+			Quakeml quakeml) {
         cwbServer.query(begin, duration, nsclSelectString);
         if (cwbServer.hasNext()) {
             do {
@@ -69,7 +78,14 @@ public class SacFileFactory {
         }
     }
 
-    public SacTimeSeries makeTimeSeries(TreeSet<MiniSeed> miniSeed, DateTime begin, double duration, Integer fill, boolean gaps, boolean trim, Quakeml quakeml) {
+    public SacTimeSeries makeTimeSeries(
+			TreeSet<MiniSeed> miniSeed,
+			DateTime begin,
+			double duration,
+			Integer fill,
+			boolean gaps,
+			boolean trim,
+			Quakeml quakeml) {
         // This logic isn't strictly the same as SacOutputter.
         if (!gaps && fill == null) {
             fill = 2147000000;
@@ -162,7 +178,11 @@ public class SacFileFactory {
 
 
     // TODO: move the getSACResponse to outputPZ or something.
-    protected void outputFile(SacTimeSeries timeSeries, DateTime begin, String mask, String pzunit) {
+    protected void outputFile(
+			SacTimeSeries timeSeries,
+			DateTime begin,
+			String mask,
+			String pzunit) {
 
 		NSCL nscl = new NSCL(timeSeries.knetwk,
 				timeSeries.kstnm,

@@ -61,7 +61,14 @@ public class SacFileFactory {
         cwbServer.query(begin, duration, nsclSelectString);
         if (cwbServer.hasNext()) {
             do {
-                SacTimeSeries sac = makeTimeSeries(cwbServer.getNext(), begin, duration, fill, gaps, trim, quakeml);
+                SacTimeSeries sac = makeTimeSeries(
+						cwbServer.getNext(),
+						begin,
+						duration,
+						fill,
+						gaps,
+						trim,
+						quakeml);
                 if (sac != null) {
                     outputFile(sac, begin, mask, pzunit);
                 } else {

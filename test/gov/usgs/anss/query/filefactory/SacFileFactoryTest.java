@@ -6,12 +6,8 @@ package gov.usgs.anss.query.filefactory;
 
 import edu.sc.seis.TauP.SacTimeSeries;
 import edu.sc.seis.TauP.SacTimeSeriesTestUtil;
-import gov.usgs.anss.query.EdgeQueryOptions;
 import gov.usgs.anss.query.CustomEvent;
-import gov.usgs.anss.query.cwb.data.CWBDataServerMSEED;
 import gov.usgs.anss.query.cwb.data.CWBDataServerMSEEDMock;
-import gov.usgs.anss.query.metadata.MetaDataServer;
-import gov.usgs.anss.query.metadata.MetaDataServerImpl;
 import gov.usgs.anss.query.metadata.MetaDataServerMock;
 import java.io.File;
 import java.util.ArrayList;

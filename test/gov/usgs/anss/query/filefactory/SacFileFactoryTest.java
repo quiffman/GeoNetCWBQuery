@@ -292,7 +292,7 @@ public class SacFileFactoryTest {
      * See also SacFileFactoryTest which runs against mocks.
      */
     @Test
-    public void testMakeTimeSeries() throws Exception {
+    public void testMakeFiles() throws Exception {
 
         cwbServer.loadMSEEDFiles(mseedFiles);
 

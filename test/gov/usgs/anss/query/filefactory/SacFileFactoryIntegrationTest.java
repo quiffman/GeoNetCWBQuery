@@ -6,7 +6,7 @@ package gov.usgs.anss.query.filefactory;
 
 import edu.sc.seis.TauP.SacTimeSeries;
 import edu.sc.seis.TauP.SacTimeSeriesTestUtil;
-import gov.usgs.anss.query.EdgeQueryOptions.CustomEvent;
+import gov.usgs.anss.query.CustomEvent;
 import gov.usgs.anss.query.cwb.data.CWBDataServerMSEED;
 import gov.usgs.anss.query.metadata.MetaDataServer;
 import gov.usgs.anss.query.metadata.MetaDataServerImpl;

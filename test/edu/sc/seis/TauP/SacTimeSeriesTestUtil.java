@@ -144,10 +144,10 @@ public class SacTimeSeriesTestUtil {
         assertEquals("Azimuth", expected.cmpaz, result.cmpaz, 0.0);
         assertEquals("Inc", expected.cmpinc, result.cmpinc, 0.0);
 
-        assertEquals("lat", expected.evla, result.evla, Math.ulp((float) result.evla));
-        assertEquals("lon", expected.evlo, result.evlo, Math.ulp((float) result.evlo));
-        assertEquals("dep", expected.evdp, result.evdp, Math.ulp((float) result.evdp));
-        assertEquals("mag", expected.mag, result.mag, Math.ulp((float) result.mag));
+        assertEquals("event lat", expected.evla, result.evla, Math.ulp((float) result.evla));
+        assertEquals("event lon", expected.evlo, result.evlo, Math.ulp((float) result.evlo));
+        assertEquals("event dep", expected.evdp, result.evdp, Math.ulp((float) result.evdp));
+        assertEquals("event mag", expected.mag, result.mag, Math.ulp((float) result.mag));
         assertEquals("imagtyp", expected.imagtyp, result.imagtyp);
         assertEquals("ievtyp", expected.ievtyp, result.ievtyp);
         assertEquals("lcalda", expected.lcalda, result.lcalda);

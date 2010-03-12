@@ -5,7 +5,7 @@
 package gov.usgs.anss.query.filefactory;
 
 import edu.sc.seis.TauP.SacTimeSeries;
-import gov.usgs.anss.query.EdgeQueryOptions.CustomEvent;
+import gov.usgs.anss.query.CustomEvent;
 import gov.usgs.anss.query.NSCL;
 import gov.usgs.anss.query.ZeroFilledSpan;
 import gov.usgs.anss.query.cwb.data.CWBDataServer;

@@ -205,7 +205,7 @@ public class SacFileFactoryTest {
                         true, // output expected
                         new String[]{
                             "/test-data/gov/usgs/anss/query/filefactory/event/NZTSZ__HHN10.ms"},
-                            new String[]{"NZTSZ  HHN10"},
+                        new String[]{"NZTSZ  HHN10"},
                         new String[]{
                             "/test-data/gov/usgs/anss/query/filefactory/event/NZTSZ__HHN10.sac.pz"},
                         new String[]{"/gov/usgs/anss/query/filefactory/event/200705120730.TSZ.HHN.10.NZ.sac"},
@@ -347,56 +347,7 @@ public class SacFileFactoryTest {
                 expResult = SacTimeSeriesTestUtil.loadSacTimeSeriesFromClasspath(filename);
                 result = new SacTimeSeries();
                 result.read(expectedSacFileName);
-
-                assertEquals("length ", result.y.length, expResult.y.length);
-
-                for (int i = 0; i < result.y.length; i++) {
-                    assertEquals("data " + i, result.y[i], expResult.y[i], 0.0);
-                }
-
-                assertEquals("nvhdr", result.nvhdr, expResult.nvhdr);
-                assertEquals("b", result.b, expResult.b, 0.01);
-                assertEquals("e", result.e, expResult.e, 0.01);
-                assertEquals("iftype", result.iftype, expResult.iftype);
-                assertEquals("leven", result.leven, expResult.leven);
-                assertEquals("delta", result.delta, expResult.delta, 0.001);  // Slight discrepancy
-                assertEquals("depmin", result.depmin, expResult.depmin, 0.0);
-                assertEquals("depmax", result.depmax, expResult.depmax, 0.0);
-
-                assertEquals("nzyear", result.nzyear, expResult.nzyear);
-                assertEquals("nzjday", result.nzjday, expResult.nzjday);
-                assertEquals("nzhour", result.nzhour, expResult.nzhour);
-                assertEquals("nzmin", result.nzmin, expResult.nzmin);
-                assertEquals("nzsec", result.nzsec, expResult.nzsec);
-                assertEquals("nzmsec", result.nzmsec, expResult.nzmsec, 2);
-
-                assertEquals("iztype", result.iztype, expResult.iztype);
-
-                assertEquals("knetwk", result.knetwk, expResult.knetwk);
-                assertEquals("kstnm", result.kstnm, expResult.kstnm);
-                assertEquals("kcmpn", result.kcmpnm, expResult.kcmpnm);
-                assertEquals("khole", result.khole, expResult.khole);
-
-                assertEquals("Lat", result.stla, expResult.stla, 0.00001);
-                assertEquals("Lon", result.stlo, expResult.stlo, 0.00001);
-                assertEquals("Elev", result.stel, expResult.stel, 0.0);
-                assertEquals("Depth", result.stdp, expResult.stdp, 0.0);
-                assertEquals("Azimuth", result.cmpaz, expResult.cmpaz, 0.0);
-                assertEquals("Inc", result.cmpinc, expResult.cmpinc, 0.0);
-
-                if (quakeml != null) {
-                    assertEquals("lat", result.evla, expResult.evla, 0.00001);
-                    assertEquals("lon", result.evlo, expResult.evlo, 0.00001);
-                    assertEquals("dep", result.evdp, expResult.evdp, 0.1);
-                    assertEquals("mag", result.mag, expResult.mag, 0.001);
-                    assertEquals("imagtyp", result.imagtyp, expResult.imagtyp);
-                    assertEquals("ievtyp", result.ievtyp, expResult.ievtyp);
-                    assertEquals("lcalda", result.lcalda, expResult.lcalda);
-
-                    assertEquals("Phase ", result.kt0, expResult.kt0.trim());
-                    assertEquals("Phase t", result.t0, expResult.t0, 0.001);
-                }
-
+                SacTimeSeriesTestUtil.compareSacTimeSeries(result, expResult);
             }
         }
     }

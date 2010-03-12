@@ -55,10 +55,10 @@ public class SacFileFactoryIntegrationTest {
                         true, // paz files expected
                         new String[]{"/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHZ10.sac.pz", "/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHN10.sac.pz", "/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHE10.sac.pz"},
                         null, //quakml
-						false, //picks
-						null, //customEvent
-						null, //synthetic
-						false //extendedPhases
+                        false, //picks
+                        null, //customEvent
+                        null, //synthetic
+                        false //extendedPhases
                     },
                     { // Will have metadata but no paz files due to null unit.
                         new CWBDataServerMSEED("cwb.geonet.org.nz", 80),
@@ -76,10 +76,10 @@ public class SacFileFactoryIntegrationTest {
                         false, // paz files expected
                         new String[]{"/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHZ10.sac.pz", "/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHN10.sac.pz", "/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHE10.sac.pz"},
                         null, //quakml
-						false, //picks
-						null, //customEvent
-						null, //synthetic
-						false //extendedPhases
+                        false, //picks
+                        null, //customEvent
+                        null, //synthetic
+                        false //extendedPhases
                     },
                     { // No meta-data
                         new CWBDataServerMSEED("cwb.geonet.org.nz", 80),
@@ -97,10 +97,10 @@ public class SacFileFactoryIntegrationTest {
                         false, // paz files expected
                         new String[]{"null"},
                         null, //quakml
-						false, //picks
-						null, //customEvent
-						null, //synthetic
-						false //extendedPhases
+                        false, //picks
+                        null, //customEvent
+                        null, //synthetic
+                        false //extendedPhases
                     },
                     { // No sac if gaps - shouldn't be any
                         new CWBDataServerMSEED("cwb.geonet.org.nz", 80),
@@ -120,10 +120,10 @@ public class SacFileFactoryIntegrationTest {
                             "/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHZ10.sac.pz",
                             "/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHN10.sac.pz", "/test-data/gov/usgs/anss/query/filefactory/no-gaps/NZMRZ__HHE10.sac.pz"},
                         null, //quakml
-						false, //picks
-						null, //customEvent
-						null, //synthetic
-						false //extendedPhases
+                        false, //picks
+                        null, //customEvent
+                        null, //synthetic
+                        false //extendedPhases
                     },
                     { // MS has gaps should produce null sac.
                         new CWBDataServerMSEED("cwb.geonet.org.nz", 80),
@@ -142,10 +142,10 @@ public class SacFileFactoryIntegrationTest {
                         new String[]{
                             "/test-data/gov/usgs/anss/query/filefactory/gaps/NZBFZ__HHE10.sac.pz",},
                         null, //quakml
-						false, //picks
-						null, //customEvent
-						null, //synthetic
-						false //extendedPhases
+                        false, //picks
+                        null, //customEvent
+                        null, //synthetic
+                        false //extendedPhases
                     },
                     { // MS has gaps but we allow them in the sac.
                         new CWBDataServerMSEED("cwb.geonet.org.nz", 80),
@@ -164,10 +164,10 @@ public class SacFileFactoryIntegrationTest {
                         new String[]{
                             "/test-data/gov/usgs/anss/query/filefactory/gaps/NZBFZ__HHE10.sac.pz",},
                         null, //quakml
-						false, //picks
-						null, //customEvent
-						null, //synthetic
-						false //extendedPhases
+                        false, //picks
+                        null, //customEvent
+                        null, //synthetic
+                        false //extendedPhases
                     },
                     { // Event data.
                         new CWBDataServerMSEED("cwb.geonet.org.nz", 80),
@@ -186,10 +186,10 @@ public class SacFileFactoryIntegrationTest {
                         new String[]{
                             "/test-data/gov/usgs/anss/query/filefactory/event/NZTSZ__HHN10.sac.pz",},
                         new QuakemlFactory().getQuakeml(SacFileFactoryIntegrationTest.class.getResourceAsStream("/gov/usgs/anss/query/filefactory/quakeml_2732452.xml"), null), //quakml
-						true, //picks
-						null, //customEvent
-						null, //synthetic
-						false //extendedPhases
+                        true, //picks
+                        null, //customEvent
+                        null, //synthetic
+                        false //extendedPhases
                     },});
     }
     private CWBDataServerMSEED cwbServer;
@@ -207,11 +207,10 @@ public class SacFileFactoryIntegrationTest {
     String[] expectedPazFiles;
     private Quakeml quakeml;
     private boolean gaps;
-	private boolean picks;
-	private CustomEvent customEvent;
-	private String synthetic;
-	private boolean extendedPhases;
-
+    private boolean picks;
+    private CustomEvent customEvent;
+    private String synthetic;
+    private boolean extendedPhases;
     private ArrayList<SacTimeSeries> expectedSac;
     private Iterator<SacTimeSeries> expectedSacIter;
 
@@ -231,10 +230,10 @@ public class SacFileFactoryIntegrationTest {
         this.expectedPazFiles = expectedPazFiles;
         this.quakeml = quakeml;
         this.gaps = gaps;
-		this.picks = picks;
-		this.customEvent = customEvent;
-		this.synthetic = synthetic;
-		this.extendedPhases = extendedPhases;
+        this.picks = picks;
+        this.customEvent = customEvent;
+        this.synthetic = synthetic;
+        this.extendedPhases = extendedPhases;
     }
 
     @BeforeClass
@@ -256,12 +255,18 @@ public class SacFileFactoryIntegrationTest {
     @Test
     public void testMakeTimeSeries() throws Exception {
 
-
         SacFileFactory sacFileFactory = new SacFileFactory();
         sacFileFactory.setCWBDataServer(cwbServer);
         sacFileFactory.setMetaDataServer(mdServer);
+        sacFileFactory.setCustomEvent(this.customEvent);
+        sacFileFactory.setSynthetic(this.synthetic);
+        sacFileFactory.setTrim(this.trim);
+        sacFileFactory.setFill(this.fill);
+        sacFileFactory.setGaps(this.gaps);
+        sacFileFactory.setPzunit(this.pazUnits);
+        sacFileFactory.setQuakeML(this.quakeml);
 
-        sacFileFactory.makeFiles(begin, duration, nsclSelectString, folder.getRoot().getAbsolutePath() + File.separator + fileMask, fill, gaps, trim, pazUnits, quakeml, picks, customEvent, synthetic, extendedPhases);
+        sacFileFactory.makeFiles(begin, duration, nsclSelectString, folder.getRoot().getAbsolutePath() + File.separator + fileMask);
 
         for (String filename : expectedSacFiles) {
             SacTimeSeries expResult = null;
@@ -286,9 +291,9 @@ public class SacFileFactoryIntegrationTest {
                 assertTrue("Didn't find expected PAZ file.", expectedPazFileName.exists());
                 assertTrue("Didn't find a file at expected PAZ file.", expectedPazFileName.isFile());
                 assertTrue("Found empty PAZ file.", expectedPazFileName.length() > 0l);
-            // Will not compare the contents of the response file.
-            // This could change over time and break the test (which would break
-            // other tests here as well).
+                // Will not compare the contents of the response file.
+                // This could change over time and break the test (which would break
+                // other tests here as well).
             }
 
 

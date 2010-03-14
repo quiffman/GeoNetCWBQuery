@@ -228,21 +228,23 @@ public class EdgeQueryOptions {
 				if (getCustomEvent() == null) {
 					setCustomEvent(new CustomEvent());
 				}
-			} else if (args[i].equals("-event:time")) {
-				getCustomEvent().setEventTime(args[++i]);
-			} else if (args[i].equals("-event:lat")) {
+
+				if (args[i].equals("-event:time")) {
+					getCustomEvent().setEventTime(args[++i]);
+				} else if (args[i].equals("-event:lat")) {
 				getCustomEvent().setEventLat(args[++i]);
-			} else if (args[i].equals("-event:lon")) {
+				} else if (args[i].equals("-event:lon")) {
 				getCustomEvent().setEventLon(args[++i]);
-			} else if (args[i].equals("-event:depth")) {
+				} else if (args[i].equals("-event:depth")) {
 				getCustomEvent().setEventDepth(args[++i]);
-			} else if (args[i].equals("-event:mag")) {
+				} else if (args[i].equals("-event:mag")) {
 				getCustomEvent().setEventMag(args[++i]);
-			} else if (args[i].equals("-event:magtype")) {
+				} else if (args[i].equals("-event:magtype")) {
 				getCustomEvent().setEventMagType(args[++i]);
-			} else if (args[i].equals("-event:type")) {
-				getCustomEvent().setEventType(args[++i]);
-            } else {
+				} else if (args[i].equals("-event:type")) {
+					getCustomEvent().setEventType(args[++i]);
+				}
+			}  else {
                 logger.info("Unknown CWB Query argument=" + args[i]);
                 extraArgsList.add(args[i]);
             }

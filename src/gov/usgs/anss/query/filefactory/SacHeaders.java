@@ -575,7 +575,7 @@ public class SacHeaders {
         String phaseGroup = "ttbasic";
 
         // Vertical
-        if (sac.cmpinc == 0.0d) {
+        if (sac.cmpinc == 0.0d || sac.cmpinc == 180.0d) {
             if (extendedPhaseGroups) {
                 phaseGroup = "ttp+";
             } else {

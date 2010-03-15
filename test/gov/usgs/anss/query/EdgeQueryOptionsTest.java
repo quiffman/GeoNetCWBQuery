@@ -89,6 +89,21 @@ public class EdgeQueryOptionsTest {
 		assertEquals("-event:mag", 5.427, (double) instance.getCustomEvent().getEventMag(), 0);
 		assertEquals("-event:magtype", SacMagType.ML, instance.getCustomEvent().getEventMagType());
 		assertEquals("-event:type", SacEventType.EARTHQUAKE, instance.getCustomEvent().getEventType());
+
+		// Test some nulls and defaults
+		instance = new EdgeQueryOptions(new String[]{
+					"-event:time", "2010/02/25 04:38:37",
+					"-s", "NZ.....HHZ.."
+		});
+
+		assertEquals("-event:time", new DateTime(2010, 2, 25, 4, 38, 37, 0, DateTimeZone.UTC), instance.getCustomEvent().getEventTime());
+		assertEquals("-event:lat", null, instance.getCustomEvent().getEventLat());
+		assertEquals("-event:lon", null, instance.getCustomEvent().getEventLon());
+		assertEquals("-event:depth", null, instance.getCustomEvent().getEventDepth());
+		assertEquals("-event:mag", null, instance.getCustomEvent().getEventMag());
+		assertEquals("-event:magtype", SacMagType.MX, instance.getCustomEvent().getEventMagType());
+		assertEquals("-event:type", SacEventType.NULL, instance.getCustomEvent().getEventType());
+
 	}
 
 

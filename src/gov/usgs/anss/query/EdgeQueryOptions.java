@@ -485,7 +485,7 @@ public class EdgeQueryOptions {
      */
     public String getSingleQuotedCommand() {
         // put command line in single quotes.
-        return CWBQueryFormatter.miniSEED(getBeginWithOffset(), duration, seedname);
+        return CWBQueryFormatter.miniSEED(getBeginWithOffset(), getDuration(), getSeedname());
     }
 
     /**

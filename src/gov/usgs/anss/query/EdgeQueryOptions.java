@@ -5,8 +5,6 @@
 package gov.usgs.anss.query;
 
 import gov.usgs.anss.query.cwb.formatter.CWBQueryFormatter;
-import gov.usgs.anss.query.filefactory.SacHeaders.SacEventType;
-import gov.usgs.anss.query.filefactory.SacHeaders.SacMagType;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -631,6 +629,8 @@ public class EdgeQueryOptions {
 
         if (begin != null) {
             return begin;
+		} else if (getCustomEvent() != null) {
+			quakeMLBegin = getCustomEvent().getEventTime();
 		} else if (getEvent() != null) {
 			quakeMLBegin = QuakemlUtils.getOriginTime(QuakemlUtils.getPreferredOrigin(QuakemlUtils.getFirstEvent(event)));
         }

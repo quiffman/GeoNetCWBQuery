@@ -14,8 +14,8 @@ public class CustomEvent {
     private Double eventLon;
     private Double eventDepth;
     private Double eventMag;
-    private SacMagType eventMagType;
-    private SacEventType eventType;
+    private SacMagType eventMagType = SacMagType.MX;
+    private SacEventType eventType = SacEventType.NULL;
     private static String beginFormat = "YYYY/MM/dd HH:mm:ss";
     private static String beginFormatDoy = "YYYY,DDD-HH:mm:ss";
     private static DateTimeFormatter parseBeginFormat = DateTimeFormat.forPattern(beginFormat).withZone(DateTimeZone.forID("UTC"));
@@ -120,7 +120,11 @@ public class CustomEvent {
      * @return the eventDepth in m
      */
     public Double getEventDepth() {
-        return eventDepth * 1000.0d;
+		if (eventDepth != null) {
+			return eventDepth * 1000.0d;
+		}
+
+        return eventDepth;
     }
 
     /**

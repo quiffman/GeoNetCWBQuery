@@ -210,7 +210,6 @@ public class EdgeQueryOptions {
                 i++;
 			} else if (args[i].equals("-nopicks")) {
 				picks = false;
-				i++;
 			} else if (args[i].startsWith("-synthetic")) {
                 String[] a = args[i].split(":");
 				if (a.length == 2) {
@@ -218,10 +217,8 @@ public class EdgeQueryOptions {
 				} else {
 					setSynthetic("iasp91");
 				}
-				i++;
 			} else if (args[i].equals("-extended-phases")) {
 				extendedPhases = true;
-				i++;
 			} else if (args[i].startsWith("-event:")) {
 				if (getCustomEvent() == null) {
 					setCustomEvent(new CustomEvent());

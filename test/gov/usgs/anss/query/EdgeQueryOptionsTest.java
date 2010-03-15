@@ -48,9 +48,7 @@ public class EdgeQueryOptionsTest {
 		assertTrue("File mode should return true", instance.isListQuery());
 	}
 
-	/**
-	 * Test of isListQuery method, of class EdgeQueryOptions.
-	 */
+
 	@Test
 	public void testEventFlags() {
 		System.out.println("testEventFlags");
@@ -93,4 +91,37 @@ public class EdgeQueryOptionsTest {
 		assertEquals("-event:type", SacEventType.EARTHQUAKE, instance.getCustomEvent().getEventType());
 	}
 
+
+	@Test
+	public void testSynthFlags() {
+		System.out.println("testSynthFlags");
+		// First test the defaults
+		EdgeQueryOptions instance = new EdgeQueryOptions(new String[]{
+			"-event", "geonet:32266622",
+		});
+
+		assertEquals("picks", true, instance.picks);
+		assertEquals("synthetic", null, instance.getSynthetic());
+		assertEquals("extended phases", false, instance.extendedPhases);
+		
+		
+		// Now add some synth flags
+		instance = new EdgeQueryOptions(new String[]{
+			"-event", "geonet:32266622",
+			"-nopicks", "-synthetic", "-extended-phases",
+		});
+
+		assertEquals("picks", false, instance.picks);
+		assertEquals("synthetic", "iasp91", instance.getSynthetic());
+		assertEquals("extended phases", true, instance.extendedPhases);
+
+
+		// Now test synthetic arse
+		instance = new EdgeQueryOptions(new String[]{
+			"-event", "geonet:32266622",
+			"-synthetic:arse",
+		});
+
+		assertEquals("synthetic", "arse", instance.getSynthetic());
+	}
 }

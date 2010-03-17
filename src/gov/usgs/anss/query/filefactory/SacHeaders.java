@@ -694,7 +694,7 @@ public class SacHeaders {
                 Arrival[] arrivals = taup.getArrivals();
 
                 for (int i = 0; i < arrivals.length; i++) {
-                    sacPhasePicks.add(new SacPhasePick(arrivals[i].getName() + " " + model, arrivals[i].getTime()));
+                    sacPhasePicks.add(new SacPhasePick(arrivals[i].getName() + " " + model.substring(0, 1), arrivals[i].getTime()));
                 }
             }
         }

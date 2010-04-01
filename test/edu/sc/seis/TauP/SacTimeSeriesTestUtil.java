@@ -173,6 +173,8 @@ public class SacTimeSeriesTestUtil {
         assertEquals("Phase 9", expected.kt9, result.kt9);
         assertEquals("Phase t9", expected.t9, result.t9, Math.ulp((float) result.t0));
 
+        assertEquals("kuser0 - velocity model", expected.kuser0, result.kuser0);
+
     }
 
     private static byte[] getSacTimeSeriesAsByteArray(SacTimeSeries sac) throws Exception {

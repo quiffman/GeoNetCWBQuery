@@ -79,9 +79,9 @@ public class QuakeMLQuery {
                 double arrivalTime = pick.getMillisAfterOrigin() / 1000.0d;
 
 
-                if (pick.getPick().getWaveformID().getNetworkCode() != null &&
-                        pick.getPick().getWaveformID().getStationCode() != null &&
-                        pick.getPick().getWaveformID().getChannelCode() != null) {
+                if (pick.getPick().getWaveformID().getNetworkCode() != null
+                        && pick.getPick().getWaveformID().getStationCode() != null
+                        && pick.getPick().getWaveformID().getChannelCode() != null) {
 
                     String network = (pick.getPick().getWaveformID().getNetworkCode().trim() + "  ").substring(0, 2);
                     String station = (pick.getPick().getWaveformID().getStationCode().trim() + "     ").substring(0, 5);
@@ -94,7 +94,11 @@ public class QuakeMLQuery {
 
                     logger.fine(String.format("Pick:%s,%s,%s,%s,%s,%s.", phaseName, arrivalTime, network, station, channel, location));
 
-                    nscls.add(new NSCL(network, station, channel, location));
+                    // TODO this is an artificial limit on the number of channels that we try to select for.
+                    // The CWB server seems to have problems with query strings longer than 1000 chars.
+                    if (nscls.size() < 50 && network.equals("NZ")) {
+                        nscls.add(new NSCL(network, station, channel, location));
+                    }
 
                 } else {
                     logger.warning("Did not find enough information to extract data for pick.");

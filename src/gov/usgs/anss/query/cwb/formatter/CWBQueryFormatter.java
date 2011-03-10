@@ -18,6 +18,7 @@
  */
 package gov.usgs.anss.query.cwb.formatter;
 
+import gov.usgs.anss.query.EdgeQueryOptions.OutputType;
 import gov.usgs.anss.query.NSCL;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -35,6 +36,22 @@ public class CWBQueryFormatter {
     private static String beginFormat = "YYYY/MM/dd HH:mm:ss.SSS";
     private static DateTimeFormatter parseBeginFormat = DateTimeFormat.forPattern(beginFormat).withZone(DateTimeZone.forID("UTC"));
 
+
+	private static String userAgent = String.format(" '-ua' '%s %s; %s; %s Java/%s; %s/%s'",
+				System.getProperty("os.name"),
+				System.getProperty("os.arch"),
+				System.getProperty("os.version"),
+				System.getProperty("java.vendor"),
+				System.getProperty("java.version"),
+				CWBQueryFormatter.class.getPackage().getImplementationTitle(),
+				CWBQueryFormatter.class.getPackage().getImplementationVersion()
+				);
+
+
+	private static String beginAndDuration(DateTime begin, Double duration) {
+        return String.format("'-b' '%s' '-d' '%s'", parseBeginFormat.withZone(DateTimeZone.UTC).print(begin), duration);
+    }
+
     /**
      * String for listing available channels.
      *
@@ -43,14 +60,26 @@ public class CWBQueryFormatter {
      * @return
      */
     public static String listChannels(DateTime begin, Double duration) {
-        return String.format("'-b' '%s' '-d' '%s' " + "'-lsc'\n", parseBeginFormat.withZone(DateTimeZone.UTC).print(begin), duration);
+        return beginAndDuration(begin, duration) + " '-lsc'\n";
     }
 
     public static String miniSEED(DateTime begin, Double duration, NSCL nscl) {
         return String.format("'-b' '%s' '-s' '%s' '-d' '%s'\t", parseBeginFormat.withZone(DateTimeZone.UTC).print(begin), nscl.toString(), duration);
+	}
+	
+	public static String miniSEED(DateTime begin, Double duration, String nsclSelectString) {
+        return String.format("'-b' '%s' '-s' '%s' '-d' '%s'\t", parseBeginFormat.withZone(DateTimeZone.UTC).print(begin), nsclSelectString, duration);
+	}
+
+    public static String miniSEED(DateTime begin, Double duration, NSCL nscl, OutputType type, boolean sendUA) {
+        return beginAndDuration(begin, duration) +
+				String.format(" '-s' '%s' '-t' '%s'", nscl.toString(), type.toString()) +
+				(sendUA?userAgent:"") + "\t";
     }
 
-    public static String miniSEED(DateTime begin, Double duration, String nsclSelectString) {
-        return String.format("'-b' '%s' '-s' '%s' '-d' '%s'\t", parseBeginFormat.withZone(DateTimeZone.UTC).print(begin), nsclSelectString, duration);
+    public static String miniSEED(DateTime begin, Double duration, String nsclSelectString, OutputType type, boolean sendUA) {
+        return beginAndDuration(begin, duration) +
+				String.format(" '-s' '%s' '-t' '%s'", nsclSelectString, type.toString()) +
+				(sendUA?userAgent:"") + "\t";
     }
 }

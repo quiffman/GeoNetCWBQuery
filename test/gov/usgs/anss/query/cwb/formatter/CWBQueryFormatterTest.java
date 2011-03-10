@@ -18,6 +18,7 @@
  */
 package gov.usgs.anss.query.cwb.formatter;
 
+import gov.usgs.anss.query.EdgeQueryOptions.OutputType;
 import gov.usgs.anss.query.NSCL;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -64,5 +65,20 @@ public class CWBQueryFormatterTest {
         assertEquals("data query 1", "'-b' '2009/01/01 00:00:00.000' '-s' 'NZMRZ..HHZ10' '-d' '1800.0'\t", result);
         result = CWBQueryFormatter.miniSEED(begin.withMillisOfSecond(799), 300d, "NZMRZ..HHZ10");
         assertEquals("data query 1", "'-b' '2009/01/01 00:00:00.799' '-s' 'NZMRZ..HHZ10' '-d' '300.0'\t", result);
+    }
+
+    @Test
+    public void testMiniSEEDQueryNoUA() {
+        NSCL nscl = NSCL.stringToNSCL("NZMRZ..HHZ10");
+        DateTime begin = new DateTime(2009, 1, 1, 0, 0, 0, 0, tz);
+        Double duration = 1800d;
+        String result = CWBQueryFormatter.miniSEED(begin, duration, nscl, OutputType.sac, false);
+        assertEquals("data query 1", "'-b' '2009/01/01 00:00:00.000' '-d' '1800.0' '-s' 'NZMRZ..HHZ10' '-t' 'sac'\t", result);
+        result = CWBQueryFormatter.miniSEED(begin, duration, "NZMRZ..HHZ10", OutputType.sac, false);
+        assertEquals("data query 1", "'-b' '2009/01/01 00:00:00.000' '-d' '1800.0' '-s' 'NZMRZ..HHZ10' '-t' 'sac'\t", result);
+        result = CWBQueryFormatter.miniSEED(begin.withMillisOfSecond(799), 300d, "NZMRZ..HHZ10", OutputType.text, false);
+        assertEquals("data query 1", "'-b' '2009/01/01 00:00:00.799' '-d' '300.0' '-s' 'NZMRZ..HHZ10' '-t' 'text'\t", result);
+        result = CWBQueryFormatter.miniSEED(begin.withMillisOfSecond(799), 300d, "NZMRZ..HHZ10", OutputType.text, true);
+        assertEquals("data query 1", "'-b' '2009/01/01 00:00:00.799' '-d' '300.0' '-s' 'NZMRZ..HHZ10' '-t' 'text' '-ua' 'Linux amd64; 2.6.34.7-56.fc13.x86_64; Sun Microsystems Inc. Java/1.6.0_17'\t", result);
     }
 }

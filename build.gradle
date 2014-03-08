@@ -51,6 +51,13 @@ dependencies {
   compile group: 'TauP', name: 'TauP-no-sac-timeseries', version: '1.1.7'
   compile group: 'log4j', name: 'log4j', version: '1.2.8'
   compile group: 'commons-io', name: 'commons-io', version: '2.0.1'
+
+  testCompile(
+    'nz.org.geonet-attic:GeoNetCWBQuery:2.0.0',
+    'nz.org.geonet:CWBQueryTestData:1.0.4',
+    'junit:junit:4.7',
+    'gsbase:gsbase:2.0.1'
+  )
 }
 
 jar {

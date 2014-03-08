@@ -1,8 +1,21 @@
 apply plugin: 'java'
 apply plugin: 'application'
+apply plugin: 'build-version'
 
 group = 'nz.org.geonet'
-version = '4.2.0-GRADLE'
+
+buildVersion {
+    releaseTagPattern = "^GeoNetCWBQuery-(\\d+\\.\\d+\\.\\d)"
+    matchGroup = "\$1"
+    versionSplitter = "."
+    snapShotQuantifier = "-SNAPSHOT"
+}
+
+version = buildVersion.version
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.9'
+}
 
 mainClassName = "gov.usgs.anss.query.EdgeQueryClient"
 tempClassDir = new File("build/temporary")
@@ -19,9 +32,13 @@ repositories {
 
 buildscript {
     repositories {
+        maven {
+            url 'https://geonet.artifactoryonline.com/geonet/public-releases'
+        }
         mavenCentral()
     }
     dependencies {
+        classpath group: 'nz.org.geonet', name: 'gradle-build-version-plugin', version: '1.0.2'
         classpath 'net.sf.proguard:proguard-gradle:4.11'
     }
 }
